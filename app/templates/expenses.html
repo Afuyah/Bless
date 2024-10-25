@@ -18,8 +18,8 @@
             <tr>
                 <th>ID</th>
                 <th>Description</th>
-                <th>Amount (Ksh)</th>
-                <th>Date</th>
+                <th>Amnt </th>
+               
                 <th>Category</th>
             </tr>
         </thead>
@@ -44,7 +44,7 @@
                         <input type="text" class="form-control" id="expenseDescription" required>
                     </div>
                     <div class="mb-3">
-                        <label for="expenseAmount" class="form-label">Amount (Ksh)</label>
+                        <label for="expenseAmount" class="form-label">Amnt </label>
                         <input type="number" class="form-control" id="expenseAmount" min="0" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Add Expense</button>
@@ -77,7 +77,7 @@
                         <td>${expense.id}</td>
                         <td>${expense.description}</td>
                         <td>Ksh ${expense.amount}</td>
-                        <td>${formattedDate}</td>
+                        
                         <td>${expense.category}</td>
                     `;
                     tableBody.appendChild(row);
