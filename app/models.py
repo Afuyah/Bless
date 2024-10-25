@@ -43,35 +43,6 @@ class Category(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
     products = db.relationship('Product', backref='category', lazy='joined')
 
-# Product Model with Cost Price, Selling Price, and Profit Calculation
-class Product(db.Model):
-    __tablename__ = 'products'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
-    cost_price = db.Column(db.Float, nullable=False, default=0.0)
-    selling_price = db.Column(db.Float, nullable=False, default=0.0)
-    stock = db.Column(db.Integer, nullable=False, default=0)
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
-    supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'), nullable=True)
-    sale_items = db.relationship('CartItem', backref='product', lazy='joined')
-
-    @validates('cost_price', 'selling_price', 'stock')
-    def validate_cost_selling_stock(self, key, value):
-        if key in ['cost_price', 'selling_price'] and value < 0:
-            raise ValueError(f"{key.replace('_', ' ').title()} cannot be negative")
-        if key == 'stock' and value < 0:
-            raise ValueError("Stock cannot be negative")
-        return value
-
-    def calculate_profit(self):
-        """Calculates profit per item sold."""
-        return self.selling_price - self.cost_price if self.selling_price > self.cost_price else 0.0
-
-    def is_low_stock(self):
-        return self.stock < 10
-
-    def __repr__(self):
-        return f'<Product {self.name}, Supplier {self.supplier_id}>'
 
 
 # Sale Model with Auto Stock Update and Total Price Indexing
@@ -106,12 +77,18 @@ class Sale(db.Model):
 
     def finalize_sale(self):
         """Automatically updates stock after a sale."""
-        for item in self.cart_items:
-            if item.product.stock < item.quantity:
-                raise ValueError(f"Not enough stock for {item.product.name}")
-        for item in self.cart_items:
-            item.product.stock -= item.quantity
-        db.session.commit()
+        try:
+            for item in self.cart_items:
+                if item.product.stock < item.quantity:
+                    raise ValueError(f"Not enough stock for {item.product.name}")
+            
+            for item in self.cart_items:
+                item.product.stock -= item.quantity
+
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()  # Rollback the session in case of error
+            raise ValueError(f"Error finalizing sale: {str(e)}")
 
 # CartItem Model
 class CartItem(db.Model):
@@ -138,8 +115,44 @@ class CartItem(db.Model):
             'product_name': product.name,
             'quantity': self.quantity,
             'total_price': self.quantity * product.selling_price,  # Calculate total based on selling price
-            'profit_per_item': product.calculate_profit()  # Profit per item
+            'profit_per_item': product.calculate_profit()[0]  # Profit per item
         }
+
+
+# Product Model with Cost Price, Selling Price, and Profit Calculation
+class Product(db.Model):
+    __tablename__ = 'products'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    cost_price = db.Column(db.Float, nullable=False, default=0.0)
+    selling_price = db.Column(db.Float, nullable=False, default=0.0)
+    stock = db.Column(db.Integer, nullable=False, default=0)
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
+    supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'), nullable=True)
+    sale_items = db.relationship('CartItem', backref='product', lazy='joined')
+
+    @validates('cost_price', 'selling_price', 'stock')
+    def validate_cost_selling_stock(self, key, value):
+        if key in ['cost_price', 'selling_price'] and value < 0:
+            raise ValueError(f"{key.replace('_', ' ').title()} cannot be negative")
+        if key == 'stock' and value < 0:
+            raise ValueError("Stock cannot be negative")
+        return value
+
+    def calculate_profit(self):
+        """Calculates profit per item sold and profit margin."""
+        profit = self.selling_price - self.cost_price
+        profit_margin = (profit / self.selling_price * 100) if self.selling_price > 0 else 0.0
+        return profit, profit_margin
+
+    def is_low_stock(self):
+        return self.stock < 10
+
+    def __repr__(self):
+        return f'<Product {self.name}, Supplier {self.supplier_id}>' 
+
+
+
 
 class Expense(db.Model):
     __tablename__ = 'expenses'
@@ -155,28 +168,28 @@ class Expense(db.Model):
     __table_args__ = (Index('ix_expense_date', 'date'),)
 
     @validates('amount', 'quantity')
-    def validate_amount(self, key, value):
-        """Validate that the expense amount and quantity are not negative."""
+    def validate_amount_quantity(self, key, value):
+        """Validate that the expense amount and quantity are positive."""
         if key == 'amount' and value < 0:
-            raise ValueError("Expense amount cannot be negative")
+            raise ValueError("Expense amount cannot be negative.")
         if key == 'quantity' and value <= 0:
             raise ValueError("Quantity must be greater than zero.")
         return value
 
     def calculate_total_cost(self):
-        """Calculate the total cost based on cost price and quantity."""
+        """Calculate total cost based on product's cost price and expense quantity."""
         product = Product.query.get(self.product_id)
-        if product:
+        if product and self.quantity:
             return product.cost_price * self.quantity
-        return 0.0
+        return None
 
     def finalize_expense(self):
-        """Update product stock based on the expense."""
+        """Adjust product stock by the quantity in this expense, if linked to a product."""
         if self.product_id:
             product = Product.query.get(self.product_id)
             if product:
-                product.stock += self.quantity  # Increment stock by the purchased quantity
-        db.session.commit()
+                product.stock += self.quantity
+        return self  # Returning self to allow caller to decide when to commit
 
     def serialize(self):
         """Convert the Expense object to a dictionary format for JSON serialization."""
@@ -192,7 +205,6 @@ class Expense(db.Model):
         }
 
 
-
 class Supplier(db.Model):
     __tablename__ = 'suppliers'
     id = db.Column(db.Integer, primary_key=True)
@@ -205,4 +217,3 @@ class Supplier(db.Model):
 
     def __repr__(self):
         return f'<Supplier {self.name}>'
-  

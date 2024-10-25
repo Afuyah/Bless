@@ -78,6 +78,7 @@ def products():
     products = Product.query.all()
     return render_template('products.html', products=products)
 
+
 # Route to add a new product
 @stock_bp.route('/products/new', methods=['GET', 'POST'])
 @login_required
@@ -199,111 +200,101 @@ def delete_product(id: int):
         db.session.rollback()
         flash('An error occurred while deleting the product. Please try again.', 'danger')
 
-    return redirect(url_for('stock.products'))
 
 
+def update_product_stock(product, quantity_to_add, total_amount):
+    """Helper function to update product stock and log expenses."""
+    # Update the stock with the quantity being added
+    product.stock += quantity_to_add
 
-# Route for displaying the stock update page and handling updates
+    # Update cost price if quantity added is greater than 0
+    if quantity_to_add > 0:
+        new_cost_price = total_amount / quantity_to_add
+        product.cost_price = new_cost_price  # Update cost price in the product
+
+    # Log the stock addition as an expense
+    new_expense = Expense(
+        description=f"Stock added for {product.name}",
+        amount=total_amount,
+        category="Stock Update",
+        quantity=quantity_to_add  # Optional: Include quantity in the expense
+    )
+    db.session.add(new_expense)
+
 @stock_bp.route('/admin_update_stock', methods=['GET', 'POST'])
 @login_required
 def update_stock():
-    if not current_user.is_admin():
-        flash(FLASH_ACCESS_DENIED)
-        return redirect(url_for('stock.products'))
-
     if request.method == 'POST':
-        product_id = request.form['product_id']
-        quantity_to_add = int(request.form['quantity'])
-        total_amount = float(request.form['total_amount'])  # Total amount for stock
+        product_id = request.form['productId']
+        quantity_to_add = int(request.form['newStock'])
+        total_amount = float(request.form['totalAmount'])
+
+        # Validate form inputs
+        if quantity_to_add <= 0:
+            flash("Quantity must be a positive integer.", "error")
+            return redirect(url_for('stock.update_stock'))
+        if total_amount < 0:
+            flash("Total amount cannot be negative.", "error")
+            return redirect(url_for('stock.update_stock'))
 
         product = Product.query.get_or_404(product_id)
 
-        # Update stock
-        product.stock += quantity_to_add
+        try:
+            update_product_stock(product, quantity_to_add, total_amount)
+            db.session.commit()
+            flash(f"Stock updated successfully for {product.name}.", "success")
+            
+            # Emit real-time stock update
+            socketio.emit('stock_updated', {
+                'id': product.id,
+                'name': product.name,
+                'stock': product.stock,
+                'cost_price': product.cost_price
+            }, broadcast=True)
 
-        # Calculate the new cost price per unit
-        if quantity_to_add > 0:
-            new_cost_price = total_amount / quantity_to_add
-            product.cost_price = new_cost_price
-
-        # Commit changes
-        db.session.commit()
-
-        # Log the stock addition as an expense
-        new_expense = Expense(
-            description=f"Stock added for {product.name}",
-            amount=total_amount,  # Log total amount as expense
-            category="Stock Update"
-        )
-        db.session.add(new_expense)
-        db.session.commit()
-
-        flash(FLASH_STOCK_UPDATED.format(product.name))
-
-        # Emit real-time stock update
-        socketio.emit('stock_updated', {
-            'id': product.id,
-            'name': product.name,
-            'stock': product.stock,
-            'cost_price': product.cost_price  # Include the updated cost price
-        }, broadcast=True)
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred while updating stock. Please try again.', "error")
+            return redirect(url_for('stock.update_stock'))
 
         return redirect(url_for('stock.update_stock'))
 
     products = Product.query.all()
     return render_template('update_stock.html', products=products)
 
-# Route to display the update stock modal for a specific product
 @stock_bp.route('/products/<int:product_id>/update_stock_modal', methods=['GET'])
 @login_required
 def update_stock_modal(product_id: int):
-    if not current_user.is_admin():
-        flash(FLASH_ACCESS_DENIED)
-        return redirect(url_for('stock.products'))
-
     product = Product.query.get_or_404(product_id)
     return render_template('update_stock_modal.html', product=product)
 
-# Route to handle stock updates from the modal form
+from sqlalchemy.exc import SQLAlchemyError
+
 @stock_bp.route('/products/<int:product_id>/update_stock', methods=['POST'])
 @login_required
 def update_stock_product(product_id: int):
-    if not current_user.is_admin():
-        flash(FLASH_ACCESS_DENIED)
-        return redirect(url_for('stock.products'))
-
     product = Product.query.get_or_404(product_id)
     quantity_to_add = int(request.form['quantity'])
-    total_amount = float(request.form['total_amount'])  # Total amount for stock
+    total_amount = float(request.form['total_amount'])
 
-    # Update stock
-    product.stock += quantity_to_add
+    if quantity_to_add <= 0:
+        return jsonify({'message': "Quantity must be a positive integer."}), 400
+    if total_amount < 0:
+        return jsonify({'message': "Total amount cannot be negative."}), 400
 
-    # Calculate the new cost price per unit
-    if quantity_to_add > 0:
-        new_cost_price = total_amount / quantity_to_add
-        product.cost_price = new_cost_price
+    try:
+        update_product_stock(product, quantity_to_add, total_amount)
+        db.session.commit()
+        socketio.emit('stock_updated', {
+            'id': product.id,
+            'name': product.name,
+            'stock': product.stock,
+            'cost_price': product.cost_price
+        }, broadcast=True)
+        return jsonify({'message': f"Stock updated successfully for {product.name}."}), 200
 
-    # Commit changes
-    db.session.commit()
-
-    # Log the stock addition as an expense
-    new_expense = Expense(
-        description=f"Stock added for {product.name}",
-        amount=total_amount,
-        category="Stock Update"
-    )
-    db.session.add(new_expense)
-    db.session.commit()
-
-    flash(FLASH_PRODUCT_UPDATED.format(product.name))
-
-    # Emit real-time stock update
-    socketio.emit('stock_updated', {
-        'id': product.id,
-        'name': product.name,
-        'stock': product.stock,
-        'cost_price': product.cost_price  # Include updated cost price
-    }, broadcast=True)
-
-    return redirect(url_for('stock.update_stock'))
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'message': 'Database error. Please try again.'}), 500
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500

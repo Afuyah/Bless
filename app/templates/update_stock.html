@@ -6,7 +6,7 @@
 <div class="container mt-5">
     <h2 class="text-center mb-4">Update Stock</h2>
 
-    <div>
+    <div class="mb-3">
         <input type="text" id="productSearch" class="form-control" placeholder="Search products...">
     </div>
 
@@ -29,7 +29,9 @@
                     <td>Ksh {{ product.cost_price }}</td>
                     <td>Ksh {{ product.selling_price }}</td>
                     <td>
-                        <button class="btn btn-info btn-sm update-stock-button" data-id="{{ product.id }}">Update Stock</button>
+                        <button class="btn btn-info btn-sm update-stock-button" 
+                                data-id="{{ product.id }}" 
+                                data-name="{{ product.name }}">Update Stock</button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -38,26 +40,30 @@
     </div>
 </div>
 
+<!-- Modal for updating stock -->
 <div class="modal fade" id="updateStockModal" tabindex="-1" aria-labelledby="updateStockModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="updateStockModalLabel">Update Stock</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="modalBody">
+            <div class="modal-body">
                 <form id="updateStockForm">
-                    <div class="form-group">
-                        <label for="newStock">New Stock Quantity</label>
-                        <input type="number" class="form-control" id="newStock" name="newStock" required>
+                    <div class="mb-3">
+                        <label for="productName" class="form-label">Product Name</label>
+                        <input type="text" class="form-control" id="productName" readonly>
                     </div>
-                    <div class="form-group">
-                        <label for="totalAmount">Total Amount (Ksh)</label>
-                        <input type="number" class="form-control" id="totalAmount" name="totalAmount" required>
+                    <div class="mb-3">
+                        <label for="newStock" class="form-label">New Stock Quantity</label>
+                        <input type="number" class="form-control" id="newStock" name="newStock" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="totalAmount" class="form-label">Total Amount (Ksh)</label>
+                        <input type="number" class="form-control" id="totalAmount" name="totalAmount" min="0" required>
                     </div>
                     <input type="hidden" id="productId" name="productId">
+                    <button type="submit" class="btn btn-primary w-100">Update Stock</button>
                 </form>
             </div>
         </div>
@@ -68,44 +74,47 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 $(document).ready(function() {
-    // Real-time search
+    // Real-time product search
     $('#productSearch').on('keyup', function() {
-        var value = $(this).val().toLowerCase();
+        let searchTerm = $(this).val().toLowerCase();
         $('#productTable tbody tr').filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            $(this).toggle($(this).text().toLowerCase().indexOf(searchTerm) > -1);
         });
     });
 
-    // Open modal with product details
-    $('.update-stock-button').click(function() {
-        var productId = $(this).data('id');
-        $.get('/stock/products/' + productId + '/update_stock_modal', function(data) {
-            $('#modalBody').html(data);
-            $('#productId').val(productId); // Set the product ID
-            $('#updateStockModal').modal('show');
-        }).fail(function() {
-            alert('Error loading product details. Please try again.');
-        });
+    // Open modal and set product details for updating stock
+    $('.update-stock-button').on('click', function() {
+        $('#productId').val($(this).data('id'));
+        $('#productName').val($(this).data('name'));
+        $('#updateStockModal').modal('show');
     });
 
-    // Handle form submission
-    $(document).on('submit', '#updateStockForm', function(event) {
-        event.preventDefault(); // Prevent the default form submission
+    // Handle form submission with AJAX
+    $('#updateStockForm').on('submit', function(event) {
+        event.preventDefault();
 
-        var newStock = $('#newStock').val();
-        var totalAmount = $('#totalAmount').val(); // Get total amount
-        var productId = $('#productId').val();
+        let newStock = $('#newStock').val();
+        let totalAmount = $('#totalAmount').val();
+        let productId = $('#productId').val();
 
-        $.post('/products/' + productId + '/update_stock', { quantity: newStock, total_amount: totalAmount }, function(response) {
-            alert(response.message); // Show response message
-            $('#updateStockModal').modal('hide'); // Hide the modal after successful update
-            location.reload(); // Reload the page or update the stock in the table
-        }).fail(function(jqXHR) {
-            var errorMessage = jqXHR.responseJSON && jqXHR.responseJSON.message ? jqXHR.responseJSON.message : 'Error updating stock. Please try again.';
-            alert(errorMessage);
+        $.ajax({
+            url: `/stock/products/${productId}/update_stock`,
+            type: 'POST',
+            data: {
+                quantity: newStock,
+                total_amount: totalAmount
+            },
+            success: function(response) {
+                alert(response.message);
+                $('#updateStockModal').modal('hide');
+                location.reload();
+            },
+            error: function(jqXHR) {
+                let errorMsg = jqXHR.responseJSON && jqXHR.responseJSON.message ? jqXHR.responseJSON.message : 'Error updating stock. Please try again.';
+                alert(errorMsg);
+            }
         });
     });
 });
 </script>
-
 {% endblock %}
