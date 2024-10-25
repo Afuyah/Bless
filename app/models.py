@@ -141,23 +141,42 @@ class CartItem(db.Model):
             'profit_per_item': product.calculate_profit()  # Profit per item
         }
 
-# Expense Model
 class Expense(db.Model):
     __tablename__ = 'expenses'
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(200), nullable=False)
-    amount = db.Column(db.Float, nullable=False)
+    amount = db.Column(db.Float, nullable=False)  # Total expense amount
     date = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     category = db.Column(db.String(100), nullable=False)  # e.g., 'utilities', 'rent', etc.
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=True)  # Optional product link
+    quantity = db.Column(db.Integer, nullable=False)  # Quantity purchased
+    supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'), nullable=True)  # Supplier reference
 
     __table_args__ = (Index('ix_expense_date', 'date'),)
 
-    @validates('amount')
+    @validates('amount', 'quantity')
     def validate_amount(self, key, value):
-        """Validate that the expense amount is not negative."""
-        if value < 0:
+        """Validate that the expense amount and quantity are not negative."""
+        if key == 'amount' and value < 0:
             raise ValueError("Expense amount cannot be negative")
+        if key == 'quantity' and value <= 0:
+            raise ValueError("Quantity must be greater than zero.")
         return value
+
+    def calculate_total_cost(self):
+        """Calculate the total cost based on cost price and quantity."""
+        product = Product.query.get(self.product_id)
+        if product:
+            return product.cost_price * self.quantity
+        return 0.0
+
+    def finalize_expense(self):
+        """Update product stock based on the expense."""
+        if self.product_id:
+            product = Product.query.get(self.product_id)
+            if product:
+                product.stock += self.quantity  # Increment stock by the purchased quantity
+        db.session.commit()
 
     def serialize(self):
         """Convert the Expense object to a dictionary format for JSON serialization."""
@@ -166,8 +185,12 @@ class Expense(db.Model):
             'description': self.description,
             'amount': self.amount,
             'date': self.date.strftime("%Y-%m-%d %H:%M:%S"),
-            'category': self.category
+            'category': self.category,
+            'product_id': self.product_id,
+            'quantity': self.quantity,
+            'supplier_id': self.supplier_id
         }
+
 
 
 class Supplier(db.Model):

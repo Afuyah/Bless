@@ -9,3 +9,4 @@ instance/
 .Python
 .env
 *.sqlite3
+.vercel

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Expenses - Mini Supermarket{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Expenses</h2>
+    <div class="filter-section mb-4">
+        <label for="filter-date">Filter by Date:</label>
+        <input type="date" id="filter-date" class="form-control" onchange="fetchExpenses()">
+    </div>
+    <table class="table table-striped" id="expenses-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Expenses will be populated here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function fetchExpenses() {
+        const dateFilter = document.getElementById('filter-date').value;
+
+        fetch(`/expense/api/expenses?date=${dateFilter}`)
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('expenses-table').querySelector('tbody');
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                data.forEach(expense => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${expense.id}</td>
+                        <td>${expense.description}</td>
+                        <td>${expense.amount}</td>
+                        <td>${expense.date}</td>
+                        <td>${expense.category}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching expenses:', error);
+            });
+    }
+
+    // Initial fetch of expenses
+    fetchExpenses();
+</script>
+{% endblock %}

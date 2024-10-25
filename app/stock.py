@@ -202,7 +202,8 @@ def delete_product(id: int):
     return redirect(url_for('stock.products'))
 
 
-# Route for updating stock on a dedicated page
+
+# Route for displaying the stock update page and handling updates
 @stock_bp.route('/admin_update_stock', methods=['GET', 'POST'])
 @login_required
 def update_stock():
@@ -210,20 +211,30 @@ def update_stock():
         flash(FLASH_ACCESS_DENIED)
         return redirect(url_for('stock.products'))
 
-    products = Product.query.all()
-
     if request.method == 'POST':
         product_id = request.form['product_id']
         quantity_to_add = int(request.form['quantity'])
+        total_amount = float(request.form['total_amount'])  # Total amount for stock
 
         product = Product.query.get_or_404(product_id)
 
         # Update stock
         product.stock += quantity_to_add
+
+        # Calculate the new cost price per unit
+        if quantity_to_add > 0:
+            new_cost_price = total_amount / quantity_to_add
+            product.cost_price = new_cost_price
+
+        # Commit changes
         db.session.commit()
 
-        # Log the stock addition
-        new_expense = Expense(description=f"Stock added for {product.name}", amount=quantity_to_add, category="Stock Update")
+        # Log the stock addition as an expense
+        new_expense = Expense(
+            description=f"Stock added for {product.name}",
+            amount=total_amount,  # Log total amount as expense
+            category="Stock Update"
+        )
         db.session.add(new_expense)
         db.session.commit()
 
@@ -233,14 +244,16 @@ def update_stock():
         socketio.emit('stock_updated', {
             'id': product.id,
             'name': product.name,
-            'stock': product.stock
+            'stock': product.stock,
+            'cost_price': product.cost_price  # Include the updated cost price
         }, broadcast=True)
 
         return redirect(url_for('stock.update_stock'))
 
+    products = Product.query.all()
     return render_template('update_stock.html', products=products)
 
-# Route to display the update stock modal
+# Route to display the update stock modal for a specific product
 @stock_bp.route('/products/<int:product_id>/update_stock_modal', methods=['GET'])
 @login_required
 def update_stock_modal(product_id: int):
@@ -261,27 +274,36 @@ def update_stock_product(product_id: int):
 
     product = Product.query.get_or_404(product_id)
     quantity_to_add = int(request.form['quantity'])
-    
+    total_amount = float(request.form['total_amount'])  # Total amount for stock
+
     # Update stock
     product.stock += quantity_to_add
+
+    # Calculate the new cost price per unit
+    if quantity_to_add > 0:
+        new_cost_price = total_amount / quantity_to_add
+        product.cost_price = new_cost_price
+
+    # Commit changes
     db.session.commit()
-    
-    # Log the stock addition
+
+    # Log the stock addition as an expense
     new_expense = Expense(
         description=f"Stock added for {product.name}",
-        amount=quantity_to_add,
+        amount=total_amount,
         category="Stock Update"
     )
     db.session.add(new_expense)
     db.session.commit()
-    
+
     flash(FLASH_PRODUCT_UPDATED.format(product.name))
-    
+
     # Emit real-time stock update
     socketio.emit('stock_updated', {
         'id': product.id,
         'name': product.name,
-        'stock': product.stock
+        'stock': product.stock,
+        'cost_price': product.cost_price  # Include updated cost price
     }, broadcast=True)
 
-    return redirect(url_for('stock.update_stock'))  # Redirect back to the update stock page
+    return redirect(url_for('stock.update_stock'))

@@ -33,17 +33,21 @@
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card text-white bg-danger">
-                <div class="card-body">
-                    <h5 class="card-title">Low Stock Products</h5>
-                    <h2 class="card-text">{{ low_stock_count }}</h2>
-                </div>
-                <div class="card-footer d-flex justify-content-between">
-                    <small>Manage Stock</small>
-                    <a href="{{ url_for('stock.update_stock') }}" class="text-white">→</a>
-                </div>
-            </div>
+    <div class="card text-white bg-danger">
+        <div class="card-body">
+            <h5 class="card-title">Low Stock Products</h5>
+            <h2 class="card-text">{{ low_stock_count }}</h2>
+            <p class="card-text">Products with low stock levels.</p> <!-- Additional context -->
         </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <small>Manage Stock</small>
+            <a href="{{ url_for('stock.update_stock') }}" class="text-white">
+                <i class="fas fa-arrow-right"></i> <!-- Font Awesome icon for arrow -->
+            </a>
+        </div>
+    </div>
+</div>
+
     </div>
 
     <!-- Product Table -->

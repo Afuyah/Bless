@@ -10,114 +10,38 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
-
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <!-- jQuery and Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<style>
-/* Overall styles */
-body {
-    background-color: #f0f4f8; /* Lighter background for better contrast */
-    font-family: 'Arial', sans-serif; /* More modern font */
 
-}
-
-.container {
-    border: 1px solid #007bff; /* Border around the main container */
-    padding: 20px; /* Padding inside the container */
-    border-radius: 10px; /* Rounded corners */
-    background: white; /* White background for container */
-}
-
-/* Category styles */
-.category-container,
-.product-container,
-.cart-container {
-    padding: 10px; /* More padding for a spacious layout */
-}
-
-/* Category styles */
-.category-list {
-    max-height: 300px; /* Limit height */
-    overflow-y: auto; /* Scrollable */
-    border: 1px solid #ccc; /* Light border for clarity */
-    border-radius: 5px; /* Slightly rounded corners */
-}
-
-.category-item {
-    padding: 12px; /* Padding for category items */
-    cursor: pointer; /* Pointer on hover */
-    transition: background-color 0.3s; /* Smooth transition */
-}
-
-.category-item:hover {
-    background-color: #007bff; /* Highlight color */
-    color: white; /* Text color on hover */
-}
-
-/* Product styles */
-.product-list {
-    display: flex;
-    flex-wrap: wrap; /* Responsive wrapping */
-}
-
-.product-item {
-    flex: 1 0 calc(45% - 20px);
-/* Responsive cards / margin: 10px; / Margin between cards / padding: 15px; / Padding inside each card / border-radius: 8px; / Rounded corners / background-color: #ffffff; / Card background color / box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); / Soft shadow for depth / transition: transform 0.2s; / Smooth hover effect */ }
-
-.product-item
-{ transform: scale(1.02); /* Slight zoom on hover */ }
-
-.product-title { font-weight: bold; /* Bold product title / margin-bottom: 5px; / Spacing below title */ }
-
-.product-price { color: #28a745; /* Green color for price / font-weight: bold; / Bold price */ }
-
-.product-stock { color: #6c757d; /* Gray color for stock */ }
-
-/* Cart styles / .cart-container { position: sticky; / Sticky cart / top: 0; / Stick to top of viewport */ }
-
-.cart-items { max-height: 300px; /* Limit cart height / overflow-y: auto; / Scrollable */ }
-
-.cart-item { display: flex; /* Flex layout for items / justify-content: space-between; / Space between elements / align-items: center; / Center vertically / margin-bottom: 10px; / Spacing between items */ }
-
-.btn { transition: background-color 0.2s, transform 0.2s; /* Button transition */ }
-
-.btn
-{ transform: translateY(-2px); /* Lift effect on hover */ }
-
-.btn-danger { background-color: #dc3545; /* Red for remove button */ }
-
-/* Alerts / .alert { margin-top: 15px; / Space above alerts / padding: 10px; / Padding inside alerts / border-radius: 5px; / Rounded corners */ }
-
-/* Media Queries for Responsiveness / @media (max-width: 768px) { .product-item { flex: 1 0 calc(100% - 20px); / Full width on small screens */ } }
- </style>
   
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="#"> NAWIRI's ENTERPISE</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Expense</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Suppliers</a>
-                    </li>
-                </ul>
-            </div>
+   <!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">NAWIRI's ENTERPRISE</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                   <a class="nav-link" href="{{ url_for('expense.expenses_page') }}">Expense</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Suppliers</a>
+                </li>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
+
 
     <!-- Wrapper for content and footer -->
 <div class="wrapper">
@@ -141,76 +65,7 @@ body {
     </footer>
 </div>
 
-<!-- Additional Styling -->
-<style>
-    .wrapper {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh; /* Full height for the wrapper */
-    }
 
-    .content {
-        flex: 1; /* Allows content to take up available space */
-    }
-
-    .welcome-title {
-        font-size: 2.5rem; /* Larger font size for the title */
-        color: #343a40; /* Dark text for contrast */
-        margin-bottom: 1rem; /* Space below the title */
-        font-weight: 700; /* Bold font weight */
-    }
-
-    .welcome-description {
-        font-size: 1.2rem; /* Medium font size for description */
-        color: #6c757d; /* Muted text color */
-        margin-bottom: 2rem; /* Space below the description */
-    }
-
-    .btn-custom {
-        background-color: #007bff; /* Primary button color */
-        color: white; /* Button text color */
-        border: none; /* No border */
-        padding: 12px 30px; /* Button padding */
-        border-radius: 25px; /* Rounded corners */
-        transition: background-color 0.3s ease; /* Smooth transition */
-        text-transform: uppercase; /* Uppercase text */
-        font-weight: 600; /* Bold text */
-    }
-
-    .btn-custom:hover {
-        background-color: #0056b3; /* Darker blue on hover */
-        text-decoration: none; /* Remove underline on hover */
-    }
-
-    .footer {
-        background-color: #f8f9fa; /* Light background for footer */
-        color: #495057; /* Darker text color for footer */
-        border-top: 1px solid #dee2e6; /* Subtle border at the top */
-    }
-
-    .footer a {
-        color: #007bff; /* Link color */
-        text-decoration: none; /* Remove underline */
-    }
-
-    .footer a:hover {
-        text-decoration: underline; /* Underline links on hover */
-    }
-
-    @media (max-width: 768px) {
-        .welcome-title {
-            font-size: 2rem; /* Smaller title on mobile */
-        }
-
-        .welcome-description {
-            font-size: 1rem; /* Smaller description on mobile */
-        }
-
-        .btn-custom {
-            padding: 10px 20px; /* Smaller button padding on mobile */
-        }
-    }
-</style>
 
 </body>
 </html>
