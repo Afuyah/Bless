@@ -16,7 +16,7 @@
                     <th>Stock</th>
                     <th>Cost Price</th>
                     <th>Selling Price</th>
-                    <th>Supplier</th>
+                   
                   
                 </tr>
             </thead>
@@ -27,13 +27,7 @@
                     <td>{{ product.stock }}</td>
                     <td>Ksh {{ product.cost_price }}</td>
                     <td>Ksh {{ product.selling_price }}</td>
-                    <td>
-                        {% if product.supplier %}
-                            {{ product.supplier.name }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
+                    
                     
                 </tr>
                 {% endfor %}
