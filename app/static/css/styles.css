@@ -149,31 +149,75 @@ body {
     }
 
 
-
-
-.navbar-brand {
-    font-size: 1.8rem; /* Larger font size for the brand */
-    font-weight: bold; /* Bold brand name */
-    color: #111/* Brand color */
+/* Navbar custom styling */
+.navbar-custom {
+    background-color: inherit;      /* Dark background for navbar */
+    color: #f8f9fa;              /* Light text color */
+    padding: 10px 20px;          /* Add padding for better spacing */
 }
 
-.navbar-nav .nav-link {
-    color: #111; /* Link color */
-    font-weight: 500; /* Medium weight for links */
-    transition: color 0.3s; /* Smooth color transition */
+.navbar-custom .navbar-brand {
+    color: grey;              /* Branding color */
+    font-weight: bold;           /* Emphasize brand name */
 }
 
-.navbar-nav .nav-link:hover {
-    color: #f0f4f8; /* Lighter color on hover */
-    text-decoration: underline; /* Underline on hover */
+.navbar-custom .navbar-nav .nav-link {
+    color: #222;              /* Light color for links */
+    padding: 8px 15px;           /* Better spacing for nav links */
+    transition: color 0.3s ease; /* Smooth hover transition */
 }
 
-@media (max-width: 768px) {
-    .navbar-nav {
-        text-align: center; /* Center nav items on smaller screens */
-    }
-    
-    .navbar-nav .nav-item {
-        margin: 10px 0; /* Spacing between items */
-    }
+.navbar-custom .navbar-nav .nav-link:hover {
+    color: #ddd;                 /* Slight hover effect */
+}
+
+/* Navbar toggler button styling */
+.navbar-toggler {
+    background-color: #222;      /* Dark color for toggler button */
+    border: none;                /* Remove default border */
+    padding: 6px 10px;           /* Adjust padding for size */
+    border-radius: 4px;          /* Rounded edges for a sleek look */
+}
+
+/* Toggler icon styling (retaining the previous style) */
+.navbar-toggler-icon {
+    width: 24px;                 /* Adjust width */
+    height: 2px;                 /* Adjust height */
+    background-color: #f8f9fa;   /* Light color for the bars */
+    display: block;
+    position: relative;
+    transition: all 0.3s ease;   /* Smooth transition for effect */
+}
+
+.navbar-toggler-icon::before,
+.navbar-toggler-icon::after {
+    content: "";
+    width: 24px;
+    height: 2px;
+    background-color: #f8f9fa;
+    position: absolute;
+    transition: all 0.3s ease;
+}
+
+.navbar-toggler-icon::before {
+    top: -8px;
+}
+
+.navbar-toggler-icon::after {
+    top: 8px;
+}
+
+/* Rotate into an X on toggle */
+.navbar-toggler.collapsed .navbar-toggler-icon {
+    background-color: transparent;
+}
+
+.navbar-toggler.collapsed .navbar-toggler-icon::before {
+    transform: rotate(45deg);
+    top: 0;
+}
+
+.navbar-toggler.collapsed .navbar-toggler-icon::after {
+    transform: rotate(-45deg);
+    top: 0;
 }
