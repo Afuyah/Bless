@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify, render_template
 from flask_login import login_required, current_user
 from app import db
 from app.models import Expense
+import logging
+from datetime import datetime
 
 expense_bp = Blueprint('expense', __name__)
 
@@ -29,3 +31,40 @@ def get_expenses():
         'date': expense.date.strftime("%Y-%m-%d %H:%M:%S"),
         'category': expense.category
     } for expense in expenses])
+
+
+
+
+@expense_bp.route('/api/add_daily_expense', methods=['POST'])
+@login_required
+def add_daily_expense():
+    try:
+        # Parse JSON data
+        data = request.get_json()
+        logging.info(f"Received data: {data}")  # Log the received data
+
+        description = data.get('description')
+        amount = data.get('amount')
+
+        # Validate data
+        if not description or not amount or float(amount) <= 0:
+            logging.error("Invalid input data")
+            return jsonify({'error': 'Invalid input data'}), 400
+
+        # Create and log new daily expense with category set to "Daily Expenses"
+        new_expense = Expense(
+            description=description,
+            amount=float(amount),
+            category="Daily Expenses",
+            date=datetime.now(),
+        )
+        db.session.add(new_expense)
+        db.session.commit()
+        logging.info("Daily expense added successfully.")
+
+        return jsonify({'message': 'Daily expense added successfully.'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error adding daily expense: {e}")
+        return jsonify({'error': 'Failed to add daily expense. Please try again.'}), 500

@@ -129,51 +129,42 @@ def new_product():
 @login_required
 def edit_product(id: int):
     if not current_user.is_admin():
-        flash(FLASH_ACCESS_DENIED)
+        flash("Access denied.", "danger")
         return redirect(url_for('stock.products'))
 
     product = Product.query.get_or_404(id)
     categories = Category.query.all()
-  
+
     if request.method == 'POST':
         try:
-            # Validate input
+            # Retrieve and validate input fields
             name = request.form['name']
-            cost_price = float(request.form['cost_price'])
             selling_price = float(request.form['selling_price'])
-            stock = int(request.form['stock'])
-
-            if selling_price < cost_price:
-                flash("Selling price cannot be lower than cost price.", 'danger')
-                return redirect(url_for('stock.edit_product', id=id))
 
             # Update product data
             product.name = name
-            product.cost_price = cost_price
             product.selling_price = selling_price
-            product.stock = stock
             product.category_id = request.form['category']
-            
 
             db.session.commit()
+            flash(f"Product '{product.name}' updated successfully.", "success")
 
-            flash(FLASH_PRODUCT_UPDATED.format(product.name), 'success')
-
-            # Emit real-time stock update
-            socketio.emit('stock_updated', {
+            # Emit real-time update for product change
+            socketio.emit('product_updated', {
                 'id': product.id,
                 'name': product.name,
-                'stock': product.stock
+                'selling_price': product.selling_price
             }, broadcast=True)
 
             return redirect(url_for('stock.products'))
 
         except Exception as e:
             db.session.rollback()
-            flash(f"An error occurred: {str(e)}", 'danger')
+            flash(f"An error occurred while updating the product: {str(e)}", "danger")
             return redirect(url_for('stock.edit_product', id=id))
 
-    return render_template('edit_product.html', product=product, categories=categories, suppliers=suppliers)
+    return render_template('edit_product.html', product=product, categories=categories)
+
 
 @stock_bp.route('/products/<int:id>/delete', methods=['POST'])
 @login_required

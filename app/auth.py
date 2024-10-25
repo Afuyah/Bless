@@ -104,3 +104,85 @@ def cashier_dashboard():
         flash('Access denied.')
         return redirect(url_for('auth.login'))
     return render_template('cashier_dashboard.html')
+
+
+
+@auth_bp.route('/user_management', methods=['GET'])
+@login_required
+def user_management():
+    if not current_user.is_admin():
+        flash('Access denied.')
+        return redirect(url_for('auth.login'))
+
+    # Fetch all users from the database
+    users = User.query.all()
+
+    return render_template('user_management.html', users=users)
+
+
+@auth_bp.route('/add_user', methods=['GET', 'POST'])
+@login_required
+def add_user():
+    if not current_user.is_admin():
+        flash('Access denied.')
+        return redirect(url_for('auth.login'))
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        role = request.form['role']
+
+        # Ensure role is valid
+        if role.upper() not in Role.__members__:
+            flash('Invalid role selected.')
+            return redirect(url_for('auth.add_user'))
+
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists.')
+            return redirect(url_for('auth.add_user'))
+
+        new_user = User(username=username, role=Role[role.upper()])
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash(f'{role.capitalize()} "{username}" added successfully!')
+        return redirect(url_for('auth.user_management'))
+
+    return render_template('add_user.html')
+
+
+    
+@auth_bp.route('/edit_user/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_user(id: int):
+    if not current_user.is_admin():
+        flash('Access denied.')
+        return redirect(url_for('auth.login'))
+
+    user = User.query.get_or_404(id)
+
+    if request.method == 'POST':
+        username = request.form['username']
+        role = request.form['role']
+
+        # Ensure role is valid
+        if role.upper() not in Role.__members__:
+            flash('Invalid role selected.')
+            return redirect(url_for('auth.edit_user', id=id))
+
+        # Check if the username already exists (but not for the current user)
+        if User.query.filter_by(username=username).first() and username != user.username:
+            flash('Username already exists.')
+            return redirect(url_for('auth.edit_user', id=id))
+
+        # Update user details
+        user.username = username
+        user.role = Role[role.upper()]
+        
+        db.session.commit()
+
+        flash(f'User "{username}" updated successfully!')
+        return redirect(url_for('auth.user_management'))
+
+    return render_template('edit_user.html', user=user, Role=Role)  # Pass Role to the template

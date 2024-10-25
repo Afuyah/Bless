@@ -1,0 +1,39 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">User Management</h2>
+    
+    <a href="{{ url_for('auth.add_user') }}" class="btn btn-primary mb-3">Add User</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.role.name }}</td>
+                <td>
+                    <a href="{{ url_for('auth.edit_user', id=user.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <!-- Add a delete user option if necessary -->
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">No users found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

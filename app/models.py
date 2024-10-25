@@ -153,18 +153,16 @@ class Product(db.Model):
 
 
 
-
 class Expense(db.Model):
     __tablename__ = 'expenses'
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(200), nullable=False)
-    amount = db.Column(db.Float, nullable=False)  # Total expense amount
+    amount = db.Column(db.Float, nullable=False) 
     date = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-    category = db.Column(db.String(100), nullable=False)  # e.g., 'utilities', 'rent', etc.
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=True)  # Optional product link
-    quantity = db.Column(db.Integer, nullable=False)  # Quantity purchased
-    supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'), nullable=True)  # Supplier reference
-
+    category = db.Column(db.String(100), nullable=True, default="Daily Expenses")  # Default category
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=True)  
+    quantity = db.Column(db.Integer, nullable=True)  
+   
     __table_args__ = (Index('ix_expense_date', 'date'),)
 
     @validates('amount', 'quantity')
@@ -189,6 +187,7 @@ class Expense(db.Model):
             product = Product.query.get(self.product_id)
             if product:
                 product.stock += self.quantity
+                db.session.commit()  # Commit the changes to the database
         return self  # Returning self to allow caller to decide when to commit
 
     def serialize(self):
@@ -201,8 +200,9 @@ class Expense(db.Model):
             'category': self.category,
             'product_id': self.product_id,
             'quantity': self.quantity,
-            'supplier_id': self.supplier_id
+            'supplier_id': self.supplier_id  # Ensure this is defined in your model
         }
+
 
 
 class Supplier(db.Model):
