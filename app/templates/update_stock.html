@@ -42,28 +42,28 @@
 
 <!-- Modal for updating stock -->
 <div class="modal fade" id="updateStockModal" tabindex="-1" aria-labelledby="updateStockModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg" style="border-radius: 12px;">
+            <div class="modal-header border-0">
                 <h5 class="modal-title" id="updateStockModalLabel">Update Stock</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <form id="updateStockForm">
                     <div class="mb-3">
                         <label for="productName" class="form-label">Product Name</label>
-                        <input type="text" class="form-control" id="productName" readonly>
+                        <input type="text" class="form-control bg-light border-0" id="productName" readonly>
                     </div>
                     <div class="mb-3">
                         <label for="newStock" class="form-label">New Stock Quantity</label>
-                        <input type="number" class="form-control" id="newStock" name="newStock" min="1" required>
+                        <input type="number" class="form-control border-1" id="newStock" name="newStock" min="1" required>
                     </div>
                     <div class="mb-3">
                         <label for="totalAmount" class="form-label">Total Amount (Ksh)</label>
-                        <input type="number" class="form-control" id="totalAmount" name="totalAmount" min="0" required>
+                        <input type="number" class="form-control border-1" id="totalAmount" name="totalAmount" min="0" required>
                     </div>
                     <input type="hidden" id="productId" name="productId">
-                    <button type="submit" class="btn btn-primary w-100">Update Stock</button>
+                    <button type="submit" class="btn btn-primary w-100 mt-3">Update Stock</button>
                 </form>
             </div>
         </div>
