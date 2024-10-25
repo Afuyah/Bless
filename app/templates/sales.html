@@ -23,22 +23,28 @@
             <p id="no-products" style="display: none;">No products found for this category.</p>
         </div>
         
-        <div class="col-md-3 cart-container border border-secondary rounded p-3">
-            <h5>Cart Summary</h5>
-            <div id="cart-items" class="cart-items"></div>
-            <p>Total: Ksh <span id="total-amount">0.00</span></p>
-            <button id="checkout-btn" class="btn btn-success">Checkout</button>
-            <!-- Loading indicator -->
-            <div class="alert alert-info" id="checkout-loading" style="display: none;">Processing your checkout...</div>
-        </div>
+       
+
+
+
+       <div class="col-md-3 cart-container border border-secondary rounded p-3">
+    <h5>Cart Summary</h5>
+    <div id="cart-items" class="cart-items"></div>
+    <div class="d-flex justify-content-between mt-2">
+        <span>Total: Ksh</span>
+        <span id="total-amount">0.00</span>
     </div>
-
-    <!-- Low Stock Notification -->
-    <div class="alert alert-warning mt-4" id="low-stock-alert" style="display: none;"></div>
-
-    <!-- Error messages area -->
-    <div class="alert alert-danger" id="error-message" style="display: none;"></div>
+    <button id="checkout-btn" class="btn btn-success mt-2">Checkout</button>
+    <!-- Loading indicator -->
+    <div class="alert alert-info mt-2" id="checkout-loading" style="display: none;">Processing your checkout...</div>
 </div>
+
+<!-- Low Stock Notification -->
+<div class="alert alert-warning mt-4" id="low-stock-alert" style="display: none;"></div>
+
+<!-- Error messages area -->
+<div class="alert alert-danger mt-2" id="error-message" style="display: none;"></div>
+
 
 
 <!-- Success Modal -->
@@ -65,31 +71,157 @@
 
 
 <!-- Additional Styling -->
+
+
 <style>
+    
+    /* Container Styling */
+.container {
+    max-width: 1200px; /* Adjust this value for desired width */
+    margin: 0 auto; /* Center the container */
+    padding: 20px; /* Add padding for better spacing */
+}
+
+/* Category and Product Item Styling */
+.category-item, .product-item {
+    cursor: pointer; /* Indicates clickable items */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 8px 0;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-item:hover, .product-item:hover {
+    background-color: #f9f9f9; /* Light background on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Elevation effect */
+}
+
+/* Cart Container Styling */
+.cart-container {
+    position: sticky; /* Keep the cart summary fixed during scrolling */
+    top: 20px; /* Adjust as needed */
+    background-color: #fff; /* Ensure white background for contrast */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    z-index: 1000; /* Ensure it appears above other elements */
+    border-radius: 8px; /* Rounded corners for cart */
+    padding: 15px; /* Padding for internal spacing */
+}
+
+/* Cart Item Layout */
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0; /* Add spacing between cart items */
+    border-bottom: 1px solid #ddd; /* Separator for items */
+}
+
+.cart-item:last-child {
+    border-bottom: none; /* Remove border for the last item */
+}
+
+.cart-item button {
+    font-size: 0.9rem; /* Button size */
+}
+
+/* Quantity Styling */
+.cart-item-quantity {
+    display: inline-block;
+    padding: 4px 8px; /* Padding for the quantity box */
+    border: 1px solid #007bff; /* Border color */
+    border-radius: 4px; /* Rounded corners */
+    background-color: #e9f7fe; /* Light blue background */
+    font-weight: bold; /* Bold text */
+}
+
+/* Total Amount Styling */
+#total-amount {
+    font-size: 1.5rem; /* Make total amount larger */
+    font-weight: bold; /* Bold text for emphasis */
+    color: #28a745; /* Green color for the total */
+}
+
+/* Checkout Button Styling */
+#checkout-btn {
+    width: 100%; /* Full-width button for better usability */
+    padding: 10px; /* Ample padding for comfort */
+    font-size: 1rem; /* Slightly larger font size */
+    background-color: #28a745; /* Green background */
+    color: white; /* White text */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded edges */
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+#checkout-btn:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+/* Alerts and Messages */
+#low-stock-alert, #error-message {
+    font-weight: bold; /* Make the warning/error messages bold */
+    margin-top: 10px; /* Spacing above */
+}
+
+#low-stock-alert {
+    color: #dc3545; /* Red color for low stock alert */
+    display: none; /* Initially hidden */
+}
+
+#error-message {
+    padding: 10px; /* Padding for error message */
+    background-color: #f8d7da; /* Light red background */
+    border: 1px solid #dc3545; /* Red border */
+    border-radius: 4px; /* Rounded edges */
+    display: none; /* Initially hidden */
+}
+
+/* Loading Indicator */
+#checkout-loading {
+    display: none; /* Initially hidden */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
     .container {
-        max-width: 1200px; /* Adjust this value for desired width */
-        margin: 0 auto; /* Center the container */
+        padding: 10px; /* Less padding for mobile */
     }
 
-    .category-item, .product-item {
-        cursor: pointer; /* Indicates clickable items */
-    }
-
-    .category-item:hover, .product-item:hover {
-        background-color: #f0f0f0; /* Light background on hover */
+    .product-item {
+        margin: 4px 0; /* Less margin for mobile */
     }
 
     .cart-container {
-        position: sticky;
-        top: 20px; /* Keep the cart visible while scrolling */
+        max-width: 100%; /* Full width on mobile */
+        margin-top: 20px; /* Margin on top for mobile */
     }
+}
 
-    .cart-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+/* Add a pointer to show the card is clickable */
+.product-item.clickable {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.product-item.clickable:hover {
+    background-color: #f0f8ff; /* Light background change on hover */
+    transform: scale(1.02); /* Slight zoom effect on hover */
+}
+
+/* Styling for out-of-stock items */
+.disabled-card {
+    opacity: 0.6; /* Dim out-of-stock items */
+    cursor: not-allowed; /* Indicate unavailability */
+}
+
+.disabled-card:hover {
+    background-color: inherit; /* No hover effect on disabled cards */
+    transform: none; /* No zoom for disabled cards */
+}
+
 </style>
+
 
 <script>
     
@@ -119,33 +251,54 @@
         });
     });
 
-    function populateProducts(products) {
-        $('#product-list').empty(); // Clear previous product listings
+    
 
-        if (products.length === 0) {
-            $('#product-list').append('<p class="text-muted">No products available.</p>');
+function populateProducts(products) {
+    $('#product-list').empty(); // Clear previous product listings
+
+    if (products.length === 0) {
+        $('#product-list').append('<p class="text-muted">No products available.</p>');
+        return;
+    }
+
+    products.forEach(product => {
+        let lowStockWarning = product.stock < 5 ? `<span class="text-danger">(Low Stock)</span>` : '';
+        $('#product-list').append(`
+            <div class="product-item border border-primary rounded p-2 mb-3 ${product.stock === 0 ? 'disabled-card' : 'clickable'}" 
+                 data-id="${product.id}" 
+                 data-name="${product.name}" 
+                 data-selling-price="${product.selling_price}" 
+                 data-stock="${product.stock}">
+                <h5 class="product-title">${product.name} ${lowStockWarning}</h5>
+                <p class="product-price">Ksh ${product.selling_price.toFixed(2)}</p>
+                <p class="product-stock">Stock: ${product.stock}</p>
+            </div>
+        `);
+    });
+}
+
+// Make the entire card clickable
+$(document).on('click', '.product-item.clickable', function () {
+    const productId = $(this).data('id');
+    const productName = $(this).data('name');
+    const productSellingPrice = parseFloat($(this).data('selling-price'));
+    const productStock = parseInt($(this).data('stock'));
+
+    const existingItem = cart.find(item => item.id === productId);
+    if (existingItem) {
+        if (existingItem.quantity < productStock) {
+            existingItem.quantity += 1;
+        } else {
+            showError('Cannot add more of this item. Stock limit reached.');
             return;
         }
-
-        products.forEach(product => {
-            let lowStockWarning = product.stock < 5 ? `<span class="text-danger">(Low Stock)</span>` : '';
-            $('#product-list').append(`
-                <div class="product-item border border-primary rounded p-2 mb-3" data-id="${product.id}">
-                    <h5 class="product-title">${product.name} ${lowStockWarning}</h5>
-                    <p class="product-price">Ksh ${product.selling_price.toFixed(2)}</p>
-                    <p class="product-stock">Stock: ${product.stock}</p>
-                    <button class="btn btn-primary add-to-cart" 
-                        data-id="${product.id}" 
-                        data-name="${product.name}" 
-                        data-selling-price="${product.selling_price}" 
-                        data-stock="${product.stock}" 
-                        ${product.stock === 0 ? 'disabled aria-disabled="true"' : ''}>
-                        ${product.stock === 0 ? 'Out of Stock' : 'Add'}
-                    </button>
-                </div>
-            `);
-        });
+    } else {
+        cart.push({ id: productId, name: productName, selling_price: productSellingPrice, quantity: 1 });
     }
+    updateCart();
+});
+
+
 
     // Handle add to cart functionality
     $(document).on('click', '.add-to-cart', function () {
