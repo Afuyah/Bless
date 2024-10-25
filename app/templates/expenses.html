@@ -16,7 +16,7 @@
     <table class="table table-striped" id="expenses-table">
         <thead>
             <tr>
-                <th>ID</th>
+                
                 <th>Description</th>
                 <th>Amnt </th>
                
@@ -74,7 +74,7 @@
                     const row = document.createElement('tr');
                     const formattedDate = new Date(expense.date).toLocaleDateString(); // Format date
                     row.innerHTML = `
-                        <td>${expense.id}</td>
+                        
                         <td>${expense.description}</td>
                         <td>Ksh ${expense.amount}</td>
                         
