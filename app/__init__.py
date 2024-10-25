@@ -38,12 +38,14 @@ def create_app(config_class=Config):
     from .sales import sales_bp
     from .home import home_bp
     from .expense import expense_bp
+    from .supplier import supplier_bp
 
     app.register_blueprint(home_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(stock_bp, url_prefix='/stock')
     app.register_blueprint(sales_bp, url_prefix='/sales')
     app.register_blueprint(expense_bp, url_prefix='/expense')
+    app.register_blueprint(supplier_bp, url_prefix='/supplier')
 
     # User loader for Flask-Login
     from .models import User

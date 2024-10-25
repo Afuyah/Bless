@@ -41,7 +41,7 @@ def add_daily_expense():
     try:
         # Parse JSON data
         data = request.get_json()
-        logging.info(f"Received data: {data}")  # Log the received data
+        logging.info(f"Received data: {data}")  
 
         description = data.get('description')
         amount = data.get('amount')

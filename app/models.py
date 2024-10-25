@@ -6,6 +6,10 @@ from datetime import datetime
 from sqlalchemy import func, Index, ForeignKey
 from sqlalchemy.orm import validates
 from app import db
+from sqlalchemy.ext.hybrid import hybrid_property
+
+
+
 
 # User Roles Enum
 class Role(Enum):
@@ -119,6 +123,8 @@ class CartItem(db.Model):
         }
 
 
+
+
 # Product Model with Cost Price, Selling Price, and Profit Calculation
 class Product(db.Model):
     __tablename__ = 'products'
@@ -134,22 +140,55 @@ class Product(db.Model):
     @validates('cost_price', 'selling_price', 'stock')
     def validate_cost_selling_stock(self, key, value):
         if key in ['cost_price', 'selling_price'] and value < 0:
-            raise ValueError(f"{key.replace('_', ' ').title()} cannot be negative")
+            raise ValueError(f"{key.replace('_', ' ').title()} cannot be negative.")
         if key == 'stock' and value < 0:
-            raise ValueError("Stock cannot be negative")
+            raise ValueError("Stock cannot be negative.")
         return value
 
-    def calculate_profit(self):
-        """Calculates profit per item sold and profit margin."""
-        profit = self.selling_price - self.cost_price
-        profit_margin = (profit / self.selling_price * 100) if self.selling_price > 0 else 0.0
-        return profit, profit_margin
+    @hybrid_property
+    def profit(self):
+        return self.selling_price - self.cost_price
+
+    @hybrid_property
+    def profit_margin(self):
+        return (self.profit / self.selling_price * 100) if self.selling_price > 0 else 0.0
 
     def is_low_stock(self):
         return self.stock < 10
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'cost_price': self.cost_price,
+            'selling_price': self.selling_price,
+            'stock': self.stock,
+            'profit': self.profit,
+            'profit_margin': self.profit_margin,
+            'supplier_id': self.supplier_id
+        }
+
     def __repr__(self):
-        return f'<Product {self.name}, Supplier {self.supplier_id}>' 
+        return f'<Product {self.name}, Supplier ID {self.supplier_id}>'
+
+class Supplier(db.Model):
+    __tablename__ = 'suppliers'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), unique=True, nullable=False)
+    phone = db.Column(db.String(20), nullable=True)    
+    products = db.relationship('Product', backref='supplier', lazy='joined') 
+
+    def __repr__(self):
+        return f'<Supplier {self.name}>'
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'phone': self.phone,
+            'products': [product.serialize() for product in self.products]  # Serialize all products
+        }
+
 
 
 
@@ -203,17 +242,3 @@ class Expense(db.Model):
             'supplier_id': self.supplier_id  # Ensure this is defined in your model
         }
 
-
-
-class Supplier(db.Model):
-    __tablename__ = 'suppliers'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), unique=True, nullable=False)
-    contact_person = db.Column(db.String(100), nullable=True)  # Optional contact person
-    phone = db.Column(db.String(20), nullable=True)  # Optional phone number
-    email = db.Column(db.String(100), nullable=True)  # Optional email address
-    address = db.Column(db.String(250), nullable=True)  # Optional address
-    products = db.relationship('Product', backref='supplier', lazy='joined')  # Relationship with Product
-
-    def __repr__(self):
-        return f'<Supplier {self.name}>'

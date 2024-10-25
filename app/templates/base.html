@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Mini Supermarket{% endblock %}</title>
+    <title>{% block title %}Nawiri Enterprise{% endblock %}</title>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -29,13 +29,24 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Home</a>
+                    <a class="nav-link active" href="{{ url_for('sales.sales_screen') }}">Shop</a>
                 </li>
                 <li class="nav-item">
-                   <a class="nav-link" href="{{ url_for('expense.expenses_page') }}">Expense</a>
+                    <a class="nav-link active" href="{{ url_for('expense.expenses_page') }}">Expenses</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Suppliers</a>
+                   <a class="nav-link active" href="{{ url_for('supplier.suppliers_page') }}">suppliers</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        More
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">credit</a>
+                        <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
+                        <div class="dropdown-divider"></div>
+                       
+                    </div>
                 </li>
             </ul>
         </div>
