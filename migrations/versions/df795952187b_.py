@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 378910585d42
+Revision ID: df795952187b
 Revises: 
-Create Date: 2024-10-25 17:01:24.773554
+Create Date: 2024-10-26 16:19:54.105747
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '378910585d42'
+revision = 'df795952187b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -56,9 +56,15 @@ def upgrade():
     sa.Column('name', sa.String(length=200), nullable=False),
     sa.Column('cost_price', sa.Float(), nullable=False),
     sa.Column('selling_price', sa.Float(), nullable=False),
-    sa.Column('stock', sa.Integer(), nullable=False),
+    sa.Column('stock', sa.Float(), nullable=False),
     sa.Column('category_id', sa.Integer(), nullable=False),
     sa.Column('supplier_id', sa.Integer(), nullable=True),
+    sa.Column('unit_type', sa.Enum('piece', 'weight', name='unit_types'), nullable=False),
+    sa.Column('packet_size', sa.Integer(), nullable=True),
+    sa.Column('combination_size', sa.Integer(), nullable=True),
+    sa.Column('combination_price', sa.Float(), nullable=True),
+    sa.Column('combination_unit_price', sa.Float(), nullable=True),
+    sa.Column('bulk_quantity', sa.Float(), nullable=True),
     sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
     sa.ForeignKeyConstraint(['supplier_id'], ['suppliers.id'], ),
     sa.PrimaryKeyConstraint('id')

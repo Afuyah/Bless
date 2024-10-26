@@ -7,9 +7,17 @@ from sqlalchemy import func, Index, ForeignKey
 from sqlalchemy.orm import validates
 from app import db
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import Enum as SQLAlchemyEnum
+import enum
+import logging
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 
-
+# Define Python Enum for unit types
+class UnitType(enum.Enum):
+    piece = 'piece'
+    weight = 'weight'
 
 # User Roles Enum
 class Role(Enum):
@@ -46,8 +54,6 @@ class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
     products = db.relationship('Product', backref='category', lazy='joined')
-
-
 
 # Sale Model with Auto Stock Update and Total Price Indexing
 class Sale(db.Model):
@@ -121,24 +127,25 @@ class CartItem(db.Model):
             'total_price': self.quantity * product.selling_price,  # Calculate total based on selling price
             'profit_per_item': product.calculate_profit()[0]  # Profit per item
         }
-
-
-
-
-# Product Model with Cost Price, Selling Price, and Profit Calculation
 class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     cost_price = db.Column(db.Float, nullable=False, default=0.0)
     selling_price = db.Column(db.Float, nullable=False, default=0.0)
-    stock = db.Column(db.Integer, nullable=False, default=0)
+    stock = db.Column(db.Float, nullable=False, default=0.0)  # Holds count for pieces, weight for weight-based
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'), nullable=True)
+    unit_type = db.Column(SQLAlchemyEnum(UnitType, name='unit_types'), nullable=False)
+    packet_size = db.Column(db.Integer, nullable=True)  # For piece products only
+    combination_size = db.Column(db.Integer, nullable=True)  # For combination sales
+    combination_price = db.Column(db.Float, nullable=True)  # For combination sales
+    combination_unit_price = db.Column(db.Float, nullable=True)
+    bulk_quantity = db.Column(db.Float, nullable=True)  # Total bulk weight for weight products
     sale_items = db.relationship('CartItem', backref='product', lazy='joined')
 
     @validates('cost_price', 'selling_price', 'stock')
-    def validate_cost_selling_stock(self, key, value):
+    def validate_prices_stock(self, key, value):
         if key in ['cost_price', 'selling_price'] and value < 0:
             raise ValueError(f"{key.replace('_', ' ').title()} cannot be negative.")
         if key == 'stock' and value < 0:
@@ -154,7 +161,16 @@ class Product(db.Model):
         return (self.profit / self.selling_price * 100) if self.selling_price > 0 else 0.0
 
     def is_low_stock(self):
-        return self.stock < 10
+        logging.debug(f"Checking stock for product: {self.name}, Unit Type: {self.unit_type}, Stock: {self.stock}")
+        return self.stock < (10 if self.unit_type == UnitType.piece else 1.0)
+
+    def is_weight_based(self):
+        """Determine if the product is weight-based."""
+        return self.unit_type == UnitType.weight
+
+    def is_piece_based(self):
+        """Determine if the product is piece-based."""
+        return self.unit_type == UnitType.piece
 
     def serialize(self):
         return {
@@ -163,6 +179,10 @@ class Product(db.Model):
             'cost_price': self.cost_price,
             'selling_price': self.selling_price,
             'stock': self.stock,
+            'unit_type': self.unit_type.name,
+            'packet_size': self.packet_size,
+            'combination_size': self.combination_size,
+            'combination_price': self.combination_price,
             'profit': self.profit,
             'profit_margin': self.profit_margin,
             'supplier_id': self.supplier_id
@@ -170,6 +190,7 @@ class Product(db.Model):
 
     def __repr__(self):
         return f'<Product {self.name}, Supplier ID {self.supplier_id}>'
+
 
 class Supplier(db.Model):
     __tablename__ = 'suppliers'
@@ -189,9 +210,6 @@ class Supplier(db.Model):
             'products': [product.serialize() for product in self.products]  # Serialize all products
         }
 
-
-
-
 class Expense(db.Model):
     __tablename__ = 'expenses'
     id = db.Column(db.Integer, primary_key=True)
@@ -209,28 +227,11 @@ class Expense(db.Model):
         """Validate that the expense amount and quantity are positive."""
         if key == 'amount' and value < 0:
             raise ValueError("Expense amount cannot be negative.")
-        if key == 'quantity' and value <= 0:
-            raise ValueError("Quantity must be greater than zero.")
+        if key == 'quantity' and value < 0:
+            raise ValueError("Quantity cannot be negative.")
         return value
 
-    def calculate_total_cost(self):
-        """Calculate total cost based on product's cost price and expense quantity."""
-        product = Product.query.get(self.product_id)
-        if product and self.quantity:
-            return product.cost_price * self.quantity
-        return None
-
-    def finalize_expense(self):
-        """Adjust product stock by the quantity in this expense, if linked to a product."""
-        if self.product_id:
-            product = Product.query.get(self.product_id)
-            if product:
-                product.stock += self.quantity
-                db.session.commit()  # Commit the changes to the database
-        return self  # Returning self to allow caller to decide when to commit
-
     def serialize(self):
-        """Convert the Expense object to a dictionary format for JSON serialization."""
         return {
             'id': self.id,
             'description': self.description,
@@ -238,7 +239,5 @@ class Expense(db.Model):
             'date': self.date.strftime("%Y-%m-%d %H:%M:%S"),
             'category': self.category,
             'product_id': self.product_id,
-            'quantity': self.quantity,
-            'supplier_id': self.supplier_id  # Ensure this is defined in your model
+            'quantity': self.quantity
         }
-

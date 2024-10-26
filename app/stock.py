@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, jsonify, redirect, url_fo
 from flask_login import login_required, current_user
 from app.models import db, Product, Category, Supplier, Expense  # Include Expense model
 from app import socketio
-
+import logging
 stock_bp = Blueprint('stock', __name__)
 
 # Constants for flash messages
@@ -78,8 +78,6 @@ def products():
     products = Product.query.all()
     return render_template('products.html', products=products)
 
-
-# Route to add a new product
 @stock_bp.route('/products/new', methods=['GET', 'POST'])
 @login_required
 def new_product():
@@ -96,25 +94,54 @@ def new_product():
         selling_price = request.form['selling_price']
         stock = request.form['stock']
         category_id = request.form['category']
-       
+        unit_type = request.form['unit_type']  
+        supplier_id = request.form.get('supplier')  
+        combination_size = request.form.get('combination_size')  
+        combination_price = request.form.get('combination_price')  
 
         if Product.query.filter_by(name=name).first():
             flash(FLASH_PRODUCT_EXISTS)
             return redirect(url_for('stock.new_product'))
 
+        # Validate combination fields if provided
+        if combination_size and combination_price:
+            try:
+                combination_size = int(combination_size)
+                combination_price = float(combination_price)
+                if combination_size <= 0 or combination_price <= 0:
+                    raise ValueError
+            except ValueError:
+                flash("Combination size and price must be positive numbers.")
+                return redirect(url_for('stock.new_product'))
+
+            # Calculate combination unit price
+            combination_unit_price = combination_price / combination_size
+            
+            # Here, we assume that the selling price can be less than or equal to the calculated combination unit price
+            # But keep the entered selling price as is. So no adjustment to selling price needed.
+            
+        else:
+            combination_size = None
+            combination_price = None
+            combination_unit_price = None
+
         new_product = Product(
             name=name,
             cost_price=float(cost_price),
-            selling_price=float(selling_price),
-            stock=int(stock),
+            selling_price=float(selling_price),  # Save as entered
+            stock=float(stock),
             category_id=category_id,
-          
+            unit_type=unit_type,
+            supplier_id=supplier_id,
+            combination_size=combination_size,
+            combination_price=combination_price,
+            combination_unit_price=combination_unit_price  # Save calculated combination unit price
         )
+        
         db.session.add(new_product)
         db.session.commit()
         flash(FLASH_PRODUCT_ADDED.format(name))
 
-        # Emit real-time stock update
         socketio.emit('stock_updated', {
             'id': new_product.id,
             'name': new_product.name,
@@ -124,6 +151,8 @@ def new_product():
         return redirect(url_for('stock.products'))
 
     return render_template('new_product.html', categories=categories, suppliers=suppliers)
+
+
 
 @stock_bp.route('/products/<int:id>/edit', methods=['GET', 'POST'])
 @login_required

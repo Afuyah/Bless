@@ -27,13 +27,30 @@
 
 
 
-       <div class="col-md-3 cart-container border border-secondary rounded p-3">
+     <div class="col-md-3 cart-container border border-secondary rounded p-3">
     <h5>Cart Summary</h5>
     <div id="cart-items" class="cart-items"></div>
     <div class="d-flex justify-content-between mt-2">
         <span>Total: Ksh</span>
         <span id="total-amount">0.00</span>
     </div>
+
+    <!-- Payment Method Selector -->
+    <div class="mt-3">
+        <label for="payment-method">Payment Method:</label>
+        <select id="payment-method" class="form-select">
+            <option value="cash">Cash</option>
+            <option value="mpesa">M-Pesa</option>
+            <option value="credit">Credit</option>
+        </select>
+    </div>
+
+    <!-- Customer Name Input -->
+    <div class="mt-2" id="customer-name-container" style="display: none;">
+        <label for="customer-name">Customer Name:</label>
+        <input type="text" id="customer-name" class="form-control" placeholder="Enter customer name" />
+    </div>
+
     <button id="checkout-btn" class="btn btn-success mt-2">Checkout</button>
     <!-- Loading indicator -->
     <div class="alert alert-info mt-2" id="checkout-loading" style="display: none;">Processing your checkout...</div>
@@ -44,6 +61,7 @@
 
 <!-- Error messages area -->
 <div class="alert alert-danger mt-2" id="error-message" style="display: none;"></div>
+
 
 
 
@@ -224,34 +242,32 @@
 
 
 <script>
-    
-    let cart = [];
 
-    // Fetch products based on category
-    $(document).on('click', '.category-item', function () {
-        const categoryId = $(this).data('category');
-        $('#product-list').html('<p>Loading products...</p>'); // Show loading indicator
-        $('#no-products').hide(); // Hide no-products message
+let cart = [];
 
-        $.ajax({
-            url: `/sales/api/products/${categoryId}`, // Flask API endpoint to fetch products by category
-            method: 'GET',
-            success: function (data) {
-                if (data.products.length > 0) {
-                    populateProducts(data.products);
-                } else {
-                    $('#product-list').empty(); // Clear product list
-                    $('#no-products').show(); // Show fallback when no products are found
-                }
-            },
-            error: function () {
-                showError('Failed to load products. Please try again.');
-                $('#product-list').empty(); // Clear the product list on error
+// Fetch products based on category
+$(document).on('click', '.category-item', function () {
+    const categoryId = $(this).data('category');
+    $('#product-list').html('<p>Loading products...</p>'); // Show loading indicator
+    $('#no-products').hide(); // Hide no-products message
+
+    $.ajax({
+        url: `/sales/api/products/${categoryId}`, // Flask API endpoint to fetch products by category
+        method: 'GET',
+        success: function (data) {
+            if (data.products && data.products.length > 0) {
+                populateProducts(data.products);
+            } else {
+                $('#product-list').empty(); // Clear product list
+                $('#no-products').show(); // Show fallback when no products are found
             }
-        });
+        },
+        error: function () {
+            showError('Failed to load products. Please try again.');
+            $('#product-list').empty(); // Clear the product list on error
+        }
     });
-
-    
+});
 
 function populateProducts(products) {
     $('#product-list').empty(); // Clear previous product listings
@@ -263,154 +279,223 @@ function populateProducts(products) {
 
     products.forEach(product => {
         let lowStockWarning = product.stock < 5 ? `<span class="text-danger">(Low Stock)</span>` : '';
+        let combinationText = product.combination_size > 1 ? `(${product.combination_size} for Ksh ${product.combination_price})` : '';
+
         $('#product-list').append(`
             <div class="product-item border border-primary rounded p-2 mb-3 ${product.stock === 0 ? 'disabled-card' : 'clickable'}" 
                  data-id="${product.id}" 
                  data-name="${product.name}" 
                  data-selling-price="${product.selling_price}" 
-                 data-stock="${product.stock}">
+                 data-combination-price="${product.combination_price || 0}" 
+                 data-combination-unit-price="${product.combination_unit_price || 0}" 
+                 data-stock="${product.stock}" 
+                 data-combination-size="${product.combination_size || 1}">
                 <h5 class="product-title">${product.name} ${lowStockWarning}</h5>
-                <p class="product-price">Ksh ${product.selling_price.toFixed(2)}</p>
+                <p class="product-price">Ksh ${product.selling_price.toFixed(2)} ${combinationText}</p>
                 <p class="product-stock">Stock: ${product.stock}</p>
             </div>
         `);
     });
 }
 
-// Make the entire card clickable
+// Make the entire card clickable to add to cart
 $(document).on('click', '.product-item.clickable', function () {
     const productId = $(this).data('id');
     const productName = $(this).data('name');
-    const productSellingPrice = parseFloat($(this).data('selling-price'));
-    const productStock = parseInt($(this).data('stock'));
+    const productSellingPrice = parseFloat($(this).data('selling-price')) || 0;
+    const productCombinationPrice = parseFloat($(this).data('combination-price')) || 0;
+    const productCombinationUnitPrice = parseFloat($(this).data('combination-unit-price')) || 0; 
+    const productStock = parseInt($(this).data('stock')) || 0;
 
     const existingItem = cart.find(item => item.id === productId);
+
+    // Check if the item is already in the cart and if there is stock available
     if (existingItem) {
         if (existingItem.quantity < productStock) {
-            existingItem.quantity += 1;
+            existingItem.quantity += 1; // Increment quantity if there's stock
         } else {
             showError('Cannot add more of this item. Stock limit reached.');
             return;
         }
     } else {
-        cart.push({ id: productId, name: productName, selling_price: productSellingPrice, quantity: 1 });
+        if (productStock > 0) { // Ensure there's stock to add
+            cart.push({
+                id: productId,
+                name: productName,
+                selling_price: productSellingPrice,
+                combination_price: productCombinationPrice,
+                combination_unit_price: productCombinationUnitPrice,
+                quantity: 1,
+                combination_size: $(this).data('combination-size') || 1
+            });
+        } else {
+            showError('Cannot add this item. Stock limit reached.');
+            return;
+        }
     }
     updateCart();
 });
 
+// Handle removing items from cart
+$(document).on('click', '.remove-from-cart', function () {
+    const productId = $(this).data('id');
+    cart = cart.filter(item => item.id !== productId);
+    updateCart();
+});
 
+// Update the cart summary
+function updateCart() {
+    $('#cart-items').empty();
+    let total = 0;
 
-    // Handle add to cart functionality
-    $(document).on('click', '.add-to-cart', function () {
-        const productId = $(this).data('id');
-        const productName = $(this).data('name');
-        const productSellingPrice = parseFloat($(this).data('selling-price'));
-        const productStock = parseInt($(this).data('stock'));
+    cart.forEach(item => {
+        let subtotal = 0;
+        const fullCombinations = Math.floor(item.quantity / item.combination_size);
+        const remainingUnits = item.quantity % item.combination_size;
 
-        const existingItem = cart.find(item => item.id === productId);
-        if (existingItem) {
-            if (existingItem.quantity < productStock) {
-                existingItem.quantity += 1;
-            } else {
-                showError('Cannot add more of this item. Stock limit reached.');
-                return;
-            }
-        } else {
-            cart.push({ id: productId, name: productName, selling_price: productSellingPrice, quantity: 1 });
+        // Calculate price using combination pricing for full combinations
+        subtotal += fullCombinations * item.combination_price;
+
+        // Calculate the remaining items' price and check if using combination pricing would be cheaper
+        const individualRemainderPrice = remainingUnits * item.selling_price;
+        const additionalCombinationPrice = item.combination_price; // Cost of 1 combination set
+
+        if (remainingUnits > 0) {
+            // Compare remaining items' individual price vs an extra combination price
+            subtotal += Math.min(individualRemainderPrice, additionalCombinationPrice);
         }
-        updateCart();
+
+        total += subtotal;
+
+        // Append item to cart display
+        $('#cart-items').append(`
+            <div class="cart-item">
+                ${item.name} - Ksh ${item.selling_price.toFixed(2)} x ${item.quantity} = Ksh ${subtotal.toFixed(2)}
+                <button class="btn btn-danger btn-sm remove-from-cart" data-id="${item.id}">X</button>
+            </div>
+        `);
     });
 
-    // Handle removing items from cart
-    $(document).on('click', '.remove-from-cart', function () {
-        const productId = $(this).data('id');
-        cart = cart.filter(item => item.id !== productId);
-        updateCart();
-    });
+    $('#total-amount').text(total.toFixed(2)); // Update the total amount display
+}
 
-    // Update the cart summary
-    function updateCart() {
-        $('#cart-items').empty();
-        let total = 0;
-        let lowStockItems = [];
 
-        cart.forEach(item => {
-            $('#cart-items').append(`
-                <div class="cart-item">
-                    ${item.name} - Ksh ${item.selling_price} x ${item.quantity} 
-                    <button class="btn btn-danger btn-sm remove-from-cart" data-id="${item.id}">X</button>
-                </div>
-            `);
-            total += item.selling_price * item.quantity;
+// Handle payment method change
+$('#payment-method').change(function () {
+    const selectedMethod = $(this).val();
+    if (selectedMethod === 'credit') {
+        $('#customer-name-container').show(); // Show customer name input
+    } else {
+        $('#customer-name-container').hide(); // Hide customer name input
+        $('#customer-name').val(''); // Clear the input if not needed
+    }
+});
 
-            const productStock = parseInt($(`.product-item[data-id="${item.id}"] .add-to-cart`).data('stock'));
-            if (productStock - item.quantity < 5) {
-                lowStockItems.push(item.name);
-            }
-        });
-
-        $('#total-amount').text(total.toFixed(2));
-        if (lowStockItems.length > 0) {
-            $('#low-stock-alert').text(`Low stock for: ${lowStockItems.join(', ')}`).show();
-        } else {
-            $('#low-stock-alert').hide();
-        }
+// Handle checkout
+$('#checkout-btn').click(function () {
+    if (cart.length === 0) {
+        showError('Your cart is empty!');
+        return;
     }
 
-    // Handle checkout
-    $('#checkout-btn').click(function () {
-        if (cart.length === 0) {
-            showError('Your cart is empty!');
-            return;
-        }
+    const checkoutButton = $(this);
+    checkoutButton.prop('disabled', true); // Disable the checkout button
+    $('#checkout-loading').show(); // Show loading indicator
 
-        $(this).prop('disabled', true); // Disable the checkout button
-        $('#checkout-loading').show(); // Show loading indicator
+    const paymentMethod = $('#payment-method').val();
+    const customerName = paymentMethod === 'credit' ? $('#customer-name').val().trim() : null; // Get customer name if credit
 
-        $.ajax({
-            url: '/sales/checkout', // Adjust to your actual checkout endpoint
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ cart: cart }),
-            success: function (response) {
-                $('#successModal').modal('show'); // Show success modal
-                cart = []; // Clear cart
-                updateCart(); // Update cart display
-            },
-            error: function () {
-                showError('Checkout failed. Please try again.');
-            },
-            complete: function () {
-                $('#checkout-btn').prop('disabled', false); // Re-enable the checkout button
-                $('#checkout-loading').hide(); // Hide loading indicator
-            }
-        });
-    });
-
-    // Search functionality for products and categories
-    $('#search').on('input', function() {
-        const searchTerm = $(this).val().toLowerCase();
-        
-        $('.product-item').filter(function() {
-            $(this).toggle($(this).find('.product-title').text().toLowerCase().indexOf(searchTerm) > -1);
-        });
-
-        if ($('#product-list').children(':visible').length === 0) {
-            $('#no-products').show();
-        } else {
-            $('#no-products').hide();
-        }
-
-        $('.category-item').filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(searchTerm) > -1);
-        });
-    });
-
-    // Utility function to show error messages
-    function showError(message) {
-        $('#error-message').text(message).show(); // Display error message
-        setTimeout(() => $('#error-message').hide(), 5000); // Hide after 5 seconds
+    // Validate customer name if payment method is credit
+    if (paymentMethod === 'credit' && !customerName) {
+        showError('Please enter customer name for credit payments.');
+        $('#customer-name').addClass('is-invalid'); // Highlight invalid input
+        checkoutButton.prop('disabled', false); // Re-enable the checkout button
+        $('#checkout-loading').hide(); // Hide loading indicator
+        return;
+    } else {
+        $('#customer-name').removeClass('is-invalid'); // Remove highlight if valid
     }
+
+    $.ajax({
+        url: '/sales/checkout', // Adjust to your actual checkout endpoint
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ cart: cart, payment_method: paymentMethod, customer_name: customerName }),
+        success: function () {
+            // Show success modal and clear the cart
+            $('#successModal').modal('show');
+            cart = []; // Clear cart
+            updateCart(); // Update cart display
+            resetCheckoutForm(); // Reset the form
+        },
+        error: function (xhr) {
+            const errorMessage = xhr.responseJSON && xhr.responseJSON.message 
+                ? xhr.responseJSON.message 
+                : 'Checkout failed. Please try again.';
+            showError(errorMessage);
+        },
+        complete: function () {
+            checkoutButton.prop('disabled', false); // Re-enable the checkout button
+            $('#checkout-loading').hide(); // Hide loading indicator
+        }
+    });
+});
+
+// Function to reset the checkout form
+function resetCheckoutForm() {
+    $('#payment-method').val('mpesa'); // Set to default payment method
+    $('#customer-name').val(''); // Clear customer name
+    $('#customer-name-container').hide(); // Hide customer name input
+}
+
+
+// Debounce function to limit the frequency of search execution
+function debounce(func, delay) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+// Search functionality for products and categories
+const searchProductsAndCategories = function () {
+    const searchTerm = $(this).val().toLowerCase();
+    
+    // Filter products
+    $('.product-item').filter(function() {
+        const productTitle = $(this).find('.product-title');
+        const isVisible = productTitle.text().toLowerCase().indexOf(searchTerm) > -1;
+        productTitle.html(isVisible ? highlightMatch(productTitle.text(), searchTerm) : productTitle.text()); // Highlight matches
+        $(this).toggle(isVisible);
+    });
+
+    // Show or hide no products message
+    $('#no-products').toggle($('#product-list').children(':visible').length === 0);
+
+    // Filter categories
+    $('.category-item').filter(function() {
+        const isVisible = $(this).text().toLowerCase().indexOf(searchTerm) > -1;
+        $(this).toggle(isVisible);
+    });
+};
+
+// Function to highlight matched text in search results
+function highlightMatch(text, term) {
+    const regex = new RegExp(`(${term})`, 'gi'); // Case insensitive match
+    return text.replace(regex, '<span class="highlight">$1</span>'); // Wrap matched text in a span for styling
+}
+
+// Attach the debounced search function to input event
+$('#search').on('input', debounce(searchProductsAndCategories, 300));
+
+// Utility function to show error messages
+function showError(message) {
+    $('#error-message').text(message).show(); // Display error message
+    setTimeout(() => $('#error-message').hide(), 5000); // Hide after 5 seconds
+}
+
+
 </script>
 
 {% endblock %}

@@ -27,13 +27,67 @@
                 {% endfor %}
             </select>
         </div>
-     
+
+        <!-- New Field for Unit Type -->
+        <div class="form-group">
+            <label for="unit_type">Unit Type:</label>
+            <select id="unit_type" name="unit_type" class="form-control" onchange="toggleUnitFields()" required>
+                <option value="" disabled selected>Select unit type</option>
+                <option value="piece">Pieces</option>
+                <option value="weight">Weight (kg)</option>
+            </select>
+        </div>
+
+        <!-- Fields for Piece-Based Products -->
+        <div id="piece_fields" style="display: none;">
+            <div class="form-group">
+                <label for="packet_size">Packet Size (Pieces):</label>
+                <input type="number" id="packet_size" name="packet_size" class="form-control" placeholder="Enter packet size (e.g., 100)" step="1">
+            </div>
+            <div class="form-group">
+                <label for="combination_size">Combination Size (Pieces):</label>
+                <input type="number" id="combination_size" name="combination_size" class="form-control" placeholder="Enter combination size" step="1">
+            </div>
+            <div class="form-group">
+                <label for="combination_price">Combination Price (Ksh):</label>
+                <input type="number" id="combination_price" name="combination_price" class="form-control" placeholder="Enter price for combination" step="0.01">
+            </div>
+        </div>
+
+        <!-- Fields for Weight-Based Products -->
+        <div id="weight_fields" style="display: none;">
+            <div class="form-group">
+                <label for="bulk_quantity">Bulk Quantity (kg):</label>
+                <input type="number" id="bulk_quantity" name="bulk_quantity" class="form-control" placeholder="Enter bulk quantity (kg)" step="0.25">
+            </div>
+        </div>
+
         <div class="text-right">
             <button type="submit" class="btn btn-success">Add Product</button>
             <a href="{{ url_for('stock.products') }}" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
 </div>
+
+<!-- JavaScript to Toggle Fields -->
+<script>
+    function toggleUnitFields() {
+        const unitType = document.getElementById('unit_type').value;
+        const pieceFields = document.getElementById('piece_fields');
+        const weightFields = document.getElementById('weight_fields');
+
+        if (unitType === 'piece') {
+            pieceFields.style.display = 'block';
+            weightFields.style.display = 'none';
+        } else if (unitType === 'weight') {
+            pieceFields.style.display = 'none';
+            weightFields.style.display = 'block';
+        } else {
+            pieceFields.style.display = 'none';
+            weightFields.style.display = 'none';
+        }
+    }
+</script>
 
 <!-- Additional Styling -->
 <style>
