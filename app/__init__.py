@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect, url_for, flash, session, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_socketio import SocketIO
@@ -6,12 +6,15 @@ from flask_login import LoginManager
 from config import Config
 import logging
 from logging.handlers import RotatingFileHandler
+from functools import wraps
 
 # Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
 socketio = SocketIO()
 login_manager = LoginManager()
+
+
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -26,11 +29,16 @@ def create_app(config_class=Config):
         app.logger.addHandler(handler)
         app.logger.info('Application startup')
 
+    # Security configurations
+    app.secret_key = 'your_secret_key'  # Set a strong secret key
+    app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
+
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     socketio.init_app(app, cors_allowed_origins="*")  # Modify as needed
     login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'  # Redirect to login if not authenticated
 
     # Register Blueprints
     from .auth import auth_bp
@@ -58,14 +66,16 @@ def create_app(config_class=Config):
     @app.errorhandler(500)
     def internal_error(error):
         app.logger.error(f"Server Error: {error}")
-        return "Internal Server Error", 500
+        return render_template('500.html'), 500  # Render a custom 500 error page
 
     @app.errorhandler(404)
     def not_found_error(error):
-        return "Page Not Found", 404
+        app.logger.warning(f"404 Error: {error}, attempted URL: {request.url}")
+        return render_template('404.html'), 404  # Render a custom 404 error page
 
     @app.template_filter('number_format')
     def number_format(value, decimals=2):
+        """Format numbers to a specified number of decimal places."""
         return f"{value:,.{decimals}f}"
 
     return app

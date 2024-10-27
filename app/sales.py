@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
-from flask_login import login_required, current_user
+from flask_login import  current_user, login_required
 from app.models import db, Product, Sale, CartItem, Category
-from app import socketio
+from app import  socketio
 from flask_socketio import emit
 from collections import defaultdict
 from sqlalchemy import func

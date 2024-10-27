@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, render_template
 from flask_login import login_required
-from app import db
+from app import  db
 from app.models import Supplier, Product
 import logging
 
