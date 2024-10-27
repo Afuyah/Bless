@@ -3,9 +3,20 @@ from flask_login import login_required, current_user
 from app.models import db, Product, Sale, CartItem, Category
 from app import socketio
 from flask_socketio import emit
+from collections import defaultdict
+from sqlalchemy import func
+
+
 from datetime import datetime, timedelta
+
 from sqlalchemy.exc import IntegrityError
 import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
 sales_bp = Blueprint('sales', __name__)
 
 # Helper function to check low stock
@@ -167,92 +178,143 @@ def checkout():
 @sales_bp.route('/reports/daily', methods=['GET'])
 @login_required
 def daily_sales_report():
-    today = datetime.today().date()  # Get today's date
-    sales = Sale.query.filter(db.func.date(Sale.date) == today).all()
+    # Get the date from request arguments, defaulting to today
+    date_str = request.args.get('date', datetime.today().date().strftime('%Y-%m-%d'))
+    report_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    
+    # Fetch sales for the specified date
+    sales = Sale.query.filter(func.date(Sale.date) == report_date).all()
 
+    # If no sales are found for the date, flash a message and exit
     if not sales:
-        flash("No sales data available for today", "info")
+        flash("No sales data available for the selected date", "info")
+        return render_template('daily_sales_report.html', 
+                               sales=[], 
+                               today=report_date, 
+                               total_sales=0, 
+                               total_transactions=0, 
+                               daily_profit=0, 
+                               most_sold_item=None, 
+                               most_sold_quantity=0)
 
-    return render_template('daily_sales_report.html', sales=sales, today=today)
+    # Initialize values for total sales and transactions count
+    total_sales = sum(sale.total for sale in sales)
+    total_transactions = len(sales)
 
-# Weekly sales report
-@sales_bp.route('/reports/weekly', methods=['GET'])
-@login_required
-def weekly_sales_report():
-    one_week_ago = datetime.utcnow().date() - timedelta(days=7)
-    sales = Sale.query.filter(Sale.date >= one_week_ago).all()
-    return render_template('weekly_sales_report.html', sales=sales)
+    # Initialize tracking for daily profit and most sold item details
+    daily_profit = 0
+    item_sales = {}
 
-@sales_bp.route('/reports/filter', methods=['POST'])
+    # Calculate profit per sale and add to daily profit
+    for sale in sales:
+        sale_profit = 0
+        for item in sale.cart_items:
+            product = item.product
+            quantity = item.quantity
+
+            # Calculate profit per item based on combination/unit pricing
+            if product.combination_size and quantity >= product.combination_size:
+                profit_per_unit = product.combination_unit_price - product.cost_price
+            else:
+                profit_per_unit = product.selling_price - product.cost_price
+
+            # Total profit for this item in this sale
+            item_profit = profit_per_unit * quantity
+            sale_profit += item_profit
+
+            # Track quantity sold for the most-sold item
+            if product.name in item_sales:
+                item_sales[product.name] += quantity
+            else:
+                item_sales[product.name] = quantity
+
+        # Add the sale's profit to the daily profit
+        daily_profit += sale_profit
+
+    # Determine the most sold item based on quantities
+    most_sold_item, most_sold_quantity = max(item_sales.items(), key=lambda x: x[1], default=(None, 0))
+
+    # Format the total sales and daily profit to two decimal places
+    total_sales = round(total_sales, 2)
+    daily_profit = round(daily_profit, 2)
+
+    # Render the report template with calculated values
+    return render_template('daily_sales_report.html', 
+                           sales=sales, 
+                           today=report_date, 
+                           total_sales=total_sales, 
+                           total_transactions=total_transactions, 
+                           daily_profit=daily_profit, 
+                           most_sold_item=most_sold_item, 
+                           most_sold_quantity=most_sold_quantity)
+
+
+
+@sales_bp.route('/reports/filter', methods=['GET'])
 @login_required
 def filter_sales_report():
-    start_date_str = request.json.get('start_date')
-    end_date_str = request.json.get('end_date')
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
 
-    # Parse the dates from the request
-    start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-    end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+    if not start_date_str or not end_date_str:
+        flash("Please provide both start and end dates", "warning")
+        return redirect(url_for('sales_bp.daily_sales_report'))
 
-    # Use join to optimize querying sales with items
-    sales = Sale.query.filter(Sale.date.between(start_date, end_date)).all()
+    start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+    end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
 
-    # Initialize report data and totals
-    report_data = {}
-    total_revenue = 0
-    total_items_sold = 0
+    sales = Sale.query.filter(Sale.date >= start_date, Sale.date <= end_date).all()
+
+    if not sales:
+        flash("No sales data available for the selected date range", "info")
+        return render_template('filtered_sales_report.html', 
+                               sales=[], 
+                               total_sales=0, 
+                               total_transactions=0, 
+                               total_profit=0, 
+                               avg_sale_value=0, 
+                               unique_products=0, 
+                               most_sold_item=None, 
+                               most_sold_quantity=0)
+
+    total_sales = sum(sale.total for sale in sales)
+    total_transactions = len(sales)
     total_profit = 0
+    item_sales = {}
 
-    # Process sales data to gather required information
     for sale in sales:
-        sale_items = sale.cart_items  # Get all items in the sale
-        total_sale_value = sale.total  # Total revenue for this sale
-
-        for item in sale_items:
-            product_name = item.product.name  # Get the product name
+        sale_profit = 0
+        for item in sale.cart_items:
+            product = item.product
             quantity = item.quantity
-            unit_price = item.product.price  # Cost price of the product
-            cost_price = unit_price * quantity
-            profit = total_sale_value - cost_price
 
-            # Group by product name instead of category
-            if product_name not in report_data:
-                report_data[product_name] = {
-                    'total_sold': 0,
-                    'total_revenue': 0,
-                    'cost_price': 0,
-                    'profit': 0,
-                }
+            if product.combination_size and quantity >= product.combination_size:
+                profit_per_unit = product.combination_unit_price - product.cost_price
+            else:
+                profit_per_unit = product.selling_price - product.cost_price
 
-            # Accumulate the values for each product
-            report_data[product_name]['total_sold'] += quantity
-            report_data[product_name]['total_revenue'] += total_sale_value
-            report_data[product_name]['cost_price'] += cost_price
-            report_data[product_name]['profit'] += profit
+            item_profit = profit_per_unit * quantity
+            sale_profit += item_profit
 
-            # Aggregate totals
-            total_revenue += total_sale_value
-            total_items_sold += quantity
-            total_profit += profit
+            if product.name in item_sales:
+                item_sales[product.name] += quantity
+            else:
+                item_sales[product.name] = quantity
 
-    # Convert the report data into a list for the JSON response
-    report_data_list = [
-        {
-            'product_name': product,
-            'total_sold': data['total_sold'],
-            'total_revenue': data['total_revenue'],
-            'cost_price': data['cost_price'],
-            'profit': data['profit'],
-        }
-        for product, data in report_data.items()
-    ]
+        total_profit += sale_profit
 
-    # Return the sales data and aggregated totals in JSON format
-    return jsonify({
-        'sales': report_data_list,
-        'total_revenue': total_revenue,
-        'total_items_sold': total_items_sold,
-        'total_profit': total_profit
-    })
+    most_sold_item, most_sold_quantity = max(item_sales.items(), key=lambda x: x[1], default=(None, 0))
 
+    # Calculate average sale value and unique products
+    avg_sale_value = total_sales / total_transactions if total_transactions else 0
+    unique_products = len(set(item.product.name for sale in sales for item in sale.cart_items))
 
-
+    return render_template('filtered_sales_report.html', 
+                           sales=sales, 
+                           total_sales=round(total_sales, 2), 
+                           total_transactions=total_transactions, 
+                           total_profit=round(total_profit, 2), 
+                           avg_sale_value=round(avg_sale_value, 2), 
+                           unique_products=unique_products, 
+                           most_sold_item=most_sold_item, 
+                           most_sold_quantity=most_sold_quantity)

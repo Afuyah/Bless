@@ -164,14 +164,20 @@
         <a href="{{ url_for('stock.categories') }}">Manage Categories</a>
         <a href="{{ url_for('stock.update_stock') }}">Update Stock</a>
         <a href="{{ url_for('auth.user_management') }}">User Management</a>
+       
         <a href="{{ url_for('auth.logout') }}">Logout</a>
     </div>
 
     <!-- Main Content -->
     <div class="content">
-        <header>
-            {% block header_title %}Admin Dashboard{% endblock %}
-        </header>
+              
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
         <div class="container mt-4">
             {% block content %}
@@ -203,4 +209,11 @@
     </script>
     {% endblock %}
 </body>
+
+<!-- Include jQuery and DataTables JS/CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+
 </html>

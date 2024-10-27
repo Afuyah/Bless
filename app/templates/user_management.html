@@ -8,32 +8,53 @@
     
     <a href="{{ url_for('auth.add_user') }}" class="btn btn-primary mb-3">Add User</a>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.role.name }}</td>
-                <td>
-                    <a href="{{ url_for('auth.edit_user', id=user.id) }}" class="btn btn-sm btn-warning">Edit</a>
-                    <!-- Add a delete user option if necessary -->
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="4" class="text-center">No users found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-striped" id="userTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.role.name }}</td>
+                   
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center">No users found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<!-- Include jQuery and DataTables JS/CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialize DataTables
+    $('#userTable').DataTable({
+        searching: true, // Enable search
+        paging: true, // Enable pagination
+        order: [] // Default order (empty for no initial order)
+    });
+});
+</script>
+
+<style>
+    /* Custom styles for the table */
+    .table-responsive {
+        margin-top: 20px; /* Add some margin to the top */
+    }
+</style>
 {% endblock %}

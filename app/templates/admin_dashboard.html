@@ -9,44 +9,45 @@
     <div class="row">
         <!-- Overview Cards -->
         <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card text-white bg-primary shadow-sm">
+            <div class="card text-white bg-primary">
                 <div class="card-body">
                     <h5 class="card-title">Total Products</h5>
                     <h2 class="card-text">{{ total_products }}</h2>
                 </div>
-                <div class="card-footer d-flex justify-content-between align-items-center">
+                <div class="card-footer d-flex justify-content-between">
                     <small>View Products</small>
                     <a href="{{ url_for('stock.products') }}" class="text-white">→</a>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card text-white bg-success shadow-sm">
+            <div class="card text-white bg-success">
                 <div class="card-body">
                     <h5 class="card-title">Total Sales</h5>
                     <h2 class="card-text">Ksh {{ total_sales }}</h2>
                 </div>
-                <div class="card-footer d-flex justify-content-between align-items-center">
+                <div class="card-footer d-flex justify-content-between">
                     <small>View Sales</small>
                     <a href="#" class="text-white">→</a>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card text-white bg-danger shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Low Stock Products</h5>
-                    <h2 class="card-text">{{ low_stock_count }}</h2>
-                    <p class="card-text">Products with low stock levels.</p>
-                </div>
-                <div class="card-footer d-flex justify-content-between align-items-center">
-                    <small>Manage Stock</small>
-                    <a href="{{ url_for('stock.update_stock') }}" class="text-white">
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
+    <div class="card text-white bg-danger">
+        <div class="card-body">
+            <h5 class="card-title">Low Stock Products</h5>
+            <h2 class="card-text">{{ low_stock_count }}</h2>
+            <p class="card-text">Products with low stock levels.</p> 
         </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <small>Manage Stock</small>
+            <a href="{{ url_for('stock.update_stock') }}" class="text-white">
+                <i class="fas fa-arrow-right"></i> <!-- Font Awesome icon for arrow -->
+            </a>
+        </div>
+    </div>
+</div>
+
     </div>
 
     <!-- Product Table -->
@@ -134,7 +135,7 @@ $(document).ready(function() {
 
     // Handle form submission
     $(document).on('submit', '#updateStockForm', function(event) {
-        event.preventDefault();
+        event.preventDefault(); // Prevent the default form submission
 
         var newStock = $('#newStock').val();
         var productId = $('#productId').val();
@@ -142,7 +143,7 @@ $(document).ready(function() {
         $.post('/products/' + productId + '/update_stock', { new_stock: newStock }, function(response) {
             alert(response.message);
             $('#updateStockModal').modal('hide');
-            location.reload();
+            location.reload(); // Reload the page or update the stock in the table
         }).fail(function(jqXHR) {
             var errorMessage = jqXHR.responseJSON && jqXHR.responseJSON.message ? jqXHR.responseJSON.message : 'Error updating stock. Please try again.';
             alert(errorMessage);

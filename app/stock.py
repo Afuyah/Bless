@@ -23,7 +23,10 @@ FLASH_STOCK_UPDATED = 'Stock for "{}" updated successfully.'
 @login_required
 def categories():
     categories = Category.query.all()
+    if not categories:
+        flash('No categories found.', 'info')
     return render_template('categories.html', categories=categories)
+
 
 # Route to create a new category
 @stock_bp.route('/categories/new', methods=['GET', 'POST'])
@@ -34,7 +37,11 @@ def new_category():
         return redirect(url_for('stock.categories'))
 
     if request.method == 'POST':
-        name = request.form['name']
+        name = request.form.get('name').strip()
+        if not name:
+            flash("Category name cannot be empty.", "danger")
+            return redirect(url_for('stock.new_category'))
+
         if Category.query.filter_by(name=name).first():
             flash(FLASH_CATEGORY_EXISTS)
             return redirect(url_for('stock.new_category'))
@@ -47,6 +54,7 @@ def new_category():
 
     return render_template('new_category.html')
 
+
 # Route to edit an existing category
 @stock_bp.route('/categories/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -54,29 +62,46 @@ def edit_category(id: int):
     category = Category.query.get_or_404(id)
 
     if request.method == 'POST':
-        category.name = request.form['name']
+        new_name = request.form['name'].strip()
+        if not new_name:
+            flash("Category name cannot be empty.", "danger")
+            return redirect(url_for('stock.edit_category', id=id))
+
+        if Category.query.filter_by(name=new_name).first():
+            flash("Category with this name already exists.", "danger")
+            return redirect(url_for('stock.edit_category', id=id))
+
+        category.name = new_name
         db.session.commit()
         flash(FLASH_CATEGORY_UPDATED.format(category.name))
         return redirect(url_for('stock.categories'))
 
     return render_template('edit_category.html', category=category)
 
+
 # Route to delete a category
 @stock_bp.route('/categories/<int:id>/delete', methods=['POST'])
 @login_required
 def delete_category(id: int):
     category = Category.query.get_or_404(id)
-    db.session.delete(category)
-    db.session.commit()
-    flash(FLASH_CATEGORY_DELETED.format(category.name))
+    try:
+        db.session.delete(category)
+        db.session.commit()
+        flash(FLASH_CATEGORY_DELETED.format(category.name))
+    except Exception as e:
+        db.session.rollback()
+        flash(f"An error occurred while deleting the category: {str(e)}", "danger")
     return redirect(url_for('stock.categories'))
 
+
 # Route to manage products
-@stock_bp.route('/products')
+@stock_bp.route('/products', methods=['GET'])
 @login_required
 def products():
-    products = Product.query.all()
-    return render_template('products.html', products=products)
+    search_query = request.args.get('search', '')
+    products = Product.query.filter(Product.name.contains(search_query)).all()
+    return render_template('products.html', products=products, search_query=search_query)
+
 
 @stock_bp.route('/products/new', methods=['GET', 'POST'])
 @login_required
@@ -89,52 +114,68 @@ def new_product():
     suppliers = Supplier.query.all()
 
     if request.method == 'POST':
-        name = request.form['name']
-        cost_price = request.form['cost_price']
-        selling_price = request.form['selling_price']
-        stock = request.form['stock']
+        name = request.form['name'].strip()
+        cost_price = request.form['cost_price'].strip()
+        selling_price = request.form['selling_price'].strip()
+        stock = request.form['stock'].strip()
         category_id = request.form['category']
-        unit_type = request.form['unit_type']  
-        supplier_id = request.form.get('supplier')  
-        combination_size = request.form.get('combination_size')  
-        combination_price = request.form.get('combination_price')  
+        unit_type = request.form['unit_type']
+        supplier_id = request.form.get('supplier')
+        combination_size = request.form.get('combination_size', '').strip()
+        combination_price = request.form.get('combination_price', '').strip()
 
+        # Check if the product already exists
         if Product.query.filter_by(name=name).first():
             flash(FLASH_PRODUCT_EXISTS)
             return redirect(url_for('stock.new_product'))
 
+        # Validate required fields
+        required_fields = [name, cost_price, selling_price, stock, category_id, unit_type]
+        if any(not field for field in required_fields):
+            flash("All fields must be filled out.")
+            return redirect(url_for('stock.new_product'))
+
+        # Validate numeric fields
+        try:
+            cost_price = float(cost_price)
+            selling_price = float(selling_price)
+            stock = float(stock)
+
+            if cost_price <= 0 or selling_price <= 0 or stock < 0:
+                flash("Cost price, selling price, and stock must be positive numbers.")
+                return redirect(url_for('stock.new_product'))
+
+        except ValueError:
+            flash("Cost price, selling price, and stock must be valid numbers.")
+            return redirect(url_for('stock.new_product'))
+
         # Validate combination fields if provided
+        combination_unit_price = None
         if combination_size and combination_price:
             try:
                 combination_size = int(combination_size)
                 combination_price = float(combination_price)
-                if combination_size <= 0 or combination_price <= 0:
-                    raise ValueError
-            except ValueError:
-                flash("Combination size and price must be positive numbers.")
-                return redirect(url_for('stock.new_product'))
 
-            # Calculate combination unit price
-            combination_unit_price = combination_price / combination_size
+                if combination_size <= 0 or combination_price <= 0:
+                    flash("Combination size and price must be positive numbers.")
+                    return redirect(url_for('stock.new_product'))
+
+                combination_unit_price = combination_price / combination_size
             
-            # Here, we assume that the selling price can be less than or equal to the calculated combination unit price
-            # But keep the entered selling price as is. So no adjustment to selling price needed.
-            
-        else:
-            combination_size = None
-            combination_price = None
-            combination_unit_price = None
+            except ValueError:
+                flash("Combination size and price must be valid positive numbers.")
+                return redirect(url_for('stock.new_product'))
 
         new_product = Product(
             name=name,
-            cost_price=float(cost_price),
-            selling_price=float(selling_price),  # Save as entered
-            stock=float(stock),
+            cost_price=cost_price,
+            selling_price=selling_price,  # Save as entered
+            stock=stock,
             category_id=category_id,
             unit_type=unit_type,
             supplier_id=supplier_id,
-            combination_size=combination_size,
-            combination_price=combination_price,
+            combination_size=combination_size if combination_size else None,
+            combination_price=combination_price if combination_price else None,
             combination_unit_price=combination_unit_price  # Save calculated combination unit price
         )
         
@@ -142,6 +183,7 @@ def new_product():
         db.session.commit()
         flash(FLASH_PRODUCT_ADDED.format(name))
 
+        # Emit socket update
         socketio.emit('stock_updated', {
             'id': new_product.id,
             'name': new_product.name,
@@ -151,6 +193,7 @@ def new_product():
         return redirect(url_for('stock.products'))
 
     return render_template('new_product.html', categories=categories, suppliers=suppliers)
+
 
 
 
@@ -224,6 +267,10 @@ def delete_product(id: int):
 
 def update_product_stock(product, quantity_to_add, total_amount):
     """Helper function to update product stock and log expenses."""
+    # Ensure quantity_to_add is valid
+    if quantity_to_add <= 0:
+        raise ValueError("Quantity to add must be positive.")
+
     # Update the stock with the quantity being added
     product.stock += quantity_to_add
 
@@ -272,6 +319,10 @@ def update_stock():
                 'cost_price': product.cost_price
             }, broadcast=True)
 
+        except ValueError as ve:
+            db.session.rollback()
+            flash(str(ve), "error")  # Display specific validation error
+            return redirect(url_for('stock.update_stock'))
         except Exception as e:
             db.session.rollback()
             flash('An error occurred while updating stock. Please try again.', "error")
@@ -297,6 +348,7 @@ def update_stock_product(product_id: int):
     quantity_to_add = int(request.form['quantity'])
     total_amount = float(request.form['total_amount'])
 
+    # Validate input
     if quantity_to_add <= 0:
         return jsonify({'message': "Quantity must be a positive integer."}), 400
     if total_amount < 0:
@@ -313,6 +365,9 @@ def update_stock_product(product_id: int):
         }, broadcast=True)
         return jsonify({'message': f"Stock updated successfully for {product.name}."}), 200
 
+    except ValueError as ve:
+        db.session.rollback()
+        return jsonify({'message': str(ve)}), 400  # Return specific validation error
     except SQLAlchemyError as e:
         db.session.rollback()
         return jsonify({'message': 'Database error. Please try again.'}), 500

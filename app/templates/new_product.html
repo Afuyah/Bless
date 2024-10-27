@@ -21,8 +21,10 @@
         </div>
         <div class="form-group">
             <label for="category">Category:</label>
+
             <select id="category" name="category" class="form-control" required>
                 {% for category in categories %}
+                 <option value="" disabled selected>Select Category</option>
                 <option value="{{ category.id }}">{{ category.name }}</option>
                 {% endfor %}
             </select>
@@ -32,7 +34,7 @@
         <div class="form-group">
             <label for="unit_type">Unit Type:</label>
             <select id="unit_type" name="unit_type" class="form-control" onchange="toggleUnitFields()" required>
-                <option value="" disabled selected>Select unit type</option>
+               
                 <option value="piece">Pieces</option>
                 <option value="weight">Weight (kg)</option>
             </select>

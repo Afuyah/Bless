@@ -10,73 +10,65 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
     <!-- jQuery and Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-  
 </head>
 <body>
-   <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
-    <div class="container">
-        <a class="navbar-brand" href="#">NAWIRI's ENTERPRISE</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{ url_for('sales.sales_screen') }}">Shop</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{ url_for('expense.expenses_page') }}">Expenses</a>
-                </li>
-                <li class="nav-item">
-                   <a class="nav-link active" href="{{ url_for('supplier.suppliers_page') }}">suppliers</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        More
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">credit</a>
-                        <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
-                        <div class="dropdown-divider"></div>
-                       
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-
-
-    <!-- Wrapper for content and footer -->
-<div class="wrapper">
-    <!-- Main container section -->
-    <div class="content">
-        <div class="container text-center my-5">
-            {% block content %}
-            <h1 class="welcome-title">Nawiri's Enterprise</h1>
-            <p class="welcome-description">Your one-stop shop for all your supermarket needs!</p>
-            <a href="#" class="btn btn-custom">Shop Now</a>
-            {% endblock %}
-        </div>
-    </div>
-
-    <!-- Footer section -->
-    <footer class="footer text-center bg-light py-4">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
         <div class="container">
-            <p class="mb-0">© 2024 Nawiri's Enterprise. All rights reserved.</p>
-            
+            <a class="navbar-brand" href="#">NAWIRI'S ENTERPRISE</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('sales.sales_screen') }}">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('expense.expenses_page') }}">Expenses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('supplier.suppliers_page') }}">Suppliers</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            More
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Credit</a>
+                            <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
+                            <div class="dropdown-divider"></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </footer>
-</div>
+    </nav>
 
+    <!-- Main Content -->
+    <div class="wrapper">
+        <div class="content">
+            <div class="container text-center my-5">
+                {% block content %}
+                <h1 class="welcome-title">Nawiri's Enterprise</h1>
+                <p class="welcome-description">Your one-stop shop for all your supermarket needs!</p>
+                <a href="#" class="btn btn-custom">Shop Now</a>
+                {% endblock %}
+            </div>
+        </div>
 
-
+        <!-- Footer -->
+        <footer class="footer text-center py-4">
+            <div class="container">
+                <p>© 2024 Nawiri's Enterprise. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
 </body>
 </html>

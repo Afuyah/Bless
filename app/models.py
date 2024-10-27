@@ -55,6 +55,8 @@ class Category(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
     products = db.relationship('Product', backref='category', lazy='joined')
 
+
+
 # Sale Model with Auto Stock Update and Total Price Indexing
 class Sale(db.Model):
     __tablename__ = 'sales'
@@ -82,8 +84,14 @@ class Sale(db.Model):
             'total': self.total,
             'payment_method': self.payment_method,
             'customer_name': self.customer_name,
-            'items': [item.serialize() for item in self.cart_items]
+            'items': [item.serialize() for item in self.cart_items],
+            'total_profit': self.calculate_profit()
         }
+
+    def calculate_profit(self):
+        """Calculate total profit for this sale."""
+        total_cost = sum(item.product.cost_price * item.quantity for item in self.cart_items)
+        return self.total - total_cost
 
     def finalize_sale(self):
         """Automatically updates stock after a sale."""
@@ -91,7 +99,7 @@ class Sale(db.Model):
             for item in self.cart_items:
                 if item.product.stock < item.quantity:
                     raise ValueError(f"Not enough stock for {item.product.name}")
-            
+
             for item in self.cart_items:
                 item.product.stock -= item.quantity
 
@@ -99,6 +107,7 @@ class Sale(db.Model):
         except Exception as e:
             db.session.rollback()  # Rollback the session in case of error
             raise ValueError(f"Error finalizing sale: {str(e)}")
+
 
 # CartItem Model
 class CartItem(db.Model):
@@ -121,12 +130,20 @@ class CartItem(db.Model):
     def serialize(self):
         """Convert the CartItem object to a dictionary format for JSON serialization."""
         product = self.product
+        total_price = self.quantity * product.selling_price
+        profit_per_item = product.calculate_profit()
         return {
             'product_name': product.name,
             'quantity': self.quantity,
-            'total_price': self.quantity * product.selling_price,  # Calculate total based on selling price
-            'profit_per_item': product.calculate_profit()[0]  # Profit per item
+            'total_price': total_price,  # Calculate total based on selling price
+            'profit_per_item': profit_per_item,
+            'total_profit': profit_per_item * self.quantity  # Total profit for this cart item
         }
+
+
+
+
+
 class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
@@ -159,6 +176,10 @@ class Product(db.Model):
     @hybrid_property
     def profit_margin(self):
         return (self.profit / self.selling_price * 100) if self.selling_price > 0 else 0.0
+
+    def calculate_profit(self):
+        """Calculate profit for the product based on selling and cost price."""
+        return self.profit  # This will return the profit per unit
 
     def is_low_stock(self):
         logging.debug(f"Checking stock for product: {self.name}, Unit Type: {self.unit_type}, Stock: {self.stock}")
