@@ -1,223 +1,349 @@
+:root {
+    --primary-color: #007bff; /* Primary brand color */
+    --secondary-color: #28a745; /* Secondary accent color */
+    --background-color: #f0f4f8; /* Light background color */
+    --text-color: #343a40; /* Main text color */
+    --border-radius: 10px; /* Standard border radius */
+    --font-family: 'Arial', sans-serif; /* Base font family */
+    --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Default box shadow */
+}
 
-/* Overall styles */
+/* Overall Styles */
+* {
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    transition: all 0.2s ease-in-out; /* Smooth transitions for all elements */
+}
+
 body {
-    background-color: #f0f4f8; /* Lighter background for better contrast */
-    font-family: 'Arial', sans-serif; /* More modern font */
-
+    background-color: var(--background-color);
+    font-family: var(--font-family);
+    margin: 0;
+    line-height: 1.6; /* Improve text readability */
 }
 
+/* Main Container Styling */
 .container {
-    border: 1px solid #007bff; /* Border around the main container */
-    padding: 20px; /* Padding inside the container */
-    border-radius: 10px; /* Rounded corners */
-    background: white; /* White background for container */
+    border: 1px solid var(--primary-color);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    background: white;
+    box-shadow: var(--box-shadow);
 }
 
-/* Category styles */
+/* Category and Product Styles */
 .category-container,
 .product-container,
 .cart-container {
-    padding: 10px; /* More padding for a spacious layout */
+    padding: 10px;
 }
 
-/* Category styles */
+/* Category List Styles */
 .category-list {
-    max-height: 300px; /* Limit height */
-    overflow-y: auto; /* Scrollable */
-    border: 1px solid #ccc; /* Light border for clarity */
-    border-radius: 5px; /* Slightly rounded corners */
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    scrollbar-width: thin; /* Custom scrollbar for Firefox */
+    scrollbar-color: var(--primary-color) #f0f4f8; /* Custom scrollbar color */
 }
 
+/* Custom Scrollbar for WebKit Browsers */
+.category-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.category-list::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+}
+
+.category-list::-webkit-scrollbar-track {
+    background: #f0f4f8;
+}
+
+/* Category Items */
 .category-item {
-    padding: 12px; /* Padding for category items */
-    cursor: pointer; /* Pointer on hover */
-    transition: background-color 0.3s; /* Smooth transition */
+    padding: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    border-bottom: 1px solid #eee;
+    display: flex; /* Align items */
+    justify-content: space-between; /* Space between items */
+    align-items: center; /* Center items vertically */
 }
 
-.category-item:hover {
-    background-color: #007bff; /* Highlight color */
-    color: white; /* Text color on hover */
+.category-item:hover,
+.category-item:focus {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateX(5px); /* Add subtle hover effect */
 }
 
-/* Product styles */
+/* Product Styles */
 .product-list {
     display: flex;
     flex-wrap: wrap; /* Responsive wrapping */
+    justify-content: space-between; /* Space between cards */
 }
 
 .product-item {
-    flex: 1 0 calc(45% - 20px);
-/* Responsive cards / margin: 10px; / Margin between cards / padding: 15px; / Padding inside each card / border-radius: 8px; / Rounded corners / background-color: #ffffff; / Card background color / box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); / Soft shadow for depth / transition: transform 0.2s; / Smooth hover effect */ }
+    position: relative; /* Needed for badge positioning */
+    flex: 1 0 calc(30% - 20px); /* Three cards on large screens */
+    margin: 10px;
+    padding: 20px; /* Increased padding for better spacing */
+    border-radius: 12px; /* Slightly more rounded corners */
+    background-color: #ffffff;
+    box-shadow: var(--box-shadow); /* Softer shadow */
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex; /* Flexbox for better alignment */
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: space-between; /* Space out elements */
+}
 
-.product-item
-{ transform: scale(1.02); /* Slight zoom on hover */ }
+/* Product Item Hover Effect */
+.product-item:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); /* More pronounced shadow */
+}
 
-.product-title { font-weight: bold; /* Bold product title / margin-bottom: 5px; / Spacing below title */ }
+/* Product Text Styles */
+.product-title {
+    font-weight: bold;
+    margin-bottom: 8px; /* Increased space below title */
+    font-size: 1.2rem; /* Larger title size */
+}
 
-.product-price { color: #28a745; /* Green color for price / font-weight: bold; / Bold price */ }
+.product-price {
+    color: var(--secondary-color);
+    font-weight: bold;
+    font-size: 1.1rem; /* Slightly larger font for price */
+}
 
-.product-stock { color: #6c757d; /* Gray color for stock */ }
+.product-stock {
+    color: #6c757d;
+}
 
-/* Cart styles / .cart-container { position: sticky; / Sticky cart / top: 0; / Stick to top of viewport */ }
+/* Badge for Stock Levels */
+.badge {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 12px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.75rem;
+}
 
-.cart-items { max-height: 300px; /* Limit cart height / overflow-y: auto; / Scrollable */ }
+/* Cart Styles */
+.cart-container {
+    position: sticky;
+    top: 0;
+    background-color: white; /* Light background for cart */
+    z-index: 10; /* Ensure it appears above other elements */
+}
 
-.cart-item { display: flex; /* Flex layout for items / justify-content: space-between; / Space between elements / align-items: center; / Center vertically / margin-bottom: 10px; / Spacing between items */ }
+.cart-items {
+    max-height: 300px;
+    overflow-y: auto;
+}
 
-.btn { transition: background-color 0.2s, transform 0.2s; /* Button transition */ }
+/* Custom Scrollbar for Cart Items */
+.cart-items::-webkit-scrollbar {
+    width: 8px;
+}
 
-.btn
-{ transform: translateY(-2px); /* Lift effect on hover */ }
+.cart-items::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+}
 
-.btn-danger { background-color: #dc3545; /* Red for remove button */ }
+.cart-items::-webkit-scrollbar-track {
+    background: #f0f4f8;
+}
 
-/* Alerts / .alert { margin-top: 15px; / Space above alerts / padding: 10px; / Padding inside alerts / border-radius: 5px; / Rounded corners */ }
+/* Cart Item Layout */
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
 
-/* Media Queries for Responsiveness / @media (max-width: 768px) { .product-item { flex: 1 0 calc(100% - 20px); / Full width on small screens */ } }
+/* Button Styles */
+.btn {
+    transition: background-color 0.2s, transform 0.2s;
+    border-radius: 5px;
+    padding: 10px 15px;
+    color: white;
+    cursor: pointer; /* Pointer on button hover */
+}
 
+.btn-danger {
+    background-color: #dc3545;
+}
 
+.btn-success {
+    background-color: var(--secondary-color);
+}
 
+.btn:hover {
+    background-color: var(--primary-color);
+}
 
-<!-- Additional Styling -->
+.btn:active {
+    transform: scale(0.98);
+    background-color: #0056b3; /* Slightly darker */
+}
 
-    .wrapper {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh; /* Full height for the wrapper */
+/* Alert Styles */
+.alert {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: rgba(0, 123, 255, 0.1); /* Light background for alerts */
+    border: 1px solid rgba(0, 123, 255, 0.2); /* Alert border */
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 4px solid var(--primary-color);
+    border-top: 4px solid transparent;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    display: none; /* Initially hidden */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .product-item {
+        flex: 1 0 calc(48% - 20px); /* Two cards on smaller screens */
     }
+}
 
-    .content {
-        flex: 1; /* Allows content to take up available space */
+@media (max-width: 420px) {
+    .product-item {
+        flex: 1 0 calc(100% - 20px); /* Full width on extra small screens */
     }
+}
 
-    .welcome-title {
-        font-size: 2.5rem; /* Larger font size for the title */
-        color: #343a40; /* Dark text for contrast */
-        margin-bottom: 1rem; /* Space below the title */
-        font-weight: 700; /* Bold font weight */
-    }
+/* Additional Styling */
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
 
-    .welcome-description {
-        font-size: 1.2rem; /* Medium font size for description */
-        color: #6c757d; /* Muted text color */
-        margin-bottom: 2rem; /* Space below the description */
-    }
+.content {
+    flex: 1;
+}
 
-    .btn-custom {
-        background-color: #007bff; /* Primary button color */
-        color: white; /* Button text color */
-        border: none; /* No border */
-        padding: 12px 30px; /* Button padding */
-        border-radius: 25px; /* Rounded corners */
-        transition: background-color 0.3s ease; /* Smooth transition */
-        text-transform: uppercase; /* Uppercase text */
-        font-weight: 600; /* Bold text */
-    }
+.welcome-title {
+    font-size: 2.5rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
 
-    .btn-custom:hover {
-        background-color: #0056b3; /* Darker blue on hover */
-        text-decoration: none; /* Remove underline on hover */
-    }
+.welcome-description {
+    font-size: 1.2rem;
+    color: #6c757d;
+    margin-bottom: 2rem;
+}
 
-    .footer {
-        background-color: #f8f9fa; /* Light background for footer */
-        color: #495057; /* Darker text color for footer */
-        border-top: 1px solid #dee2e6; /* Subtle border at the top */
-    }
+.btn-custom {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    transition: background-color 0.3s ease;
+    text-transform: uppercase;
+    font-weight: 600;
+}
 
-    .footer a {
-        color: #007bff; /* Link color */
-        text-decoration: none; /* Remove underline */
-    }
+.btn-custom:hover {
+    background-color: #0056b3; /* Darker on hover */
+}
 
-    .footer a:hover {
-        text-decoration: underline; /* Underline links on hover */
-    }
+.footer {
+    background-color: inherit;
+    color: #495057;
+    border-top: 1px solid #dee2e6;
+    text-align: center;
+    padding: 15px 0;
+}
 
-    @media (max-width: 768px) {
-        .welcome-title {
-            font-size: 2rem; /* Smaller title on mobile */
-        }
+.footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
 
-        .welcome-description {
-            font-size: 1rem; /* Smaller description on mobile */
-        }
+.footer a:hover {
+    text-decoration: underline;
+}
 
-        .btn-custom {
-            padding: 10px 20px; /* Smaller button padding on mobile */
-        }
-    }
-
-
-/* Navbar custom styling */
+/* Navbar Custom Styling */
 .navbar-custom {
-    background-color: inherit;      /* Dark background for navbar */
-    color: #f8f9fa;              /* Light text color */
-    padding: 10px 20px;          /* Add padding for better spacing */
+    background-color: inherit;
+    color: #f8f9fa;
+    padding: 10px 20px;
 }
 
 .navbar-custom .navbar-brand {
-    color: grey;              /* Branding color */
-    font-weight: bold;           /* Emphasize brand name */
+    color: grey;
+    font-weight: bold;
 }
 
 .navbar-custom .navbar-nav .nav-link {
-    color: #222;              /* Light color for links */
-    padding: 8px 15px;           /* Better spacing for nav links */
-    transition: color 0.3s ease; /* Smooth hover transition */
+    color: #222;
+    padding: 8px 15px;
+    transition: color 0.3s ease;
 }
 
 .navbar-custom .navbar-nav .nav-link:hover {
-    color: #ddd;                 /* Slight hover effect */
+    color: #ddd;
 }
 
-/* Navbar toggler button styling */
+/* Navbar Toggler Button Styling */
 .navbar-toggler {
-    background-color: #222;      /* Dark color for toggler button */
-    border: none;                /* Remove default border */
-    padding: 6px 10px;           /* Adjust padding for size */
-    border-radius: 4px;          /* Rounded edges for a sleek look */
+    background-color: #222;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
 }
 
-/* Toggler icon styling (retaining the previous style) */
+/* Toggler Icon Styling */
 .navbar-toggler-icon {
-    width: 24px;                 /* Adjust width */
-    height: 2px;                 /* Adjust height */
-    background-color: #f8f9fa;   /* Light color for the bars */
-    display: block;
-    position: relative;
-    transition: all 0.3s ease;   /* Smooth transition for effect */
-}
-
-.navbar-toggler-icon::before,
-.navbar-toggler-icon::after {
-    content: "";
     width: 24px;
-    height: 2px;
-    background-color: #f8f9fa;
-    position: absolute;
-    transition: all 0.3s ease;
+    height: 24px;
+    background-color: var(--primary-color);
 }
 
-.navbar-toggler-icon::before {
-    top: -8px;
+/* Profile Dropdown */
+.profile-dropdown {
+    position: relative;
 }
 
-.navbar-toggler-icon::after {
-    top: 8px;
+.profile-dropdown .dropdown-menu {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: var(--box-shadow);
 }
 
-/* Rotate into an X on toggle */
-.navbar-toggler.collapsed .navbar-toggler-icon {
-    background-color: transparent;
+.profile-dropdown .dropdown-item {
+    padding: 10px 15px;
+    transition: background-color 0.3s;
 }
 
-.navbar-toggler.collapsed .navbar-toggler-icon::before {
-    transform: rotate(45deg);
-    top: 0;
-}
-
-.navbar-toggler.collapsed .navbar-toggler-icon::after {
-    transform: rotate(-45deg);
-    top: 0;
+.profile-dropdown .dropdown-item:hover {
+    background-color: var(--primary-color);
+    color: white;
 }

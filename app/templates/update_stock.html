@@ -70,26 +70,20 @@
     </div>
 </div>
 
-<!-- Include jQuery and DataTables JS/CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function() {
-    // Initialize DataTables
-    var table = $('#productTable').DataTable({
-        searching: true, // Enable search
-        paging: true, // Enable pagination
-        order: [], // Default order (empty for no initial order)
-        columnDefs: [{
-            orderable: false, // Disable sorting on the actions column
-            targets: 4
-        }]
+    // Real-time product search
+    $('#productSearch').on('keyup', function() {
+        let searchTerm = $(this).val().toLowerCase();
+        $('#productTable tbody tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(searchTerm) > -1);
+        });
     });
 
     // Open modal and set product details for updating stock
-    $('#productTable').on('click', '.update-stock-button', function() {
+    $('.update-stock-button').on('click', function() {
         $('#productId').val($(this).data('id'));
         $('#productName').val($(this).data('name'));
         $('#updateStockModal').modal('show');
@@ -103,30 +97,21 @@ $(document).ready(function() {
         let totalAmount = $('#totalAmount').val();
         let productId = $('#productId').val();
 
-        // Disable button and show loading message
-        const submitButton = $(this).find('button[type="submit"]');
-        submitButton.prop('disabled', true).text('Updating...');
-
         $.ajax({
             url: `/stock/products/${productId}/update_stock`,
             type: 'POST',
-            contentType: 'application/json', // Sending JSON data
-            data: JSON.stringify({
+            data: {
                 quantity: newStock,
                 total_amount: totalAmount
-            }),
+            },
             success: function(response) {
                 alert(response.message);
                 $('#updateStockModal').modal('hide');
-                table.ajax.reload(); // Reload DataTable
+                location.reload();
             },
             error: function(jqXHR) {
                 let errorMsg = jqXHR.responseJSON && jqXHR.responseJSON.message ? jqXHR.responseJSON.message : 'Error updating stock. Please try again.';
                 alert(errorMsg);
-            },
-            complete: function() {
-                // Re-enable the button after the request completes
-                submitButton.prop('disabled', false).text('Update Stock');
             }
         });
     });

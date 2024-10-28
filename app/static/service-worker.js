@@ -1,54 +1,57 @@
-const CACHE_NAME = 'my-cache-v1';
+const CACHE_NAME = 'my-cache-v2';
 const urlsToCache = [
     '/',
     '/static/css/styles.css',
     '/static/js/script.js',
-    '/static/images/icon-192x192.png',  // Ensure this path is correct
-    // Add any other resources you need to cache
+    '/static/images/icon-192x192.png',
+    '/offline.html'  // Fallback page when offline
 ];
 
-// Install the service worker
+// Install event - Cache essential resources
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
-                console.log('Caching files:', urlsToCache);  // Log cached files
-                return cache.addAll(urlsToCache).catch((error) => {
-                    console.error('Failed to cache files:', error);  // Catch errors
-                });
+                console.log('Caching initial files:', urlsToCache);
+                return cache.addAll(urlsToCache)
+                    .catch((error) => console.error('Failed to cache files on install:', error));
             })
     );
+    self.skipWaiting();  // Immediately activate this service worker
 });
 
-// Fetch resources with network-first strategy for API calls
+// Fetch event - Network-first for API calls, Cache-first for others with offline fallback
 self.addEventListener('fetch', (event) => {
     if (event.request.url.includes('/api/')) {
-        // Network-first strategy for API requests
         event.respondWith(
             fetch(event.request)
                 .then((response) => {
-                    // Update cache with the latest response
                     return caches.open(CACHE_NAME).then((cache) => {
                         cache.put(event.request, response.clone());
                         return response;
                     });
                 })
-                .catch(() => {
-                    return caches.match(event.request);
-                })
+                .catch(() => caches.match(event.request) || new Response('{"error": "Network error"}', {
+                    headers: { 'Content-Type': 'application/json' }
+                }))
         );
     } else {
-        // Cache-first strategy for other requests
         event.respondWith(
             caches.match(event.request)
                 .then((response) => {
-                    return response || fetch(event.request);
+                    return response || fetch(event.request)
+                        .then((networkResponse) => {
+                            // Cache the dynamically fetched resource if not an API request
+                            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse.clone()));
+                            return networkResponse;
+                        });
                 })
+                .catch(() => caches.match('/offline.html'))  // Show offline page for failed requests
         );
     }
 });
 
-// Activate the service worker and clean up old caches
+// Activate event - Clear old caches and claim clients immediately
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
@@ -62,12 +65,19 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
-    return self.clients.claim(); // Claim clients immediately
+    return self.clients.claim();
 });
 
-// Notify clients of new content
+// Listen for skip waiting message from the client
 self.addEventListener('message', (event) => {
     if (event.data.action === 'SKIP_WAITING') {
         self.skipWaiting();
     }
+});
+
+// Notify the client of updates and request a reload
+self.addEventListener('controllerchange', () => {
+    self.clients.matchAll().then(clients => {
+        clients.forEach(client => client.postMessage({ action: 'NEW_VERSION_AVAILABLE' }));
+    });
 });

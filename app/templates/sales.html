@@ -18,66 +18,62 @@
         </div>
 
         <div class="col-md-6 product-container">
-            <h3>NAWIRI's ENTERPISE</h3>
+            <h3>NAWIRI's ENTERPRISE</h3>
             <div class="product-list" id="product-list"></div>
-            <p id="no-products" style="display: none;">No products found for this category.</p>
+            <p id="no-products" style="display: none;" class="alert alert-warning">No products found for this category.</p>
         </div>
-        
-       
 
+        <div class="col-md-3 cart-container border border-secondary rounded p-3">
+            <h5>Cart Summary</h5>
+            <div id="cart-items" class="cart-items"></div>
+            <div class="d-flex justify-content-between mt-2">
+                <span>Total: Ksh</span>
+                <span id="total-amount">0.00</span>
+            </div>
 
+            <!-- Payment Method Selector -->
+            <div class="mt-3">
+                <label for="payment-method">Payment Method:</label>
+                <select id="payment-method" class="form-select">
+                    <option value="cash">Cash</option>
+                    <option value="mpesa">M-Pesa</option>
+                    <option value="credit">Credit</option>
+                </select>
+            </div>
 
-     <div class="col-md-3 cart-container border border-secondary rounded p-3">
-    <h5>Cart Summary</h5>
-    <div id="cart-items" class="cart-items"></div>
-    <div class="d-flex justify-content-between mt-2">
-        <span>Total: Ksh</span>
-        <span id="total-amount">0.00</span>
+            <!-- Customer Name Input -->
+            <div class="mt-2" id="customer-name-container" style="display: none;">
+                <label for="customer-name">Customer Name:</label>
+                <input type="text" id="customer-name" class="form-control" placeholder="Enter customer name" />
+            </div>
+
+            <button id="checkout-btn" class="btn btn-success mt-2">Checkout</button>
+
+            <!-- Loading indicator -->
+            <div class="alert alert-info mt-2" id="checkout-loading" style="display: none;">Processing your checkout...</div>
+        </div>
     </div>
 
-    <!-- Payment Method Selector -->
-    <div class="mt-3">
-        <label for="payment-method">Payment Method:</label>
-        <select id="payment-method" class="form-select">
-            <option value="cash">Cash</option>
-            <option value="mpesa">M-Pesa</option>
-            <option value="credit">Credit</option>
-        </select>
-    </div>
+    <!-- Low Stock Notification -->
+    <div class="alert alert-warning mt-4" id="low-stock-alert" style="display: none;"></div>
 
-    <!-- Customer Name Input -->
-    <div class="mt-2" id="customer-name-container" style="display: none;">
-        <label for="customer-name">Customer Name:</label>
-        <input type="text" id="customer-name" class="form-control" placeholder="Enter customer name" />
-    </div>
+    <!-- Error messages area -->
+    <div class="alert alert-danger mt-2" id="error-message" style="display: none;"></div>
 
-    <button id="checkout-btn" class="btn btn-success mt-2">Checkout</button>
-    <!-- Loading indicator -->
-    <div class="alert alert-info mt-2" id="checkout-loading" style="display: none;">Processing your checkout...</div>
-</div>
-
-<!-- Low Stock Notification -->
-<div class="alert alert-warning mt-4" id="low-stock-alert" style="display: none;"></div>
-
-<!-- Error messages area -->
-<div class="alert alert-danger mt-2" id="error-message" style="display: none;"></div>
-
-
-
-
-<!-- Success Modal -->
+    <!-- Success Modal -->
+    
 <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="successModalLabel">Checkout Successful</h5>
+                <h5 class="modal-title" id="successModalLabel">Successful</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                Your checkout has been processed successfully!
-            </div>
+               Checkout Successfull
+                           </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
@@ -91,186 +87,36 @@
 <!-- Additional Styling -->
 
 
-<style>
-    
-    /* Container Styling */
-.container {
-    max-width: 1200px; /* Adjust this value for desired width */
-    margin: 0 auto; /* Center the container */
-    padding: 20px; /* Add padding for better spacing */
-}
-
-/* Category and Product Item Styling */
-.category-item, .product-item {
-    cursor: pointer; /* Indicates clickable items */
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 12px;
-    margin: 8px 0;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.category-item:hover, .product-item:hover {
-    background-color: #f9f9f9; /* Light background on hover */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Elevation effect */
-}
-
-/* Cart Container Styling */
-.cart-container {
-    position: sticky; /* Keep the cart summary fixed during scrolling */
-    top: 20px; /* Adjust as needed */
-    background-color: #fff; /* Ensure white background for contrast */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    z-index: 1000; /* Ensure it appears above other elements */
-    border-radius: 8px; /* Rounded corners for cart */
-    padding: 15px; /* Padding for internal spacing */
-}
-
-/* Cart Item Layout */
-.cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0; /* Add spacing between cart items */
-    border-bottom: 1px solid #ddd; /* Separator for items */
-}
-
-.cart-item:last-child {
-    border-bottom: none; /* Remove border for the last item */
-}
-
-.cart-item button {
-    font-size: 0.9rem; /* Button size */
-}
-
-/* Quantity Styling */
-.cart-item-quantity {
-    display: inline-block;
-    padding: 4px 8px; /* Padding for the quantity box */
-    border: 1px solid #007bff; /* Border color */
-    border-radius: 4px; /* Rounded corners */
-    background-color: #e9f7fe; /* Light blue background */
-    font-weight: bold; /* Bold text */
-}
-
-/* Total Amount Styling */
-#total-amount {
-    font-size: 1.5rem; /* Make total amount larger */
-    font-weight: bold; /* Bold text for emphasis */
-    color: #28a745; /* Green color for the total */
-}
-
-/* Checkout Button Styling */
-#checkout-btn {
-    width: 100%; /* Full-width button for better usability */
-    padding: 10px; /* Ample padding for comfort */
-    font-size: 1rem; /* Slightly larger font size */
-    background-color: #28a745; /* Green background */
-    color: white; /* White text */
-    border: none; /* No border */
-    border-radius: 4px; /* Rounded edges */
-    transition: background-color 0.3s ease; /* Smooth transition */
-}
-
-#checkout-btn:hover {
-    background-color: #218838; /* Darker green on hover */
-}
-
-/* Alerts and Messages */
-#low-stock-alert, #error-message {
-    font-weight: bold; /* Make the warning/error messages bold */
-    margin-top: 10px; /* Spacing above */
-}
-
-#low-stock-alert {
-    color: #dc3545; /* Red color for low stock alert */
-    display: none; /* Initially hidden */
-}
-
-#error-message {
-    padding: 10px; /* Padding for error message */
-    background-color: #f8d7da; /* Light red background */
-    border: 1px solid #dc3545; /* Red border */
-    border-radius: 4px; /* Rounded edges */
-    display: none; /* Initially hidden */
-}
-
-/* Loading Indicator */
-#checkout-loading {
-    display: none; /* Initially hidden */
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .container {
-        padding: 10px; /* Less padding for mobile */
-    }
-
-    .product-item {
-        margin: 4px 0; /* Less margin for mobile */
-    }
-
-    .cart-container {
-        max-width: 100%; /* Full width on mobile */
-        margin-top: 20px; /* Margin on top for mobile */
-    }
-}
-
-/* Add a pointer to show the card is clickable */
-.product-item.clickable {
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.product-item.clickable:hover {
-    background-color: #f0f8ff; /* Light background change on hover */
-    transform: scale(1.02); /* Slight zoom effect on hover */
-}
-
-/* Styling for out-of-stock items */
-.disabled-card {
-    opacity: 0.6; /* Dim out-of-stock items */
-    cursor: not-allowed; /* Indicate unavailability */
-}
-
-.disabled-card:hover {
-    background-color: inherit; /* No hover effect on disabled cards */
-    transform: none; /* No zoom for disabled cards */
-}
-
-</style>
-
 
 <script>
 
 let cart = [];
 
-// Fetch products based on category
 $(document).on('click', '.category-item', function () {
     const categoryId = $(this).data('category');
     $('#product-list').html('<p>Loading products...</p>'); // Show loading indicator
     $('#no-products').hide(); // Hide no-products message
 
     $.ajax({
-        url: `/sales/api/products/${categoryId}`, // Flask API endpoint to fetch products by category
+        url: `/sales/api/products/${categoryId}`,
         method: 'GET',
         success: function (data) {
             if (data.products && data.products.length > 0) {
                 populateProducts(data.products);
             } else {
-                $('#product-list').empty(); // Clear product list
-                $('#no-products').show(); // Show fallback when no products are found
+                $('#product-list').empty();
+                $('#no-products').show();
             }
         },
         error: function () {
             showError('Failed to load products. Please try again.');
-            $('#product-list').empty(); // Clear the product list on error
+            $('#product-list').empty();
         }
     });
 });
 
 function populateProducts(products) {
-    $('#product-list').empty(); // Clear previous product listings
+    $('#product-list').empty();
 
     if (products.length === 0) {
         $('#product-list').append('<p class="text-muted">No products available.</p>');
@@ -279,16 +125,16 @@ function populateProducts(products) {
 
     products.forEach(product => {
         let lowStockWarning = product.stock < 5 ? `<span class="text-danger">(Low Stock)</span>` : '';
-        let combinationText = product.combination_size > 1 ? `(${product.combination_size} for Ksh ${product.combination_price})` : '';
+        let combinationText = product.combination_size > 1 ? `(${product.combination_size} @ Ksh ${product.combination_price})` : '';
 
         $('#product-list').append(`
-            <div class="product-item border border-primary rounded p-2 mb-3 ${product.stock === 0 ? 'disabled-card' : 'clickable'}" 
-                 data-id="${product.id}" 
-                 data-name="${product.name}" 
-                 data-selling-price="${product.selling_price}" 
-                 data-combination-price="${product.combination_price || 0}" 
-                 data-combination-unit-price="${product.combination_unit_price || 0}" 
-                 data-stock="${product.stock}" 
+            <div class="product-item border border-primary rounded p-2 mb-3 ${product.stock === 0 ? 'disabled-card' : 'clickable'}"
+                 data-id="${product.id}"
+                 data-name="${product.name}"
+                 data-selling-price="${product.selling_price}"
+                 data-combination-price="${product.combination_price || 0}"
+                 data-combination-unit-price="${product.combination_unit_price || 0}"
+                 data-stock="${product.stock}"
                  data-combination-size="${product.combination_size || 1}">
                 <h5 class="product-title">${product.name} ${lowStockWarning}</h5>
                 <p class="product-price">Ksh ${product.selling_price.toFixed(2)} ${combinationText}</p>
@@ -298,7 +144,6 @@ function populateProducts(products) {
     });
 }
 
-// Make the entire card clickable to add to cart
 $(document).on('click', '.product-item.clickable', function () {
     const productId = $(this).data('id');
     const productName = $(this).data('name');
@@ -309,16 +154,16 @@ $(document).on('click', '.product-item.clickable', function () {
 
     const existingItem = cart.find(item => item.id === productId);
 
-    // Check if the item is already in the cart and if there is stock available
     if (existingItem) {
         if (existingItem.quantity < productStock) {
             existingItem.quantity += 1; // Increment quantity if there's stock
+            showSuccess(`${productName} has been added to the cart.`);
         } else {
             showError('Cannot add more of this item. Stock limit reached.');
             return;
         }
     } else {
-        if (productStock > 0) { // Ensure there's stock to add
+        if (productStock > 0) {
             cart.push({
                 id: productId,
                 name: productName,
@@ -328,6 +173,7 @@ $(document).on('click', '.product-item.clickable', function () {
                 quantity: 1,
                 combination_size: $(this).data('combination-size') || 1
             });
+            showSuccess(`${productName} has been added to the cart.`);
         } else {
             showError('Cannot add this item. Stock limit reached.');
             return;
@@ -336,14 +182,6 @@ $(document).on('click', '.product-item.clickable', function () {
     updateCart();
 });
 
-// Handle removing items from cart
-$(document).on('click', '.remove-from-cart', function () {
-    const productId = $(this).data('id');
-    cart = cart.filter(item => item.id !== productId);
-    updateCart();
-});
-
-// Update the cart summary
 function updateCart() {
     $('#cart-items').empty();
     let total = 0;
@@ -353,21 +191,16 @@ function updateCart() {
         const fullCombinations = Math.floor(item.quantity / item.combination_size);
         const remainingUnits = item.quantity % item.combination_size;
 
-        // Calculate price using combination pricing for full combinations
         subtotal += fullCombinations * item.combination_price;
-
-        // Calculate the remaining items' price and check if using combination pricing would be cheaper
         const individualRemainderPrice = remainingUnits * item.selling_price;
         const additionalCombinationPrice = item.combination_price; // Cost of 1 combination set
 
         if (remainingUnits > 0) {
-            // Compare remaining items' individual price vs an extra combination price
             subtotal += Math.min(individualRemainderPrice, additionalCombinationPrice);
         }
 
         total += subtotal;
 
-        // Append item to cart display
         $('#cart-items').append(`
             <div class="cart-item">
                 ${item.name} - Ksh ${item.selling_price.toFixed(2)} x ${item.quantity} = Ksh ${subtotal.toFixed(2)}
@@ -376,8 +209,47 @@ function updateCart() {
         `);
     });
 
-    $('#total-amount').text(total.toFixed(2)); // Update the total amount display
+    $('#total-amount').text(total.toFixed(2));
 }
+
+// Display success message
+function showSuccess(message) {
+    const alert = `<div class="alert alert-success" role="alert">${message}</div>`;
+    $('#error-message').html(alert).show().delay(3000).fadeOut();
+}
+
+// Display error message
+function showError(message) {
+    const alert = `<div class="alert alert-danger" role="alert">${message}</div>`;
+    $('#error-message').html(alert).show().delay(3000).fadeOut();
+}
+
+// Confirm checkout
+$('#checkout-btn').on('click', function () {
+    if (cart.length === 0) {
+        showError('Your cart is empty. Please add items before checking out.');
+        return;
+    }
+
+    const paymentMethod = $('#payment-method').val();
+    const customerName = paymentMethod === 'credit' ? $('#customer-name').val() : '';
+
+    if (paymentMethod === 'credit' && customerName.trim() === '') {
+        showError('Please enter customer name for credit payment.');
+        return;
+    }
+
+    $('#checkout-loading').show(); // Show loading indicator
+
+    // Simulate checkout process
+    setTimeout(() => {
+        $('#checkout-loading').hide();
+        $('#successModal').modal('show'); // Show success modal
+        cart = []; // Clear the cart
+        updateCart(); // Update cart display
+    }, 2000); // Simulate processing time
+});
+
 
 
 // Handle payment method change
@@ -447,7 +319,6 @@ function resetCheckoutForm() {
     $('#customer-name').val(''); // Clear customer name
     $('#customer-name-container').hide(); // Hide customer name input
 }
-
 
 // Debounce function to limit the frequency of search execution
 function debounce(func, delay) {

@@ -36,7 +36,7 @@ def register():
         db.session.commit()
 
         flash(f'{role.capitalize()} "{username}" registered successfully!')
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.user_management'))
 
     return render_template('register.html')
 

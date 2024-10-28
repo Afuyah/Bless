@@ -9,11 +9,13 @@ expense_bp = Blueprint('expense', __name__)
 
 
 @expense_bp.route('/expenses')
+@login_required
 def expenses_page():
     return render_template('expenses.html')  # Create this template
 
 
 @expense_bp.route('/api/expenses', methods=['GET'])
+@login_required
 def get_expenses():
     date_filter = request.args.get('date')
     query = Expense.query

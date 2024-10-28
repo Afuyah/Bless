@@ -14,7 +14,15 @@ migrate = Migrate()
 socketio = SocketIO()
 login_manager = LoginManager()
 
-
+# Custom decorator to enforce login requirement
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('user_id'):  # Check if user is logged in
+            flash('You must be logged in to view this page.', 'warning')  # Flash message
+            return redirect(url_for('auth.login'))  # Redirect to login page
+        return f(*args, **kwargs)
+    return decorated_function
 
 def create_app(config_class=Config):
     app = Flask(__name__)

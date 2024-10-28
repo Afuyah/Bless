@@ -1,7 +1,7 @@
 // Check if the browser supports service workers
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/static/service-worker.js') // Adjust the path as needed
+        navigator.serviceWorker.register('/static/service-worker.js') // Adjust the path if needed
             .then((registration) => {
                 console.log('Service Worker registered with scope:', registration.scope);
 
@@ -14,10 +14,10 @@ if ('serviceWorker' in navigator) {
                             if (navigator.serviceWorker.controller) {
                                 // New content is available; ask user to refresh
                                 console.log('New content is available; please refresh.');
-                                // Optionally, you can prompt the user to refresh the page
-                                // if confirm('New version available. Refresh?')) {
-                                //     window.location.reload();
-                                // }
+                                if (confirm('New version available. Refresh?')) {
+                                    // Reload the page to load the new version
+                                    window.location.reload();
+                                }
                             } else {
                                 console.log('Content is cached for offline use.');
                             }
@@ -31,7 +31,7 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// Optional: Allow the user to manually refresh and get new content
+// Function to manually refresh and get new content by updating Service Worker
 function updateServiceWorker() {
     if (navigator.serviceWorker) {
         navigator.serviceWorker.getRegistration().then((registration) => {
@@ -42,5 +42,8 @@ function updateServiceWorker() {
     }
 }
 
-// Example function to trigger an update
-document.getElementById('update-button').addEventListener('click', updateServiceWorker);
+// Example manual update trigger
+const updateButton = document.getElementById('update-button');
+if (updateButton) {
+    updateButton.addEventListener('click', updateServiceWorker);
+}
