@@ -372,3 +372,26 @@ def update_stock_product(product_id: int):
         return jsonify({'message': 'Database error. Please try again.'}), 500
     except Exception as e:
         return jsonify({'message': str(e)}), 500
+
+
+@stock_bp.route('/api/low-stock-products', methods=['GET'])
+def get_low_stock_products():
+    low_stock_products = Product.query.filter(Product.stock < 5).all()  # Fetch products with stock less than 5
+    low_stock_count = len(low_stock_products)
+
+    # Construct a list of product details to return
+    products_data = [
+        {
+            'id': product.id,
+            'name': product.name,
+            'stock': product.stock,
+            'cost_price': product.cost_price,  # Include cost price
+            'selling_price': product.selling_price  # Include selling price
+        }
+        for product in low_stock_products
+    ]
+
+    return jsonify({
+        'low_stock_count': low_stock_count,
+        'products': products_data  # Return detailed product data
+    })

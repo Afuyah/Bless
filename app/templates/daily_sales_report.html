@@ -10,7 +10,7 @@
             <input type="date" name="start_date" class="form-control" value="{{ start_date }}" required aria-label="Start Date">
             <span class="input-group-text">to</span>
             <input type="date" name="end_date" class="form-control" value="{{ end_date }}" required aria-label="End Date">
-            <button type="submit" class="btn btn-primary ms-2" aria-label="Get Filtered Sales Report">Get Filtered Report</button>
+            <button type="submit" class="btn btn-gradient ms-2" aria-label="Get Filtered Sales Report">Get Filtered Report</button>
         </div>
     </form>
     <div id="dateFeedback" class="alert alert-danger d-none" role="alert"></div>
@@ -19,43 +19,37 @@
     <form method="get" action="{{ url_for('sales.daily_sales_report') }}" class="mb-4 text-center">
         <div class="input-group mb-3 justify-content-center">
             <input type="date" name="date" class="form-control" value="{{ today.strftime('%Y-%m-%d') }}" required aria-label="Date for Daily Report">
-            <button type="submit" class="btn btn-primary ms-2" aria-label="Get Daily Sales Report">Get Daily Report</button>
+            <button type="submit" class="btn btn-gradient ms-2" aria-label="Get Daily Sales Report">Get Daily Report</button>
         </div>
     </form>
 
-    <div class="summary mb-4">
-        <h5 class="text-muted">Sales Summary</h5>
-        <div class="row">
-            <div class="col-md-4 text-center">
-                <div class="card p-3 shadow-sm">
-                    <h6>Total Sales</h6>
-                    <p class="fs-4">Ksh {{ total_sales }}</p>
-                </div>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="card p-3 shadow-sm">
-                    <h6>Total Transactions</h6>
-                    <p class="fs-4">{{ total_transactions }}</p>
-                </div>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="card p-3 shadow-sm">
-                    <h6>Daily Profit</h6>
-                    <p class="fs-4">Ksh {{ daily_profit }}</p>
-                </div>
-            </div>
+    <!-- Sales Summary -->
+    <div class="summary mb-4 d-flex flex-wrap justify-content-around">
+        <div class="card summary-card">
+            <h6>Total Sales</h6>
+            <p class="fs-4">Ksh {{ total_sales }}</p>
         </div>
-        {% if most_sold_item %}
-            <div class="alert alert-info text-center mt-3">
-                Most Sold Item: <strong>{{ most_sold_item }}</strong> ({{ most_sold_quantity }} sold)
-            </div>
-        {% else %}
-            <div class="alert alert-warning text-center mt-3">
-                No items sold for the selected date.
-            </div>
-        {% endif %}
+        <div class="card summary-card">
+            <h6>Total Transactions</h6>
+            <p class="fs-4">{{ total_transactions }}</p>
+        </div>
+        <div class="card summary-card">
+            <h6>Daily Profit</h6>
+            <p class="fs-4">Ksh {{ daily_profit }}</p>
+        </div>
     </div>
 
+    {% if most_sold_item %}
+        <div class="alert alert-info text-center mt-3">
+            Most Sold Item: <strong>{{ most_sold_item }}</strong> ({{ most_sold_quantity }} sold)
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center mt-3">
+            No items sold for the selected date.
+        </div>
+    {% endif %}
+
+    <!-- Sales Data Table -->
     {% if sales %}
         <div class="table-responsive">
             <table class="table table-striped table-hover" id="salesTable">
@@ -135,64 +129,80 @@ $(document).ready(function() {
 </script>
 
 <style>
+    body {
+        background-color: #f0f4f8;
+        font-family: 'Montserrat', sans-serif;
+    }
+
     .container {
         max-width: 1200px;
-        background: #ffffff;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         margin: auto;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
     }
 
     h4 {
         color: #343a40;
-        font-family: 'Roboto', sans-serif;
+        font-weight: 600;
+        margin-bottom: 30px;
     }
 
-    h5 {
-        color: #6c757d;
+    .summary {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
     }
 
-    .summary .card {
-        background-color: #ffffff;
-        border: 1px solid #dee2e6;
-        border-radius: 5px;
-        transition: box-shadow 0.3s;
+    .summary-card {
+        background: linear-gradient(90deg, #007bff, #00d4ff);
+        color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        flex: 1 1 calc(33% - 20px);
+        margin: 10px;
+        transition: transform 0.3s;
     }
 
-    .summary .card:hover {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    .summary-card:hover {
+        transform: translateY(-5px);
     }
 
     .table {
         margin-top: 20px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     }
 
     .table th {
         background-color: #007bff;
         color: white;
-    }
-
-    .table td {
-        background-color: #ffffff;
-    }
-
-    .input-group {
-        max-width: 600px;
-        margin: 0 auto;
+        text-transform: uppercase;
+        font-size: 0.9em;
     }
 
     .table tbody tr:hover {
-        background-color: #f1f1f1;
+        background-color: rgba(0, 123, 255, 0.1);
+    }
+
+    .btn-gradient {
+        background: linear-gradient(90deg, #007bff, #00d4ff);
+        color: white;
+        border: none;
+        transition: background 0.3s;
+    }
+
+    .btn-gradient:hover {
+        background: linear-gradient(90deg, #0056b3, #009bbf);
     }
 
     @media (max-width: 768px) {
-        .summary .card {
+        .summary-card {
+            flex: 1 1 100%;
             margin-bottom: 20px;
-        }
-
-        .input-group {
-            width: 100%;
         }
     }
 </style>

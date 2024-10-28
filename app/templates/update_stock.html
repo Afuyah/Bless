@@ -11,7 +11,7 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-hover table-bordered" id="productTable">
+        <table class="table table-striped table-bordered" id="productTable">
             <thead class="thead-light">
                 <tr>
                     <th>Name</th>
@@ -70,10 +70,24 @@
     </div>
 </div>
 
+<!-- Include jQuery and DataTables scripts -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+
 <script>
 $(document).ready(function() {
+    // Initialize DataTable
+    $('#productTable').DataTable({
+        searching: false, // Disable default search, we have our own
+        paging: true, // Enable pagination
+        order: [], // Disable default ordering
+        columnDefs: [
+            { orderable: false, targets: 4 } // Disable ordering on actions column
+        ]
+    });
+
     // Real-time product search
     $('#productSearch').on('keyup', function() {
         let searchTerm = $(this).val().toLowerCase();
@@ -117,4 +131,41 @@ $(document).ready(function() {
     });
 });
 </script>
+
+<style>
+/* Custom styles for better aesthetics */
+.container {
+    max-width: 900px;
+}
+
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+.btn-info {
+    transition: background-color 0.3s ease;
+}
+
+.btn-info:hover {
+    background-color: #007bff; /* Custom hover color */
+}
+
+.modal-content {
+    border-radius: 15px;
+}
+
+.modal-header {
+    background-color: #f8f9fa; /* Light background for modal header */
+}
+
+.modal-body {
+    background-color: #ffffff; /* White background for modal body */
+}
+</style>
+
 {% endblock %}

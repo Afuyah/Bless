@@ -174,6 +174,29 @@ def checkout():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
+@sales_bp.route('/api/todays-total-sales', methods=['GET'])
+@login_required
+def todays_total_sales():
+    # Get today's date
+    today = datetime.today().date()
+    
+    # Fetch sales for today
+    sales = Sale.query.filter(func.date(Sale.date) == today).all()
+    
+    # Calculate total sales
+    total_sales = sum(sale.total for sale in sales)
+    
+    # Calculate total transactions
+    total_transactions = len(sales)
+    
+    # Return total sales as JSON
+    return jsonify({
+        'total_sales': round(total_sales, 2),
+        'total_transactions': total_transactions
+    })
+
+
+
 @sales_bp.route('/reports/daily', methods=['GET'])
 @login_required
 def daily_sales_report():

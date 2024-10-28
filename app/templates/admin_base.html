@@ -9,160 +9,11 @@
 
     <!-- Bootstrap and Custom CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
     <style>
-        /* Base styling */
-        body {
-            background-color: #f4f6f9;
-            font-family: 'Poppins', sans-serif;
-            color: #343a40;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden; /* Prevent horizontal scroll */
-        }
-
-        /* Parallax Background */
-        .parallax {
-            background-image: url('https://source.unsplash.com/random/1920x1080/?office');
-            height: 300px; /* Height for the parallax section */
-            background-attachment: fixed;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
-        }
-
-        .parallax h1 {
-            color: white;
-            text-align: center;
-            padding: 100px 0;
-            font-size: 3rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-        }
-
-        /* Sidebar styles */
-        .sidebar {
-            height: 100vh;
-            width: 250px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: #343a40; /* Dark background for the sidebar */
-            padding-top: 20px;
-            transition: transform 0.3s ease-in-out;
-            overflow-y: auto;
-            transform: translateX(0);
-        }
-
-        .sidebar h3 {
-            color: #ffffff;
-            text-align: center;
-            font-weight: 500;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-        }
-
-        .sidebar a {
-            display: block;
-            padding: 12px 20px;
-            color: #cfd8dc; /* Lighter text color */
-            text-decoration: none;
-            font-size: 1rem;
-            transition: background 0.3s, color 0.3s;
-            border-radius: 4px;
-        }
-
-        .sidebar a:hover, .sidebar a.active {
-            background-color: #495057; /* Slightly lighter for hover */
-            color: #ffffff;
-        }
-
-        /* Toggle button for small screens */
-        .sidebar-toggle {
-            display: none;
-            font-size: 1.5rem;
-            color: #222;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 1000;
-            cursor: pointer;
-        }
-
-        /* Main content styles */
-        .content {
-            margin-left: 260px;
-            padding: 25px;
-            transition: margin-left 0.3s;
-        }
-
-        /* Sidebar hidden for small screens */
-        .sidebar-hidden .sidebar {
-            transform: translateX(-100%);
-        }
-
-        .sidebar-hidden .content {
-            margin-left: 0;
-        }
-
-        /* Header */
-        header {
-            background-color: #f8f9fb;
-            color: #333;
-            padding: 15px 25px;
-            border-bottom: 1px solid #dee2e6;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-            font-size: 1.5rem;
-            font-weight: 500;
-        }
-
-        /* Card styles */
-        .card {
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px); /* Lift effect on hover */
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Footer */
-        footer {
-            background-color: #343a40;
-            color: #cfd8dc;
-            padding: 15px 0;
-            text-align: center;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 250px;
-                transform: translateX(-100%);
-            }
-
-            .content {
-                margin-left: 0;
-            }
-
-            .sidebar-toggle {
-                display: block;
-            }
-
-            /* Show sidebar on toggle */
-            .sidebar-visible .sidebar {
-                transform: translateX(0);
-            }
-
-            .sidebar-visible .content {
-                margin-left: 250px;
-            }
-        }
+        
     </style>
 
     {% block extra_css %}
@@ -170,7 +21,6 @@
 </head>
 <body>
 
-   
     <!-- Sidebar Toggle Button -->
     <div class="sidebar-toggle" id="sidebarToggle">
         <i class="fas fa-bars"></i>
@@ -179,13 +29,14 @@
     <!-- Sidebar Navigation -->
     <div class="sidebar" id="sidebar">
         <h3>Nawiri's Enterprise</h3>
-        <a href="{{ url_for('auth.admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('auth.admin_dashboard') }}" class="active">Dashboard</a>
         <a href="{{ url_for('sales.daily_sales_report') }}">Sales Reports</a>
         <a href="{{ url_for('stock.products') }}">Manage Products</a>
         <a href="{{ url_for('stock.categories') }}">Manage Categories</a>
         <a href="{{ url_for('stock.update_stock') }}">Update Stock</a>
         <a href="{{ url_for('auth.user_management') }}">User Management</a>
-        <a href="{{ url_for('auth.logout') }}">Logout</a>
+        <hr style="border-color: #6c757d; margin: 10px 0;">
+        <a href="{{ url_for('auth.logout') }}" class="text-danger">Logout</a>
     </div>
 
     <!-- Main Content -->

@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Products</h2>
+    <h2 class="text-center mb-4">Product Inventory</h2>
     <div class="text-right mb-3">
         <a href="{{ url_for('stock.new_product') }}" class="btn btn-custom">Add New Product</a>
     </div>
@@ -106,6 +106,7 @@
         margin: 0 3px;
         border: none;
     }
+    
     .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
         background-color: #0056b3;
         color: #fff;
@@ -119,6 +120,11 @@
 
         h2 {
             font-size: 1.6rem;
+        }
+
+        .btn-custom {
+            font-size: 0.9rem;
+            padding: 8px 16px;
         }
     }
 </style>
@@ -134,7 +140,7 @@ $(document).ready(function() {
         paging: true,
         ordering: true,
         columnDefs: [
-            { orderable: false, targets: [0, 1] }
+            { orderable: false, targets: [] } // Adjust to make specific columns non-orderable if needed
         ],
         language: {
             searchPlaceholder: "Search products...",
