@@ -152,7 +152,7 @@ class Product(db.Model):
     stock = db.Column(db.Float, nullable=False, default=0.0)  # Represents count for pieces
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'), nullable=True)
-    packet_size = db.Column(db.Integer, nullable=True)  # For piece products only
+   
     combination_size = db.Column(db.Integer, nullable=True)  # For combination sales
     combination_price = db.Column(db.Float, nullable=True)  # For combination sales
     combination_unit_price = db.Column(db.Float, nullable=True)
@@ -190,7 +190,7 @@ class Product(db.Model):
             'cost_price': self.cost_price,
             'selling_price': self.selling_price,
             'stock': self.stock,
-            'packet_size': self.packet_size,
+           
             'combination_size': self.combination_size,
             'combination_price': self.combination_price,
             'profit': self.profit,
