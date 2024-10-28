@@ -3,17 +3,27 @@
 <div class="container mt-5">
     <h4 class="mb-4 text-center">Filtered Sales Report</h4>
 
-   
-    
-    <div class="card mb-4 shadow-sm border-light">
+    <div class="card mb-4 shadow-lg border-light">
         <div class="card-body">
-            <h5 class="card-title">Sales Summary</h5>
+            <h5 class="card-title text-primary">Sales Summary</h5>
             <h6 class="card-subtitle mb-2 text-muted">Overview of the sales data</h6>
-            <p>Total Sales: <strong>Ksh {{ total_sales }}</strong></p>
-            <p>Total Transactions: <strong>{{ total_transactions }}</strong></p>
-            <p>Total Profit: <strong>Ksh {{ total_profit }}</strong></p>
-            <p>Average Sale Value: <strong>Ksh {{ avg_sale_value }}</strong></p>
-            <p>Unique Products Sold: <strong>{{ unique_products }}</strong></p>
+            <div class="row">
+                <div class="col-md-4">
+                    <p>Total Sales: <strong>Ksh {{ total_sales }}</strong></p>
+                </div>
+                <div class="col-md-4">
+                    <p>Total Transactions: <strong>{{ total_transactions }}</strong></p>
+                </div>
+                <div class="col-md-4">
+                    <p>Total Profit: <strong>Ksh {{ total_profit }}</strong></p>
+                </div>
+                <div class="col-md-4">
+                    <p>Average Sale Value: <strong>Ksh {{ avg_sale_value }}</strong></p>
+                </div>
+                <div class="col-md-4">
+                    <p>Unique Products Sold: <strong>{{ unique_products }}</strong></p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -75,23 +85,23 @@
         max-width: 1200px;
         background: #f8f9fa;
         border-radius: 10px;
-        padding: 20px;
+        padding: 30px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
-    h1 {
+    h4, h5, h6 {
         color: #343a40;
         font-family: 'Roboto', sans-serif;
-    }
-
-    h2 {
-        color: #495057;
     }
 
     .card {
         background-color: #ffffff;
         border: none;
-        border-radius: 8px;
+        border-radius: 10px;
+    }
+
+    .card-body {
+        padding: 20px;
     }
 
     .table {
@@ -121,6 +131,13 @@
         text-align: center;
         margin-top: 20px;
         font-size: 1.1em;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .card-title, .card-subtitle {
+            text-align: center;
+        }
     }
 </style>
 {% endblock %}

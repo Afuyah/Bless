@@ -182,11 +182,7 @@ body {
     }
 }
 
-/* Define color variables for easier customization */
-:root {
-    --primary-color: #007bff; /* Replace with your theme color */
-    --secondary-color: #28a745; /* Replace with your theme secondary color */
-}
+
 
 /* Cart Styles */
 .cart-container {

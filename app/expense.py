@@ -124,8 +124,6 @@ def render_expenses_report():
     return render_template('expenses_report.html')
 
 
-from datetime import datetime
-
 @expense_bp.route('/api/expenses_report', methods=['GET'])
 @login_required
 def expenses_report():
@@ -151,9 +149,17 @@ def expenses_report():
                              Expense.date <= f"{end_date} 23:59:59")
 
         expenses = query.order_by(Expense.date.desc()).all()
+        
+        # Calculate total expenditures and differentiate categories
+        total_expenditure = sum(exp.amount for exp in expenses)
+        total_stock_expenditure = sum(exp.amount for exp in expenses if exp.category == 'Stock Update')
+        total_daily_expenditure = sum(exp.amount for exp in expenses if exp.category == 'Daily Expenses')
+
         response_data = {
             'success': True,
-            'total_expenditure': sum(exp.amount for exp in expenses),
+            'total_expenditure': total_expenditure,
+            'total_stock_expenditure': total_stock_expenditure,
+            'total_daily_expenditure': total_daily_expenditure,
             'expenses': [{
                 'id': exp.id,
                 'description': exp.description,
@@ -165,10 +171,14 @@ def expenses_report():
         return jsonify(response_data), 200
 
     except Exception as e:
-        print(f"Error: {e}")  # Useful for debugging
+        print(f"Error fetching expenses report: {e}")  # More descriptive error message for debugging
         return jsonify({'success': False, 'error': 'Failed to fetch expenses report.'}), 500
 
 
+
+
+
+        
 @expense_bp.route('/api/todays_expenditure', methods=['GET'])
 @login_required
 def todays_expenditure():

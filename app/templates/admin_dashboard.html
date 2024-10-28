@@ -23,23 +23,7 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        fetch('/expense/api/todays_expenditure')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('todaysExpense').innerText = `Ksh ${data.total_expenditure.toFixed(2)}`;
-                } else {
-                    document.getElementById('todaysExpense').innerText = "Error fetching data";
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('todaysExpense').innerText = "Error fetching data";
-            });
-    });
-</script>
+
 
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card shadow rounded text-white bg-success">
@@ -72,107 +56,29 @@
         </div>
     </div>
 
-    <!-- Product Table -->
-    <h3 class="mt-4">Products Overview</h3>
-    <div>
-        <input type="text" id="productSearch" class="form-control mb-2" placeholder="Search products...">
-    </div>
-    <div class="table-responsive">
-        <table class="table table-striped table-hover" id="productTable">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Name</th>
-                    <th>Current Stock</th>
-                    <th>Cost Price (Ksh)</th>
-                    <th>Selling Price (Ksh)</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                <tr>
-                    <td>{{ product.name }}</td>
-                    <td class="stock-cell {% if product.stock < 10 %}text-danger{% endif %}">{{ product.stock }}</td>
-                    <td>Ksh {{ product.cost_price }}</td>
-                    <td>Ksh {{ product.selling_price }}</td>
-                    <td>
-                        <button class="btn btn-info btn-sm update-stock-button" data-id="{{ product.id }}">Update Stock</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Update Stock Modal -->
-<div class="modal fade" id="updateStockModal" tabindex="-1" aria-labelledby="updateStockModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="updateStockModalLabel">Update Stock</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="updateStockForm">
-                    <div class="form-group">
-                        <label for="newStock">New Stock Quantity</label>
-                        <input type="number" class="form-control" id="newStock" name="newStock" required>
-                    </div>
-                    <input type="hidden" id="productId" name="productId">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary" form="updateStockForm">Update Stock</button>
-            </div>
-        </div>
-    </div>
-</div>
+ 
 
 <!-- JavaScript -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script>
-$(document).ready(function() {
-    // Real-time search
-    $('#productSearch').on('keyup', function() {
-        var value = $(this).val().toLowerCase();
-        $('#productTable tbody tr').filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-        });
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/expense/api/todays_expenditure')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('todaysExpense').innerText = `Ksh ${data.total_expenditure.toFixed(2)}`;
+                } else {
+                    document.getElementById('todaysExpense').innerText = "Error fetching data";
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('todaysExpense').innerText = "Error fetching data";
+            });
     });
-
-    // Open modal with product details
-    $('.update-stock-button').click(function() {
-        var productId = $(this).data('id');
-        $.get('/stock/products/' + productId + '/update_stock_modal', function(data) {
-            $('#modalBody').html(data);
-            $('#productId').val(productId);
-            $('#updateStockModal').modal('show');
-        }).fail(function() {
-            alert('Error loading product details. Please try again.');
-        });
-    });
-
-    // Handle form submission
-    $(document).on('submit', '#updateStockForm', function(event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        var newStock = $('#newStock').val();
-        var productId = $('#productId').val();
-
-        $.post('/products/' + productId + '/update_stock', { new_stock: newStock }, function(response) {
-            alert(response.message);
-            $('#updateStockModal').modal('hide');
-            location.reload(); // Reload the page or update the stock in the table
-        }).fail(function(jqXHR) {
-            var errorMessage = jqXHR.responseJSON && jqXHR.responseJSON.message ? jqXHR.responseJSON.message : 'Error updating stock. Please try again.';
-            alert(errorMessage);
-        });
-    });
-});
 </script>
+
 
 {% endblock %}

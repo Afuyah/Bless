@@ -7,18 +7,19 @@
     <!-- Date Range Filter Form -->
     <form method="get" action="{{ url_for('sales.filter_sales_report') }}" class="mb-4 text-center">
         <div class="input-group mb-3 justify-content-center">
-            <input type="date" name="start_date" class="form-control" value="{{ start_date }}" required>
+            <input type="date" name="start_date" class="form-control" value="{{ start_date }}" required aria-label="Start Date">
             <span class="input-group-text">to</span>
-            <input type="date" name="end_date" class="form-control" value="{{ end_date }}" required>
-            <button type="submit" class="btn btn-primary ms-2">Get Filtered Report</button>
+            <input type="date" name="end_date" class="form-control" value="{{ end_date }}" required aria-label="End Date">
+            <button type="submit" class="btn btn-primary ms-2" aria-label="Get Filtered Sales Report">Get Filtered Report</button>
         </div>
     </form>
+    <div id="dateFeedback" class="alert alert-danger d-none" role="alert"></div>
 
     <!-- Daily Sales Report Form -->
     <form method="get" action="{{ url_for('sales.daily_sales_report') }}" class="mb-4 text-center">
         <div class="input-group mb-3 justify-content-center">
-            <input type="date" name="date" class="form-control" value="{{ today.strftime('%Y-%m-%d') }}" required>
-            <button type="submit" class="btn btn-primary ms-2">Get Daily Report</button>
+            <input type="date" name="date" class="form-control" value="{{ today.strftime('%Y-%m-%d') }}" required aria-label="Date for Daily Report">
+            <button type="submit" class="btn btn-primary ms-2" aria-label="Get Daily Sales Report">Get Daily Report</button>
         </div>
     </form>
 
@@ -124,8 +125,10 @@ $(document).ready(function() {
         const endDate = new Date($('input[name="end_date"]').val());
 
         if (endDate < startDate) {
-            alert("End date must be greater than or equal to start date.");
+            $('#dateFeedback').text("End date must be greater than or equal to start date.").removeClass('d-none');
             return false; // Prevent form submission
+        } else {
+            $('#dateFeedback').addClass('d-none'); // Hide feedback
         }
     });
 });
@@ -186,6 +189,10 @@ $(document).ready(function() {
     @media (max-width: 768px) {
         .summary .card {
             margin-bottom: 20px;
+        }
+
+        .input-group {
+            width: 100%;
         }
     }
 </style>
