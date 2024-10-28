@@ -219,7 +219,6 @@ class Supplier(db.Model):
             'phone': self.phone,
             'products': [product.serialize() for product in self.products]  # Serialize all products
         }
-
 class Expense(db.Model):
     __tablename__ = 'expenses'
     id = db.Column(db.Integer, primary_key=True)
@@ -229,16 +228,18 @@ class Expense(db.Model):
     category = db.Column(db.String(100), nullable=True, default="Daily Expenses")  # Default category
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=True)  
     quantity = db.Column(db.Integer, nullable=True)  
-   
+    
     __table_args__ = (Index('ix_expense_date', 'date'),)
+
+    product = db.relationship('Product', backref='expenses', lazy='joined')  # Define relationship
 
     @validates('amount', 'quantity')
     def validate_amount_quantity(self, key, value):
         """Validate that the expense amount and quantity are positive."""
         if key == 'amount' and value < 0:
             raise ValueError("Expense amount cannot be negative.")
-        if key == 'quantity' and value < 0:
-            raise ValueError("Quantity cannot be negative.")
+        if key == 'quantity' and (value < 0 or value == 0):  # Adjust based on logic
+            raise ValueError("Quantity must be positive.")
         return value
 
     def serialize(self):
@@ -249,5 +250,6 @@ class Expense(db.Model):
             'date': self.date.strftime("%Y-%m-%d %H:%M:%S"),
             'category': self.category,
             'product_id': self.product_id,
-            'quantity': self.quantity
+            'quantity': self.quantity,
+            'product_name': self.product.name if self.product else None  # Optional product name
         }

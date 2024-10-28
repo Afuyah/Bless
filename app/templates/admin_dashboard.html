@@ -9,19 +9,38 @@
     <div class="row">
         <!-- Overview Cards -->
         <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card shadow rounded text-white bg-primary">
-                <div class="card-body">
-                    <h5 class="card-title">Total Products</h5>
-                    <h2 class="card-text">{{ total_products }}</h2>
-                </div>
-                <div class="card-footer d-flex justify-content-between align-items-center">
-                    <small>View Products</small>
-                    <a href="{{ url_for('stock.products') }}" class="text-white">
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
+    <div class="card shadow rounded text-white bg-primary">
+        <div class="card-body">
+            <h5 class="card-title">Today's Expense</h5>
+            <h2 class="card-text" id="todaysExpense">Loading...</h2>
         </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <small>more info</small>
+            <a href="{{ url_for('expense.render_expenses_report') }}" class="text-white">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/expense/api/todays_expenditure')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('todaysExpense').innerText = `Ksh ${data.total_expenditure.toFixed(2)}`;
+                } else {
+                    document.getElementById('todaysExpense').innerText = "Error fetching data";
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('todaysExpense').innerText = "Error fetching data";
+            });
+    });
+</script>
+
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card shadow rounded text-white bg-success">
                 <div class="card-body">

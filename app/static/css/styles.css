@@ -1,17 +1,10 @@
 :root {
-    --primary-color: #007bff; /* Primary brand color */
-    --secondary-color: #28a745; /* Secondary accent color */
-    --background-color: #f0f4f8; /* Light background color */
-    --text-color: #343a40; /* Main text color */
-    --border-radius: 10px; /* Standard border radius */
-    --font-family: 'Arial', sans-serif; /* Base font family */
-    --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Default box shadow */
-}
-
-/* Overall Styles */
-* {
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
-    transition: all 0.2s ease-in-out; /* Smooth transitions for all elements */
+    --background-color: #f0f4f8; /* Light background */
+    --font-family: 'Arial', sans-serif; /* Modern font */
+    --primary-color: #4CAF50; /* Green color for borders */
+    --secondary-color: #007bff; /* Added secondary color for other uses */
+    --border-radius: 12px; /* Rounded corners */
+    --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 body {
@@ -19,22 +12,34 @@ body {
     font-family: var(--font-family);
     margin: 0;
     line-height: 1.6; /* Improve text readability */
+    height: 100vh; /* Set body height to 100% of the viewport height */
 }
 
-/* Main Container Styling */
+/* Fluid Container Styling */
 .container {
-    border: 1px solid var(--primary-color);
+    max-width: 1400px; /* Increased max width for larger screens */
+    width: calc(100% - 20px); /* Full width minus the margins (10px on each side) */
+    border: 1px solid var(--primary-color); /* Green border */
     padding: 20px;
     border-radius: var(--border-radius);
-    background: white;
-    box-shadow: var(--box-shadow);
+    background: inherit; /* White background for the container */
+    box-shadow: var(--box-shadow); /* Subtle shadow */
+    margin: 10px auto; /* 10px margin for spacing from edges */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
 }
 
-/* Category and Product Styles */
-.category-container,
-.product-container,
-.cart-container {
-    padding: 10px;
+/* Hover Effect */
+.container:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Enhance shadow on hover */
+    transform: translateY(-2px); /* Slight upward movement on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px; /* Reduce padding on smaller screens */
+        width: calc(100% - 20px); /* Maintain margin on smaller screens */
+    }
 }
 
 /* Category List Styles */
@@ -79,22 +84,39 @@ body {
     transform: translateX(5px); /* Add subtle hover effect */
 }
 
-/* Product Styles */
+
+/* Product Container Styles */
+.product-container {
+    position: relative; /* Ensures proper positioning of child elements */
+    padding: 15px; /* Padding for aesthetics */
+    border: 1px solid #ccc; /* Optional border for visual separation */
+    border-radius: 8px; /* Rounded corners for a softer look */
+    background-color: #f9f9f9; /* Light background for contrast */
+    max-height: 700px; /* Set maximum height for the container */
+    overflow: hidden; /* Prevents overflow from the container */
+}
+
+/* Scrollable Product List */
 .product-list {
     display: flex;
     flex-wrap: wrap; /* Responsive wrapping */
     justify-content: space-between; /* Space between cards */
+    max-height: 600px; /* Limit height for scrollability */
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    padding: 0 10px; /* Padding for inner spacing */
 }
 
+/* Individual Product Item Styles */
 .product-item {
     position: relative; /* Needed for badge positioning */
     flex: 1 0 calc(30% - 20px); /* Three cards on large screens */
-    margin: 10px;
+    margin: 10px; /* Margin between items */
     padding: 20px; /* Increased padding for better spacing */
-    border-radius: 12px; /* Slightly more rounded corners */
-    background-color: #ffffff;
-    box-shadow: var(--box-shadow); /* Softer shadow */
-    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 12px; /* Slightly rounded corners */
+    background-color: #ffffff; /* White background for cards */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Softer shadow */
+    transition: transform 0.2s, box-shadow 0.2s; /* Smooth transitions */
     display: flex; /* Flexbox for better alignment */
     flex-direction: column; /* Stack elements vertically */
     justify-content: space-between; /* Space out elements */
@@ -111,28 +133,59 @@ body {
     font-weight: bold;
     margin-bottom: 8px; /* Increased space below title */
     font-size: 1.2rem; /* Larger title size */
+    transition: color 0.2s, transform 0.2s; /* Smooth transition */
+}
+
+.product-title:hover {
+    color: var(--primary-color); /* Change color on hover */
+    transform: scale(1.05); /* Slightly enlarge on hover */
 }
 
 .product-price {
     color: var(--secondary-color);
     font-weight: bold;
     font-size: 1.1rem; /* Slightly larger font for price */
+    transition: color 0.2s, transform 0.2s; /* Smooth transition */
+}
+
+.product-price:hover {
+    color: var(--primary-color); /* Change color on hover */
+    transform: scale(1.05); /* Slightly enlarge on hover */
 }
 
 .product-stock {
-    color: #6c757d;
+    color: #6c757d; /* Color for stock information */
 }
 
 /* Badge for Stock Levels */
 .badge {
     background-color: var(--secondary-color);
     color: white;
-    padding: 5px 10px;
-    border-radius: 12px;
-    position: absolute;
+    padding: 5px 10px; /* Padding inside badge */
+    border-radius: 12px; /* Rounded corners for badge */
+    position: absolute; /* Positioned at the top right */
     top: 10px;
     right: 10px;
-    font-size: 0.75rem;
+    font-size: 0.75rem; /* Smaller font size for badge */
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .product-item {
+        flex: 1 0 calc(45% - 20px); /* Two cards on medium screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .product-item {
+        flex: 1 0 calc(100% - 20px); /* One card on small screens */
+    }
+}
+
+/* Define color variables for easier customization */
+:root {
+    --primary-color: #007bff; /* Replace with your theme color */
+    --secondary-color: #28a745; /* Replace with your theme secondary color */
 }
 
 /* Cart Styles */
@@ -141,10 +194,14 @@ body {
     top: 0;
     background-color: white; /* Light background for cart */
     z-index: 10; /* Ensure it appears above other elements */
+    border: 1px solid #e0e0e0; /* Light border for subtle separation */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    padding: 15px; /* Padding inside the cart */
 }
 
 .cart-items {
-    max-height: 300px;
+    max-height: 600px; /* Increased height before scrolling starts */
     overflow-y: auto;
 }
 
@@ -168,6 +225,23 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
+    padding: 10px; /* Add padding for better spacing */
+    border-bottom: 1px solid #e0e0e0; /* Separator for cart items */
+}
+
+/* Cart Item Hover Effect */
+.cart-item:hover {
+    background-color: #f7f7f7; /* Light gray background on hover */
+    transition: background-color 0.2s ease; /* Smooth transition */
+}
+
+/* Total Amount Styles */
+.cart-total {
+    font-size: 1.5em; /* Larger font size for visibility */
+    font-weight: bold; /* Bold for emphasis */
+    color: var(--primary-color); /* Use primary color */
+    margin-top: 15px; /* Space above the total */
+    text-align: right; /* Align to the right */
 }
 
 /* Button Styles */
@@ -177,6 +251,7 @@ body {
     padding: 10px 15px;
     color: white;
     cursor: pointer; /* Pointer on button hover */
+    font-weight: 600; /* Bold text for buttons */
 }
 
 .btn-danger {
@@ -188,12 +263,17 @@ body {
 }
 
 .btn:hover {
-    background-color: var(--primary-color);
+    background-color: var(--secondary-color); /* Change hover color to secondary */
+    transform: scale(1.02); /* Slightly enlarge on hover */
 }
 
 .btn:active {
-    transform: scale(0.98);
-    background-color: #0056b3; /* Slightly darker */
+    transform: scale(0.95); /* Slightly shrink on click */
+}
+
+.btn:focus {
+    outline: 2px solid var(--primary-color); /* Visible outline on focus */
+    outline-offset: 2px; /* Offset the outline for better visibility */
 }
 
 /* Alert Styles */
@@ -216,6 +296,10 @@ body {
     display: none; /* Initially hidden */
 }
 
+.spinner.show {
+    display: block; /* Show when class is applied */
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -233,6 +317,17 @@ body {
         flex: 1 0 calc(100% - 20px); /* Full width on extra small screens */
     }
 }
+
+/* Cart Item Quantity Badge */
+.cart-item-quantity {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    padding: 5px 8px;
+    margin-left: 10px; /* Space between text and badge */
+    font-size: 0.9em; /* Slightly smaller font */
+}
+
 
 /* Additional Styling */
 .wrapper {
@@ -303,47 +398,9 @@ body {
 }
 
 .navbar-custom .navbar-nav .nav-link {
-    color: #222;
-    padding: 8px 15px;
-    transition: color 0.3s ease;
+    color: grey;
 }
 
 .navbar-custom .navbar-nav .nav-link:hover {
-    color: #ddd;
-}
-
-/* Navbar Toggler Button Styling */
-.navbar-toggler {
-    background-color: #222;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 4px;
-}
-
-/* Toggler Icon Styling */
-.navbar-toggler-icon {
-    width: 24px;
-    height: 24px;
-    background-color: var(--primary-color);
-}
-
-/* Profile Dropdown */
-.profile-dropdown {
-    position: relative;
-}
-
-.profile-dropdown .dropdown-menu {
-    background-color: white;
-    border-radius: 5px;
-    box-shadow: var(--box-shadow);
-}
-
-.profile-dropdown .dropdown-item {
-    padding: 10px 15px;
-    transition: background-color 0.3s;
-}
-
-.profile-dropdown .dropdown-item:hover {
-    background-color: var(--primary-color);
-    color: white;
+    color: var(--primary-color); /* Highlight on hover */
 }

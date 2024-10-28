@@ -1,0 +1,93 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Expenses Report{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Expenses Report</h2>
+
+    <div class="filter-section mb-4">
+        <label for="start-date">Start Date:</label>
+        <input type="date" id="start-date" class="form-control mb-2" onchange="fetchExpensesReport()">
+        
+        <label for="end-date">End Date:</label>
+        <input type="date" id="end-date" class="form-control mb-2" onchange="fetchExpensesReport()">
+    </div>
+
+    <div class="total-expenditure mb-4">
+        <h5>Total Expenditure: <span id="total-expenditure">Ksh 0.00</span></h5>
+    </div>
+
+    <table class="table table-striped" id="expenses-table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Amount (Ksh)</th>
+                <th>Date</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Expenses will be populated here via JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Function to set default date to today
+    function setDefaultDates() {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        document.getElementById('start-date').value = today;
+        document.getElementById('end-date').value = today;
+    }
+
+    // Fetch and display expenses report based on date range
+    function fetchExpensesReport() {
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+
+        // Ensure dates are selected before making the request
+        if (!startDate || !endDate) {
+            return;
+        }
+
+        fetch(`/expense/api/expenses_report?start_date=${startDate}&end_date=${endDate}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert("Failed to fetch expenses report.");
+                    return;
+                }
+
+                // Update total expenditure
+                document.getElementById('total-expenditure').innerText = `Ksh ${data.total_expenditure.toFixed(2)}`;
+
+                // Populate the expenses table
+                const tableBody = document.getElementById('expenses-table').querySelector('tbody');
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                data.expenses.forEach(expense => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${expense.description}</td>
+                        <td>Ksh ${parseFloat(expense.amount).toFixed(2)}</td>
+                        <td>${new Date(expense.date).toLocaleDateString()}</td>
+                        <td>${expense.category}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching expenses report:', error);
+                alert("Could not fetch expenses report. Please try again later.");
+            });
+    }
+
+    // Set default dates and fetch initial data
+    window.onload = function() {
+        setDefaultDates();
+        fetchExpensesReport();
+    };
+</script>
+
+{% endblock %}

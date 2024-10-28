@@ -70,3 +70,124 @@ def add_daily_expense():
         db.session.rollback()
         logging.error(f"Error adding daily expense: {e}")
         return jsonify({'error': 'Failed to add daily expense. Please try again.'}), 500
+
+@expense_bp.route('/api/total_daily_expenditure', methods=['GET'])
+@login_required
+def total_daily_expenditure():
+    """Fetch total daily expenditure with an optional date filter."""
+    date_filter = request.args.get('date')
+    
+    try:
+        if date_filter:
+            # Validate and parse the date filter
+            parsed_date = datetime.strptime(date_filter, "%Y-%m-%d").date()
+            expenses = Expense.query.filter(Expense.date >= f"{parsed_date} 00:00:00",
+                                             Expense.date <= f"{parsed_date} 23:59:59").all()
+        else:
+            # If no date is provided, fetch today's expenses
+            today = datetime.now().date()
+            expenses = Expense.query.filter(Expense.date >= f"{today} 00:00:00",
+                                             Expense.date <= f"{today} 23:59:59").all()
+
+        # Calculate the total expenditure
+        total_expenditure = sum(expense.amount for expense in expenses)
+
+        # Prepare the response
+        response_data = {
+            'success': True,
+            'total_expenditure': total_expenditure,
+            'date': date_filter if date_filter else today.strftime("%Y-%m-%d"),
+            'expenses': [{
+                'id': expense.id,
+                'description': expense.description,
+                'amount': expense.amount,
+                'date': expense.date.strftime("%Y-%m-%d %H:%M:%S"),
+                'category': expense.category
+            } for expense in expenses]
+        }
+
+        return jsonify(response_data), 200
+
+    except ValueError:
+        return jsonify({'success': False, 'error': 'Invalid date format. Use YYYY-MM-DD.'}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': 'Failed to fetch total daily expenditure. Please try again.'}), 500 
+
+
+
+
+@expense_bp.route('/expenses_report', methods=['GET'])
+@login_required
+def render_expenses_report():
+    """Render the Expenses Report page."""
+    return render_template('expenses_report.html')
+
+
+from datetime import datetime
+
+@expense_bp.route('/api/expenses_report', methods=['GET'])
+@login_required
+def expenses_report():
+    """Fetch expenses within a specified date range."""
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
+    # Set default to today's date if no dates are provided
+    if not start_date or not end_date:
+        today = datetime.today().date()
+        start_date = today.strftime("%Y-%m-%d")
+        end_date = today.strftime("%Y-%m-%d")
+
+    try:
+        query = Expense.query
+        
+        # Parse the dates
+        start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+        end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+        # Filter by date range
+        query = query.filter(Expense.date >= f"{start_date} 00:00:00",
+                             Expense.date <= f"{end_date} 23:59:59")
+
+        expenses = query.order_by(Expense.date.desc()).all()
+        response_data = {
+            'success': True,
+            'total_expenditure': sum(exp.amount for exp in expenses),
+            'expenses': [{
+                'id': exp.id,
+                'description': exp.description,
+                'amount': exp.amount,
+                'date': exp.date.strftime("%Y-%m-%d %H:%M:%S"),
+                'category': exp.category or 'Daily Expenses'
+            } for exp in expenses]
+        }
+        return jsonify(response_data), 200
+
+    except Exception as e:
+        print(f"Error: {e}")  # Useful for debugging
+        return jsonify({'success': False, 'error': 'Failed to fetch expenses report.'}), 500
+
+
+@expense_bp.route('/api/todays_expenditure', methods=['GET'])
+@login_required
+def todays_expenditure():
+    """Fetch today's total expenditure."""
+    try:
+        today = datetime.now().date()
+        start_of_day = datetime.combine(today, datetime.min.time())
+        end_of_day = datetime.combine(today, datetime.max.time())
+
+        expenses = Expense.query.filter(
+            Expense.date >= start_of_day,
+            Expense.date <= end_of_day
+        ).all()
+
+        total_expenditure = sum(exp.amount for exp in expenses)
+        return jsonify({
+            'success': True,
+            'total_expenditure': total_expenditure
+        }), 200
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Failed to fetch today\'s expenditure.'}), 500
