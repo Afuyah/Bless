@@ -2,154 +2,155 @@
 {% block content %}
 <div class="container mt-5">
     <h2 class="text-center mb-4">Add New Product</h2>
-    <form method="POST" action="{{ url_for('stock.new_product') }}" class="p-4 bg-light rounded shadow-sm">
-        <div class="form-group">
+    <form method="POST" action="{{ url_for('stock.new_product') }}" class="p-5 bg-white rounded shadow-lg">
+        <div class="form-group mb-4">
             <label for="name">Product Name:</label>
-            <input type="text" id="name" name="name" class="form-control" placeholder="Enter product name" required>
+            <input type="text" id="name" name="name" class="form-control required" placeholder="Enter product name" required>
         </div>
-        <div class="form-group">
+        <div class="form-group mb-4">
             <label for="cost_price">Cost Price (Ksh):</label>
-            <input type="number" id="cost_price" name="cost_price" class="form-control" step="0.01" placeholder="Enter product cost price" required>
+            <input type="number" id="cost_price" name="cost_price" class="form-control required" step="0.01" placeholder="Enter cost price" required>
         </div>
-        <div class="form-group">
+        <div class="form-group mb-4">
             <label for="selling_price">Selling Price (Ksh):</label>
-            <input type="number" id="selling_price" name="selling_price" class="form-control" step="0.01" placeholder="Enter product selling price" required>
+            <input type="number" id="selling_price" name="selling_price" class="form-control required" step="0.01" placeholder="Enter selling price" required>
         </div>
-        <div class="form-group">
+        <div class="form-group mb-4">
             <label for="stock">Stock:</label>
-            <input type="number" id="stock" name="stock" class="form-control" placeholder="Enter stock quantity" required>
+            <input type="number" id="stock" name="stock" class="form-control required" placeholder="Enter stock quantity" required>
         </div>
-        <div class="form-group">
+        <div class="form-group mb-4">
             <label for="category">Category:</label>
-
-            <select id="category" name="category" class="form-control" required>
+            <select id="category" name="category" class="form-control required" required>
+                <option value="" disabled selected>Select Category</option>
                 {% for category in categories %}
-                 <option value="" disabled selected>Select Category</option>
-                <option value="{{ category.id }}">{{ category.name }}</option>
+                    <option value="{{ category.id }}">{{ category.name }}</option>
                 {% endfor %}
             </select>
         </div>
-
-        <!-- New Field for Unit Type -->
-        <div class="form-group">
-            <label for="unit_type">Unit Type:</label>
-            <select id="unit_type" name="unit_type" class="form-control" onchange="toggleUnitFields()" required>
-               
-                <option value="piece">Pieces</option>
-                <option value="weight">Weight (kg)</option>
-            </select>
+        <div class="form-group mb-4">
+            <label for="packet_size">Packet Size (Pieces):</label>
+            <input type="number" id="packet_size" name="packet_size" class="form-control required" placeholder="Enter packet size" step="1" required>
         </div>
-
-        <!-- Fields for Piece-Based Products -->
-        <div id="piece_fields" style="display: none;">
-            <div class="form-group">
-                <label for="packet_size">Packet Size (Pieces):</label>
-                <input type="number" id="packet_size" name="packet_size" class="form-control" placeholder="Enter packet size (e.g., 100)" step="1">
-            </div>
-            <div class="form-group">
-                <label for="combination_size">Combination Size (Pieces):</label>
-                <input type="number" id="combination_size" name="combination_size" class="form-control" placeholder="Enter combination size" step="1">
-            </div>
-            <div class="form-group">
-                <label for="combination_price">Combination Price (Ksh):</label>
-                <input type="number" id="combination_price" name="combination_price" class="form-control" placeholder="Enter price for combination" step="0.01">
-            </div>
+        <div class="form-group mb-4">
+            <label for="combination_size">Combination Size (Pieces):</label>
+            <input type="number" id="combination_size" name="combination_size" class="form-control required" placeholder="Enter combination size" step="1" required>
         </div>
-
-        <!-- Fields for Weight-Based Products -->
-        <div id="weight_fields" style="display: none;">
-            <div class="form-group">
-                <label for="bulk_quantity">Bulk Quantity (kg):</label>
-                <input type="number" id="bulk_quantity" name="bulk_quantity" class="form-control" placeholder="Enter bulk quantity (kg)" step="0.25">
-            </div>
+        <div class="form-group mb-4">
+            <label for="combination_price">Combination Price (Ksh):</label>
+            <input type="number" id="combination_price" name="combination_price" class="form-control required" placeholder="Enter combination price" step="0.01" required>
         </div>
-
-        <div class="text-right">
-            <button type="submit" class="btn btn-success">Add Product</button>
-            <a href="{{ url_for('stock.products') }}" class="btn btn-secondary">Cancel</a>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-submit">Add Product</button>
+            <a href="{{ url_for('stock.products') }}" class="btn btn-secondary ml-3">Cancel</a>
         </div>
     </form>
 </div>
 
-<!-- JavaScript to Toggle Fields -->
+<!-- Advanced JavaScript Validation and Enhancements -->
 <script>
-    function toggleUnitFields() {
-        const unitType = document.getElementById('unit_type').value;
-        const pieceFields = document.getElementById('piece_fields');
-        const weightFields = document.getElementById('weight_fields');
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.querySelector("form");
+        const requiredFields = document.querySelectorAll(".required");
 
-        if (unitType === 'piece') {
-            pieceFields.style.display = 'block';
-            weightFields.style.display = 'none';
-        } else if (unitType === 'weight') {
-            pieceFields.style.display = 'none';
-            weightFields.style.display = 'block';
-        } else {
-            pieceFields.style.display = 'none';
-            weightFields.style.display = 'none';
-        }
-    }
+        form.addEventListener("submit", (event) => {
+            let allValid = true;
+            requiredFields.forEach(field => {
+                if (!field.value || parseFloat(field.value) <= 0) {
+                    field.classList.add("invalid");
+                    allValid = false;
+                } else {
+                    field.classList.remove("invalid");
+                }
+            });
+
+            if (!allValid) {
+                event.preventDefault();
+                alert("Please fill out all fields with positive values.");
+            }
+        });
+
+        requiredFields.forEach(field => {
+            field.addEventListener("input", () => {
+                if (field.value && parseFloat(field.value) > 0) {
+                    field.classList.remove("invalid");
+                }
+            });
+        });
+    });
 </script>
 
-<!-- Additional Styling -->
+<!-- Enhanced Styling -->
 <style>
     body {
-        background-color: #f4f6f9; /* Light background for a clean look */
-        font-family: 'Poppins', sans-serif; /* Modern font */
+        background-color: #f0f2f5;
+        font-family: 'Poppins', sans-serif;
     }
 
     h2 {
-        color: #343a40; /* Darker shade for the heading */
-        font-weight: 600; /* Slightly bolder for emphasis */
+        color: #2C3E50;
+        font-weight: 600;
     }
 
     .form-group label {
-        font-weight: 500; /* Emphasized label */
-        color: #495057; /* Darker text for contrast */
+        font-weight: 600;
+        color: #34495E;
     }
 
     .form-control {
-        border-radius: 5px; /* Rounded corners for input fields */
-        padding: 10px; /* Adequate padding */
-        font-size: 1rem; /* Consistent font size */
-        border: 1px solid #ced4da; /* Standard border color */
-        transition: border-color 0.2s, box-shadow 0.2s; /* Smooth transitions */
+        border-radius: 10px;
+        padding: 12px;
+        font-size: 1rem;
+        border: 1px solid #ced4da;
+        transition: border-color 0.3s, box-shadow 0.3s;
     }
 
     .form-control:focus {
-        border-color: #80bdff; /* Border color on focus */
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Subtle shadow on focus */
+        border-color: #5DADE2;
+        box-shadow: 0 0 0 0.2rem rgba(93, 173, 226, 0.3);
     }
 
-    .btn-success {
-        background-color: #28a745; /* Green button */
-        border: none; /* No border */
-        padding: 10px 20px; /* Padding for the button */
-        border-radius: 30px; /* Rounded button */
-        transition: all 0.3s ease; /* Smooth transition */
+    .btn-submit {
+        background-color: #5DADE2;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
     }
 
-    .btn-success:hover {
-        background-color: #218838; /* Darker green on hover */
-        box-shadow: 0px 6px 12px rgba(40, 167, 69, 0.3); /* Subtle shadow on hover */
+    .btn-submit:hover {
+        background-color: #2E86C1;
+        box-shadow: 0px 8px 15px rgba(46, 134, 193, 0.3);
     }
 
     .btn-secondary {
-        border-radius: 30px; /* Rounded cancel button */
-        padding: 10px 20px; /* Padding for the button */
+        border-radius: 30px;
+        padding: 10px 25px;
+        font-size: 1rem;
     }
 
-    .shadow-sm {
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for form */
+    .shadow-lg {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .invalid {
+        border-color: #E74C3C !important;
+        box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
     }
 
     @media (max-width: 768px) {
-        form {
-            padding: 20px; /* Adjusted padding for mobile view */
+        .container {
+            padding: 15px;
         }
 
         h2 {
-            font-size: 1.6rem; /* Larger heading for better visibility */
+            font-size: 1.5rem;
+        }
+
+        .btn-submit, .btn-secondary {
+            font-size: 0.9rem;
+            padding: 8px 20px;
         }
     }
 </style>

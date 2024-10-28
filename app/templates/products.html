@@ -9,7 +9,7 @@
         <a href="{{ url_for('stock.new_product') }}" class="btn btn-custom">Add New Product</a>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover table-light table-bordered" id="productTable">
+        <table class="table table-hover table-light table-bordered shadow" id="productTable">
             <thead class="thead-light">
                 <tr>
                     <th>Name</th>
@@ -32,7 +32,7 @@
     </div>
 </div>
 
-<!-- Additional Custom Styling for Product Page -->
+<!-- Custom Styling for Product Page -->
 <style>
     body {
         background-color: #f4f6f9;
@@ -61,11 +61,6 @@
         box-shadow: 0px 8px 16px rgba(0, 123, 255, 0.4);
     }
 
-    .btn-sm {
-        padding: 8px 14px;
-        border-radius: 20px;
-    }
-
     .table-light {
         border: 1px solid #dee2e6;
         border-radius: 12px;
@@ -74,6 +69,7 @@
 
     .table-hover tbody tr:hover {
         background-color: #e9ecef;
+        transition: background-color 0.3s ease;
     }
 
     .table th, .table td {
@@ -96,6 +92,25 @@
         background-color: #ffffff;
     }
 
+    .table-responsive {
+        padding-bottom: 1rem;
+        border-radius: 8px;
+    }
+
+    /* DataTables pagination styling */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        background-color: #007bff;
+        color: #fff;
+        border-radius: 50%;
+        padding: 5px 10px;
+        margin: 0 3px;
+        border: none;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background-color: #0056b3;
+        color: #fff;
+    }
+
     /* Responsive styling */
     @media (max-width: 768px) {
         .table-responsive {
@@ -114,11 +129,17 @@
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function() {
-    // Initialize DataTables
     $('#productTable').DataTable({
-        searching: true, // Enable search
-        paging: true, // Enable pagination
-        order: [], // Default order (empty for no initial order)
+        searching: true,
+        paging: true,
+        ordering: true,
+        columnDefs: [
+            { orderable: false, targets: [0, 1] }
+        ],
+        language: {
+            searchPlaceholder: "Search products...",
+            search: ""
+        }
     });
 });
 </script>

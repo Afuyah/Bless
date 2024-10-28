@@ -9,45 +9,48 @@
     <div class="row">
         <!-- Overview Cards -->
         <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card text-white bg-primary">
+            <div class="card shadow rounded text-white bg-primary">
                 <div class="card-body">
                     <h5 class="card-title">Total Products</h5>
                     <h2 class="card-text">{{ total_products }}</h2>
                 </div>
-                <div class="card-footer d-flex justify-content-between">
+                <div class="card-footer d-flex justify-content-between align-items-center">
                     <small>View Products</small>
-                    <a href="{{ url_for('stock.products') }}" class="text-white">→</a>
+                    <a href="{{ url_for('stock.products') }}" class="text-white">
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card text-white bg-success">
+            <div class="card shadow rounded text-white bg-success">
                 <div class="card-body">
                     <h5 class="card-title">Total Sales</h5>
                     <h2 class="card-text">Ksh {{ total_sales }}</h2>
                 </div>
-                <div class="card-footer d-flex justify-content-between">
+                <div class="card-footer d-flex justify-content-between align-items-center">
                     <small>View Sales</small>
-                    <a href="#" class="text-white">→</a>
+                    <a href="{{ url_for('sales.daily_sales_report') }}" class="text-white">
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mb-4">
-    <div class="card text-white bg-danger">
-        <div class="card-body">
-            <h5 class="card-title">Low Stock Products</h5>
-            <h2 class="card-text">{{ low_stock_count }}</h2>
-            <p class="card-text">Products with low stock levels.</p> 
+            <div class="card shadow rounded text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Low Stock Products</h5>
+                    <h2 class="card-text">{{ low_stock_count }}</h2>
+                    <p class="card-text">Products with low stock levels.</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <small>Manage Stock</small>
+                    <a href="{{ url_for('stock.update_stock') }}" class="text-white">
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="card-footer d-flex justify-content-between align-items-center">
-            <small>Manage Stock</small>
-            <a href="{{ url_for('stock.update_stock') }}" class="text-white">
-                <i class="fas fa-arrow-right"></i> <!-- Font Awesome icon for arrow -->
-            </a>
-        </div>
-    </div>
-</div>
-
     </div>
 
     <!-- Product Table -->
@@ -70,7 +73,7 @@
                 {% for product in products %}
                 <tr>
                     <td>{{ product.name }}</td>
-                    <td>{{ product.stock }}</td>
+                    <td class="stock-cell {% if product.stock < 10 %}text-danger{% endif %}">{{ product.stock }}</td>
                     <td>Ksh {{ product.cost_price }}</td>
                     <td>Ksh {{ product.selling_price }}</td>
                     <td>
@@ -111,6 +114,7 @@
 <!-- JavaScript -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script>
 $(document).ready(function() {
     // Real-time search

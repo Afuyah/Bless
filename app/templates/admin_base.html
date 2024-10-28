@@ -20,6 +20,25 @@
             color: #343a40;
             margin: 0;
             padding: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Parallax Background */
+        .parallax {
+            background-image: url('https://source.unsplash.com/random/1920x1080/?office');
+            height: 300px; /* Height for the parallax section */
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .parallax h1 {
+            color: white;
+            text-align: center;
+            padding: 100px 0;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
         }
 
         /* Sidebar styles */
@@ -29,7 +48,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            background-color: #1c1e21;
+            background-color: #343a40; /* Dark background for the sidebar */
             padding-top: 20px;
             transition: transform 0.3s ease-in-out;
             overflow-y: auto;
@@ -41,13 +60,13 @@
             text-align: center;
             font-weight: 500;
             margin-bottom: 20px;
-            font-size: 1.25rem;
+            font-size: 1.5rem;
         }
 
         .sidebar a {
             display: block;
             padding: 12px 20px;
-            color: #a8b0b6;
+            color: #cfd8dc; /* Lighter text color */
             text-decoration: none;
             font-size: 1rem;
             transition: background 0.3s, color 0.3s;
@@ -55,7 +74,7 @@
         }
 
         .sidebar a:hover, .sidebar a.active {
-            background-color: #2a2d31;
+            background-color: #495057; /* Slightly lighter for hover */
             color: #ffffff;
         }
 
@@ -104,17 +123,18 @@
             border-radius: 8px;
             box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
-            transition: box-shadow 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .card:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
             box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         /* Footer */
         footer {
-            background-color: #1c1e21;
-            color: #a8b0b6;
+            background-color: #343a40;
+            color: #cfd8dc;
             padding: 15px 0;
             text-align: center;
         }
@@ -150,6 +170,7 @@
 </head>
 <body>
 
+   
     <!-- Sidebar Toggle Button -->
     <div class="sidebar-toggle" id="sidebarToggle">
         <i class="fas fa-bars"></i>
@@ -164,13 +185,11 @@
         <a href="{{ url_for('stock.categories') }}">Manage Categories</a>
         <a href="{{ url_for('stock.update_stock') }}">Update Stock</a>
         <a href="{{ url_for('auth.user_management') }}">User Management</a>
-       
         <a href="{{ url_for('auth.logout') }}">Logout</a>
     </div>
 
     <!-- Main Content -->
     <div class="content">
-              
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}

@@ -143,22 +143,19 @@ class CartItem(db.Model):
 
 
 
-
 class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     cost_price = db.Column(db.Float, nullable=False, default=0.0)
     selling_price = db.Column(db.Float, nullable=False, default=0.0)
-    stock = db.Column(db.Float, nullable=False, default=0.0)  # Holds count for pieces, weight for weight-based
+    stock = db.Column(db.Float, nullable=False, default=0.0)  # Represents count for pieces
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'), nullable=True)
-    unit_type = db.Column(SQLAlchemyEnum(UnitType, name='unit_types'), nullable=False)
     packet_size = db.Column(db.Integer, nullable=True)  # For piece products only
     combination_size = db.Column(db.Integer, nullable=True)  # For combination sales
     combination_price = db.Column(db.Float, nullable=True)  # For combination sales
     combination_unit_price = db.Column(db.Float, nullable=True)
-    bulk_quantity = db.Column(db.Float, nullable=True)  # Total bulk weight for weight products
     sale_items = db.relationship('CartItem', backref='product', lazy='joined')
 
     @validates('cost_price', 'selling_price', 'stock')
@@ -182,25 +179,17 @@ class Product(db.Model):
         return self.profit  # This will return the profit per unit
 
     def is_low_stock(self):
-        logging.debug(f"Checking stock for product: {self.name}, Unit Type: {self.unit_type}, Stock: {self.stock}")
-        return self.stock < (10 if self.unit_type == UnitType.piece else 1.0)
-
-    def is_weight_based(self):
-        """Determine if the product is weight-based."""
-        return self.unit_type == UnitType.weight
-
-    def is_piece_based(self):
-        """Determine if the product is piece-based."""
-        return self.unit_type == UnitType.piece
+        """Determine if stock is low, with a threshold of 10 for piece-based products."""
+        return self.stock < 10
 
     def serialize(self):
+        """Serialize product details for JSON responses."""
         return {
             'id': self.id,
             'name': self.name,
             'cost_price': self.cost_price,
             'selling_price': self.selling_price,
             'stock': self.stock,
-            'unit_type': self.unit_type.name,
             'packet_size': self.packet_size,
             'combination_size': self.combination_size,
             'combination_price': self.combination_price,

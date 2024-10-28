@@ -41,7 +41,7 @@ def get_products_by_category(category_id):
         if not products:
             return jsonify({'message': 'No products found in this category'}), 404
 
-        # Constructing the product list to include all necessary fields
+        # Constructing the product list to include necessary fields
         product_list = [{
             'id': product.id,
             'name': product.name,
@@ -49,9 +49,7 @@ def get_products_by_category(category_id):
             'combination_price': product.combination_price,
             'combination_unit_price': product.combination_unit_price,
             'combination_size': product.combination_size,
-            'stock': product.stock,
-            'is_weight_based': product.unit_type == 'weight',  # Assuming 'weight' indicates a weight-based product
-            'unit_type': str(product.unit_type)  # Convert to string for JSON serialization
+            'stock': product.stock
         } for product in products]
 
         return jsonify({'products': product_list})
@@ -59,6 +57,7 @@ def get_products_by_category(category_id):
     except Exception as e:
         logging.error(f"Error fetching products for category {category_id}: {e}")
         return jsonify({'error': 'An error occurred while fetching products.'}), 500
+
 
 @sales_bp.route('/add_to_cart', methods=['POST'])
 @login_required
