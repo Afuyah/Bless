@@ -8,6 +8,6 @@ load_dotenv(os.path.join(basedir, '.env'))
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'you-will-never-guess')  
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:DRsIuHtEGEqukqwEjLnsSosOGoFeuhRK@junction.proxy.rlwy.net:19724/railway'
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL') 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SOCKETIO_MESSAGE_QUEUE = None
