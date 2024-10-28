@@ -7,22 +7,16 @@
     <meta name="keywords" content="Admin, Dashboard, Sales, Inventory">
     <title>{% block title %}Nawiri Admin Dashboard{% endblock %}</title>
 
-    <!-- Bootstrap and Custom CSS -->
+    <!-- Bootstrap, FontAwesome, and Custom CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-   <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-
-    <style>
-        
-    </style>
-
-    {% block extra_css %}
-    {% endblock %}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
 </head>
 <body>
 
-    <!-- Sidebar Toggle Button -->
-    <div class="sidebar-toggle" id="sidebarToggle">
+    <!-- Sidebar Toggle Button for Mobile -->
+    <div class="sidebar-toggle d-md-none" id="sidebarToggle">
         <i class="fas fa-bars"></i>
     </div>
 
@@ -62,28 +56,22 @@
     </div>
 
     {% block extra_js %}
-    <!-- Bootstrap JS and jQuery -->
+    <!-- jQuery, Bootstrap, and DataTables JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 
     <!-- JavaScript for Sidebar Toggle -->
     <script>
         $(document).ready(function() {
-            const body = $('body');
+            const sidebar = $('#sidebar');
             const sidebarToggle = $('#sidebarToggle');
 
             sidebarToggle.on('click', function() {
-                body.toggleClass('sidebar-visible');
+                sidebar.toggleClass('sidebar-hidden');
             });
         });
     </script>
     {% endblock %}
 </body>
-
-<!-- Include jQuery and DataTables JS/CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-
 </html>

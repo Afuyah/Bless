@@ -3,16 +3,16 @@
     --font-family: 'Arial', sans-serif; /* Modern font */
     --primary-color: #4CAF50; /* Green color for borders */
     --secondary-color: #007bff; /* Added secondary color for other uses */
-    --border-radius: 12px; /* Rounded corners */
+   
     --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 body {
     background-color: var(--background-color);
     font-family: var(--font-family);
-    margin: 0;
     line-height: 1.6; /* Improve text readability */
-    height: 100vh; /* Set body height to 100% of the viewport height */
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack children vertically */
 }
 
 /* Fluid Container Styling */
@@ -20,10 +20,10 @@ body {
     max-width: 1400px; /* Increased max width for larger screens */
     width: calc(100% - 20px); /* Full width minus the margins (10px on each side) */
     border: 1px solid var(--primary-color); /* Green border */
-    padding: 20px;
+    padding: 10px;
     border-radius: var(--border-radius);
     background: inherit; /* White background for the container */
-    box-shadow: var(--box-shadow); /* Subtle shadow */
+
     margin: 10px auto; /* 10px margin for spacing from edges */
     transition: all 0.3s ease; /* Smooth transition for hover effects */
 }
@@ -321,10 +321,10 @@ body {
 
 
 /* Additional Styling */
-.wrapper {
+..wrapper {
+    flex: 1; /* Allow wrapper to grow and fill available space */
     display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    flex-direction: column; /* Stack content and footer */
 }
 
 .content {
@@ -360,11 +360,11 @@ body {
 }
 
 .footer {
-    background-color: inherit;
-    color: #495057;
-    border-top: 1px solid #dee2e6;
-    text-align: center;
-    padding: 15px 0;
+    background-color: inherit; /* Footer background */
+    color: var(--text-color);
+    text-align: center; /* Center align text */
+    padding: 15px 0; /* Padding for footer */
+    border-top: 1px solid #dee2e6; /* Top border */
 }
 
 .footer a {
@@ -376,22 +376,47 @@ body {
     text-decoration: underline;
 }
 
-/* Navbar Custom Styling */
-.navbar-custom {
-    background-color: inherit;
-    color: #f8f9fa;
-    padding: 10px 20px;
+
+.content {
+    flex: 1; /* This allows the content to take up remaining space */
+}
+/* Navbar Styling */
+
+
+.navbar-light .navbar-nav .nav-link {
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for color */
 }
 
-.navbar-custom .navbar-brand {
-    color: grey;
-    font-weight: bold;
+.navbar-light .navbar-nav .nav-link:hover {
+    background-color: var(--hover-color); /* Light green on hover */
+    color: var(--primary-color); /* Change text color on hover */
+    transform: translateY(-2px); /* Slight lift effect */
 }
 
-.navbar-custom .navbar-nav .nav-link {
-    color: grey;
+.navbar-light .navbar-nav .nav-item.active .nav-link {
+    color: var(--primary-color); /* Active link color */
+    font-weight: bold; /* Bold text for active links */
 }
 
-.navbar-custom .navbar-nav .nav-link:hover {
-    color: var(--primary-color); /* Highlight on hover */
+.navbar-light .navbar-toggler {
+    border-color: var(--primary-color); /* Toggler border color */
+}
+
+.navbar-light .navbar-toggler:hover {
+    background-color: var(--hover-color); /* Toggler hover color */
+}
+
+
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-nav {
+        text-align: center; /* Center text in mobile view */
+    }
+
+    .navbar-nav .nav-item {
+        margin-bottom: 10px; /* Space between nav items */
+    }
 }

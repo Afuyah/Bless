@@ -6,11 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Nawiri Enterprise - Your comprehensive POS solution for streamlined stock and expense management.">
     <meta name="theme-color" content="#2b2b2b">
-    <meta name="mobile-web-app-capable" content="yes"> <!-- Updated Meta Tag -->
+    <meta name="mobile-web-app-capable" content="yes">
     <title>{% block title %}Nawiri Enterprise{% endblock %}</title>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -29,58 +30,99 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
- 
-
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #343a40;
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #ffffff;
+        }
+        .navbar-nav .nav-link {
+            color: #ffffff;
+            padding: 15px 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .navbar-nav .nav-link:hover {
+            background-color: #495057;
+            color: #ffffff;
+        }
+        .navbar-nav .nav-link.active {
+            background-color: #495057;
+            color: #ffffff;
+        }
+        .dropdown-menu {
+            background-color: #343a40;
+            border: none;
+        }
+        .dropdown-item {
+            color: #ffffff;
+        }
+        .dropdown-item:hover {
+            background-color: #495057;
+        }
+        .navbar-toggler {
+            border: none;
+        }
+        .navbar-toggler-icon {
+            background-color: #ffffff;
+        }
+        footer {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+    </style>
 </head>
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">NAWIRI'S ENTERPRISE</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('sales.sales_screen') }}">Shop</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('expense.expenses_page') }}">Expenses</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('supplier.suppliers_page') }}">Suppliers</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="More options">More</a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Credit</a>
-                            <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
-                            <div class="dropdown-divider"></div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+   <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">Nawiri's Enterprise</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('sales.sales_screen') }}">Shop</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('expense.expenses_page') }}">Expenses</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('supplier.suppliers_page') }}">Suppliers</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Credit</a>
+                        <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
+                    </div>
+                </li>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!-- Main Content -->
+
+    
     <div class="wrapper">
-
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-               
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    {% endfor %}
-               
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
             {% endif %}
         {% endwith %}
-        
+
         <div class="content">
-            <div class="container text-center my-5">
+            <div class="container text-center my-2">
                 {% block content %}
-                
                 {% endblock %}
             </div>
         </div>
@@ -101,14 +143,11 @@
                     .then((registration) => {
                         console.log('ServiceWorker registered with scope:', registration.scope);
 
-                        // Detect updates to the Service Worker
                         registration.onupdatefound = () => {
                             const installingWorker = registration.installing;
-
                             installingWorker.onstatechange = () => {
                                 if (installingWorker.state === 'installed') {
                                     if (navigator.serviceWorker.controller) {
-                                        // New content is available, prompt user
                                         console.log('New content is available; please refresh.');
                                         if (confirm('New version available. Refresh now?')) {
                                             window.location.reload();
@@ -135,10 +174,30 @@
                     alert.style.opacity = '0';
                     setTimeout(() => {
                         alert.remove();
-                    }, 500); // Match this duration with CSS transition
-                }, 5000); // Adjust this value for how long the alert is displayed
+                    }, 500);
+                }, 5000);
             });
         });
+
+
+
+        document.addEventListener('scroll', function () {
+    const navbar = document.querySelector('.navbar');
+    if (window.scrollY > 50) {
+        navbar.classList.add('navbar-scrolled');
+    } else {
+        navbar.classList.remove('navbar-scrolled');
+    }
+});
+
+// CSS for scrolled effect
+<style>
+.navbar-scrolled {
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent on scroll */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+</style>
+
     </script>
 </body>
 

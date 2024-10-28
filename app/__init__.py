@@ -5,6 +5,7 @@ from flask_socketio import SocketIO
 from flask_login import LoginManager
 from config import Config
 import logging
+import pytz
 from logging.handlers import RotatingFileHandler
 from functools import wraps
 
@@ -53,7 +54,9 @@ def create_app(config_class=Config):
     # Security configurations
     app.secret_key = 'your_secret_key'  # Set a strong secret key
     app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
+    app.config['TIME_ZONE'] = 'Africa/Nairobi'
 
+    
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
@@ -98,5 +101,11 @@ def create_app(config_class=Config):
     def number_format(value, decimals=2):
         """Format numbers to a specified number of decimal places."""
         return f"{value:,.{decimals}f}"
+
+    @app.route('/current_time')
+    def current_time():
+        tz = pytz.timezone(app.config['TIME_ZONE'])
+        current_time = datetime.now(tz)
+        return f"Current time: {current_time.strftime('%Y-%m-%d %H:%M:%S')}"    
 
     return app
