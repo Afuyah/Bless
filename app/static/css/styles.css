@@ -87,7 +87,7 @@ body {
     border: 1px solid #ccc; /* Optional border for visual separation */
     border-radius: 8px; /* Rounded corners for a softer look */
     background-color: #f9f9f9; /* Light background for contrast */
-    max-height: 700px; /* Set maximum height for the container */
+    max-height: 600px; /* Set maximum height for the container */
     overflow: hidden; /* Prevents overflow from the container */
 }
 
@@ -96,7 +96,7 @@ body {
     display: flex;
     flex-wrap: wrap; /* Responsive wrapping */
     justify-content: space-between; /* Space between cards */
-    max-height: 600px; /* Limit height for scrollability */
+    max-height: 500px; /* Limit height for scrollability */
     overflow-y: auto; /* Enable vertical scrolling */
     overflow-x: hidden; /* Prevent horizontal scrolling */
     padding: 0 10px; /* Padding for inner spacing */
@@ -171,7 +171,7 @@ body {
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 400px) {
     .product-item {
         flex: 1 0 calc(100% - 20px); /* One card on small screens */
     }
