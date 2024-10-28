@@ -28,11 +28,6 @@ body {
     transition: all 0.3s ease; /* Smooth transition for hover effects */
 }
 
-/* Hover Effect */
-.container:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Enhance shadow on hover */
-    transform: translateY(-2px); /* Slight upward movement on hover */
-}
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -233,7 +228,7 @@ body {
 
 /* Total Amount Styles */
 .cart-total {
-    font-size: 1.5em; /* Larger font size for visibility */
+    font-size: 2.5em; /* Larger font size for visibility */
     font-weight: bold; /* Bold for emphasis */
     color: var(--primary-color); /* Use primary color */
     margin-top: 15px; /* Space above the total */
