@@ -23,36 +23,44 @@
             <p id="no-products" style="display: none;" class="alert alert-warning">No products found for this category.</p>
         </div>
 
-        <div class="col-md-3 cart-container border border-secondary rounded p-3">
-            <h5>Cart Summary</h5>
-            <div id="cart-items" class="cart-items"></div>
-            <div class="d-flex justify-content-between mt-2">
-                <span>Total: Ksh</span>
-                <span id="total-amount">0.00</span>
-            </div>
-
-            <!-- Payment Method Selector -->
-            <div class="mt-3">
-                <label for="payment-method">Payment Method:</label>
-                <select id="payment-method" class="form-select">
-                    <option value="cash">Cash</option>
-                    <option value="mpesa">M-Pesa</option>
-                    <option value="credit">Credit</option>
-                </select>
-            </div>
-
-            <!-- Customer Name Input -->
-            <div class="mt-2" id="customer-name-container" style="display: none;">
-                <label for="customer-name">Customer Name:</label>
-                <input type="text" id="customer-name" class="form-control" placeholder="Enter customer name" />
-            </div>
-
-            <button id="checkout-btn" class="btn btn-success mt-2">Checkout</button>
-
-            <!-- Loading indicator -->
-            <div class="alert alert-info mt-2" id="checkout-loading" style="display: none;">Processing your checkout...</div>
-        </div>
+ <div class="col-md-3 cart-container border border-secondary rounded p-4 bg-light shadow-sm">
+    <h5 class="text-center mb-3">Cart Summary</h5>
+    
+    <!-- Cart Items Display -->
+    <div id="cart-items" class="cart-items mb-3" style="max-height: 200px; overflow-y: auto;"></div>
+    
+    <div class="d-flex justify-content-between mt-2 fw-bold">
+        <span>Total:</span>
+        <span id="total-amount">Ksh 0.00</span>
     </div>
+
+    <!-- Payment Method Selector -->
+    <div class="mt-3">
+        <label for="payment-method" class="form-label">Payment Method:</label>
+        <select id="payment-method" class="form-select">
+            <option value="cash">Cash</option>
+            <option value="mpesa">M-Pesa</option>
+            <option value="credit">Credit</option>
+        </select>
+    </div>
+
+    <!-- Customer Name Input -->
+    <div class="mt-2" id="customer-name-container" style="display: none;">
+        <label for="customer-name" class="form-label">Customer Name:</label>
+        <input type="text" id="customer-name" class="form-control" placeholder="Enter customer name" />
+    </div>
+
+    <!-- Checkout Button -->
+    <button id="checkout-btn" class="btn btn-success mt-3 w-100">Checkout</button>
+
+    <!-- Loading Indicator -->
+    <div class="alert alert-info mt-2" id="checkout-loading" style="display: none;">Processing your checkout...</div>
+
+    <!-- Error and Success Messages -->
+    <div id="error-message" class="mt-2 text-danger"></div>
+    <div id="success-message" class="mt-2 text-success" style="display: none;"></div>
+</div>
+
 
     <!-- Low Stock Notification -->
     <div class="alert alert-warning mt-4" id="low-stock-alert" style="display: none;"></div>
@@ -61,7 +69,7 @@
     <div class="alert alert-danger mt-2" id="error-message" style="display: none;"></div>
 
     <!-- Success Modal -->
-    
+  
 <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -72,8 +80,8 @@
                 </button>
             </div>
             <div class="modal-body">
-               Checkout Successfull
-                           </div>
+               checkout  processed successfully! 
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
@@ -81,10 +89,8 @@
     </div>
 </div>
 
+</div>
 
-
-
-<!-- Additional Styling -->
 
 
 
@@ -92,31 +98,32 @@
 
 let cart = [];
 
+// Fetch products based on category
 $(document).on('click', '.category-item', function () {
     const categoryId = $(this).data('category');
     $('#product-list').html('<p>Loading products...</p>'); // Show loading indicator
     $('#no-products').hide(); // Hide no-products message
 
     $.ajax({
-        url: `/sales/api/products/${categoryId}`,
+        url: `/sales/api/products/${categoryId}`, // Flask API endpoint to fetch products by category
         method: 'GET',
         success: function (data) {
             if (data.products && data.products.length > 0) {
                 populateProducts(data.products);
             } else {
-                $('#product-list').empty();
-                $('#no-products').show();
+                $('#product-list').empty(); // Clear product list
+                $('#no-products').show(); // Show fallback when no products are found
             }
         },
         error: function () {
             showError('Failed to load products. Please try again.');
-            $('#product-list').empty();
+            $('#product-list').empty(); // Clear the product list on error
         }
     });
 });
 
 function populateProducts(products) {
-    $('#product-list').empty();
+    $('#product-list').empty(); // Clear previous product listings
 
     if (products.length === 0) {
         $('#product-list').append('<p class="text-muted">No products available.</p>');
@@ -128,13 +135,13 @@ function populateProducts(products) {
         let combinationText = product.combination_size > 1 ? `(${product.combination_size} @ Ksh ${product.combination_price})` : '';
 
         $('#product-list').append(`
-            <div class="product-item border border-primary rounded p-2 mb-3 ${product.stock === 0 ? 'disabled-card' : 'clickable'}"
-                 data-id="${product.id}"
-                 data-name="${product.name}"
-                 data-selling-price="${product.selling_price}"
-                 data-combination-price="${product.combination_price || 0}"
-                 data-combination-unit-price="${product.combination_unit_price || 0}"
-                 data-stock="${product.stock}"
+            <div class="product-item border border-primary rounded p-2 mb-3 ${product.stock === 0 ? 'disabled-card' : 'clickable'}" 
+                 data-id="${product.id}" 
+                 data-name="${product.name}" 
+                 data-selling-price="${product.selling_price}" 
+                 data-combination-price="${product.combination_price || 0}" 
+                 data-combination-unit-price="${product.combination_unit_price || 0}" 
+                 data-stock="${product.stock}" 
                  data-combination-size="${product.combination_size || 1}">
                 <h5 class="product-title">${product.name} ${lowStockWarning}</h5>
                 <p class="product-price">Ksh ${product.selling_price.toFixed(2)} ${combinationText}</p>
@@ -144,6 +151,7 @@ function populateProducts(products) {
     });
 }
 
+// Make the entire card clickable to add to cart
 $(document).on('click', '.product-item.clickable', function () {
     const productId = $(this).data('id');
     const productName = $(this).data('name');
@@ -154,16 +162,16 @@ $(document).on('click', '.product-item.clickable', function () {
 
     const existingItem = cart.find(item => item.id === productId);
 
+    // Check if the item is already in the cart and if there is stock available
     if (existingItem) {
         if (existingItem.quantity < productStock) {
             existingItem.quantity += 1; // Increment quantity if there's stock
-            showSuccess(`${productName} has been added to the cart.`);
         } else {
             showError('Cannot add more of this item. Stock limit reached.');
             return;
         }
     } else {
-        if (productStock > 0) {
+        if (productStock > 0) { // Ensure there's stock to add
             cart.push({
                 id: productId,
                 name: productName,
@@ -173,7 +181,6 @@ $(document).on('click', '.product-item.clickable', function () {
                 quantity: 1,
                 combination_size: $(this).data('combination-size') || 1
             });
-            showSuccess(`${productName} has been added to the cart.`);
         } else {
             showError('Cannot add this item. Stock limit reached.');
             return;
@@ -182,6 +189,14 @@ $(document).on('click', '.product-item.clickable', function () {
     updateCart();
 });
 
+// Handle removing items from cart
+$(document).on('click', '.remove-from-cart', function () {
+    const productId = $(this).data('id');
+    cart = cart.filter(item => item.id !== productId);
+    updateCart();
+});
+
+// Update the cart summary
 function updateCart() {
     $('#cart-items').empty();
     let total = 0;
@@ -191,16 +206,21 @@ function updateCart() {
         const fullCombinations = Math.floor(item.quantity / item.combination_size);
         const remainingUnits = item.quantity % item.combination_size;
 
+        // Calculate price using combination pricing for full combinations
         subtotal += fullCombinations * item.combination_price;
+
+        // Calculate the remaining items' price and check if using combination pricing would be cheaper
         const individualRemainderPrice = remainingUnits * item.selling_price;
         const additionalCombinationPrice = item.combination_price; // Cost of 1 combination set
 
         if (remainingUnits > 0) {
+            // Compare remaining items' individual price vs an extra combination price
             subtotal += Math.min(individualRemainderPrice, additionalCombinationPrice);
         }
 
         total += subtotal;
 
+        // Append item to cart display
         $('#cart-items').append(`
             <div class="cart-item">
                 ${item.name} - Ksh ${item.selling_price.toFixed(2)} x ${item.quantity} = Ksh ${subtotal.toFixed(2)}
@@ -209,47 +229,8 @@ function updateCart() {
         `);
     });
 
-    $('#total-amount').text(total.toFixed(2));
+    $('#total-amount').text(total.toFixed(2)); // Update the total amount display
 }
-
-// Display success message
-function showSuccess(message) {
-    const alert = `<div class="alert alert-success" role="alert">${message}</div>`;
-    $('#error-message').html(alert).show().delay(3000).fadeOut();
-}
-
-// Display error message
-function showError(message) {
-    const alert = `<div class="alert alert-danger" role="alert">${message}</div>`;
-    $('#error-message').html(alert).show().delay(3000).fadeOut();
-}
-
-// Confirm checkout
-$('#checkout-btn').on('click', function () {
-    if (cart.length === 0) {
-        showError('Your cart is empty. Please add items before checking out.');
-        return;
-    }
-
-    const paymentMethod = $('#payment-method').val();
-    const customerName = paymentMethod === 'credit' ? $('#customer-name').val() : '';
-
-    if (paymentMethod === 'credit' && customerName.trim() === '') {
-        showError('Please enter customer name for credit payment.');
-        return;
-    }
-
-    $('#checkout-loading').show(); // Show loading indicator
-
-    // Simulate checkout process
-    setTimeout(() => {
-        $('#checkout-loading').hide();
-        $('#successModal').modal('show'); // Show success modal
-        cart = []; // Clear the cart
-        updateCart(); // Update cart display
-    }, 2000); // Simulate processing time
-});
-
 
 
 // Handle payment method change
@@ -319,6 +300,7 @@ function resetCheckoutForm() {
     $('#customer-name').val(''); // Clear customer name
     $('#customer-name-container').hide(); // Hide customer name input
 }
+
 
 // Debounce function to limit the frequency of search execution
 function debounce(func, delay) {
