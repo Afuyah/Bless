@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, render_template
 from flask_login import login_required, current_user
-from app import db
+from app import db, admin_required
 from app.models import Expense
 import logging
 from datetime import datetime

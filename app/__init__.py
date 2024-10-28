@@ -24,6 +24,19 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Assuming you have a way to check if the user is admin
+        if not session.get('is_admin', False):  # Replace with your admin check logic
+            flash('Access denied. Admins only.', 'danger')  # Flash message for access denial
+            return redirect(url_for('home.index'))  # Redirect to a safe page
+        return f(*args, **kwargs)
+    return decorated_function
+
+    
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.models import db, Product, Category, Supplier, Expense  # Include Expense model
-from app import socketio
+from app import socketio, admin_required 
 import logging
 stock_bp = Blueprint('stock', __name__)
 
@@ -21,6 +21,7 @@ FLASH_STOCK_UPDATED = 'Stock for "{}" updated successfully.'
 # Route to manage product categories
 @stock_bp.route('/categories')
 @login_required
+@admin_required
 def categories():
     categories = Category.query.all()
     if not categories:
@@ -31,6 +32,7 @@ def categories():
 # Route to create a new category
 @stock_bp.route('/categories/new', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def new_category():
     if not current_user.is_admin():
         flash(FLASH_ACCESS_DENIED)
@@ -58,6 +60,7 @@ def new_category():
 # Route to edit an existing category
 @stock_bp.route('/categories/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def edit_category(id: int):
     category = Category.query.get_or_404(id)
 
@@ -82,6 +85,7 @@ def edit_category(id: int):
 # Route to delete a category
 @stock_bp.route('/categories/<int:id>/delete', methods=['POST'])
 @login_required
+@admin_required
 def delete_category(id: int):
     category = Category.query.get_or_404(id)
     try:
@@ -97,6 +101,7 @@ def delete_category(id: int):
 # Route to manage products
 @stock_bp.route('/products', methods=['GET'])
 @login_required
+@admin_required
 def products():
     search_query = request.args.get('search', '')
     products = Product.query.filter(Product.name.contains(search_query)).all()
@@ -105,6 +110,7 @@ def products():
 
 @stock_bp.route('/products/new', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def new_product():
     if not current_user.is_admin():
         flash(FLASH_ACCESS_DENIED)
@@ -199,6 +205,7 @@ def new_product():
 
 @stock_bp.route('/products/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def edit_product(id: int):
     if not current_user.is_admin():
         flash("Access denied.", "danger")
@@ -240,6 +247,7 @@ def edit_product(id: int):
 
 @stock_bp.route('/products/<int:id>/delete', methods=['POST'])
 @login_required
+@admin_required
 def delete_product(id: int):
     if not current_user.is_admin():
         flash(FLASH_ACCESS_DENIED)
@@ -290,6 +298,7 @@ def update_product_stock(product, quantity_to_add, total_amount):
 
 @stock_bp.route('/admin_update_stock', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def update_stock():
     if request.method == 'POST':
         product_id = request.form['productId']
@@ -335,6 +344,7 @@ def update_stock():
 
 @stock_bp.route('/products/<int:product_id>/update_stock_modal', methods=['GET'])
 @login_required
+@admin_required
 def update_stock_modal(product_id: int):
     product = Product.query.get_or_404(product_id)
     return render_template('update_stock_modal.html', product=product)
