@@ -34,26 +34,20 @@ def get_expenses():
         'category': expense.category
     } for expense in expenses])
 
-
-
-
 @expense_bp.route('/api/add_daily_expense', methods=['POST'])
 @login_required
 def add_daily_expense():
     try:
-        # Parse JSON data
         data = request.get_json()
-        logging.info(f"Received data: {data}")  
-
-        description = data.get('description')
+        description = data.get('description', '').strip()
         amount = data.get('amount')
 
-        # Validate data
-        if not description or not amount or float(amount) <= 0:
+        # Validate input
+        if not description or not isinstance(amount, (float, int)) or float(amount) <= 0 or len(description) > 255:
             logging.error("Invalid input data")
             return jsonify({'error': 'Invalid input data'}), 400
 
-        # Create and log new daily expense with category set to "Daily Expenses"
+        # Create new expense
         new_expense = Expense(
             description=description,
             amount=float(amount),
@@ -62,14 +56,22 @@ def add_daily_expense():
         )
         db.session.add(new_expense)
         db.session.commit()
-        logging.info("Daily expense added successfully.")
+        logging.info(f"Expense added successfully by user {current_user.id}.")
 
-        return jsonify({'message': 'Daily expense added successfully.'}), 200
+        return jsonify({
+            'message': 'Daily expense added successfully.',
+            'expense_id': new_expense.id
+        }), 200
 
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logging.error(f"Database error: {e}")
+        return jsonify({'error': 'Failed to add expense due to database error.'}), 500
     except Exception as e:
         db.session.rollback()
-        logging.error(f"Error adding daily expense: {e}")
+        logging.error(f"Unexpected error: {e}")
         return jsonify({'error': 'Failed to add daily expense. Please try again.'}), 500
+
 
 @expense_bp.route('/api/total_daily_expenditure', methods=['GET'])
 @login_required

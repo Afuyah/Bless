@@ -4,14 +4,14 @@
 
 {% block content %}
 <div class="registration-container">
-    <h2 class="text-center">Add User</h2>
-    <form method="POST" action="{{ url_for('auth.register') }}" class="mt-4">
+    <h3 class="text-center">Add User</h3>
+    <form method="POST" action="{{ url_for('auth.add_user') }}" class="mt-4">
         <div class="form-group">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" class="form-control" placeholder="Username" required aria-label="Username">
         </div>
         <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password"> Secure Password</label>
             <input type="password" id="password" name="password" class="form-control" placeholder="Password" required aria-label="Password" aria-describedby="passwordStrength">
             <!-- Password Strength Meter -->
             <div id="passwordStrength" class="text-muted"></div>

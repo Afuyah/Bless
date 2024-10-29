@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="text-center">Add Supplier</h2>
+    <h3 class="text-center">Add Supplier</h3>
 
     <!-- Feedback Messages -->
     <div id="successMessage" class="alert alert-success d-none" role="alert">
@@ -78,63 +78,68 @@
     }
 
     // Function to submit supplier data
-    function submitSupplier(event) {
-        event.preventDefault(); // Prevent default form submission
+function submitSupplier(event) {
+    event.preventDefault(); // Prevent default form submission
 
-        const supplierName = document.getElementById('supplierName').value;
-        const supplierPhone = document.getElementById('supplierPhone').value;
-        const productId = document.getElementById('productSelect').value;
+    const supplierName = document.getElementById('supplierName').value;
+    const supplierPhone = document.getElementById('supplierPhone').value;
+    const productId = document.getElementById('productSelect').value;
 
-        // Validate phone number format
-        const phonePattern = /^[0-9]{10}$/; // Example pattern for 10-digit phone numbers
-        if (supplierPhone && !phonePattern.test(supplierPhone)) {
-            alert('Please enter a valid phone number (10 digits).');
-            return;
-        }
-
-        // Prepare data to send
-        const supplierData = {
-            name: supplierName,
-            phone: supplierPhone,
-            product_id: productId // Include product ID if necessary
-        };
-
-        // Send POST request to add supplier
-        fetch('/supplier/api/add_supplier', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(supplierData)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to add supplier');
-            }
-            return response.json();
-        })
-        .then(data => {
-            const addSupplierModal = bootstrap.Modal.getInstance(document.getElementById('addSupplierModal'));
-            addSupplierModal.hide();
-            document.getElementById('addSupplierForm').reset();
-            fetchSuppliers(); // Refresh the supplier table
-            
-            // Show success message
-            const successMessage = document.getElementById('successMessage');
-            successMessage.classList.remove('d-none');
-            setTimeout(() => successMessage.classList.add('d-none'), 3000); // Hide after 3 seconds
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            
-            // Show error message
-            const errorMessage = document.getElementById('errorMessage');
-            const errorMessageText = document.getElementById('errorMessageText');
-            errorMessageText.textContent = error.message;
-            errorMessage.classList.remove('d-none');
-            setTimeout(() => errorMessage.classList.add('d-none'), 3000); // Hide after 3 seconds
-        });
+    // Validate phone number format
+    const phonePattern = /^[0-9]{10}$/; // Example pattern for 10-digit phone numbers
+    if (supplierPhone && !phonePattern.test(supplierPhone)) {
+        alert('Please enter a valid phone number (10 digits).');
+        return;
     }
+
+    // Prepare data to send
+    const supplierData = {
+        name: supplierName,
+        phone: supplierPhone,
+        product_id: productId // Include product ID if necessary
+    };
+
+    // Send POST request to add supplier
+    fetch('/supplier/api/add_supplier', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(supplierData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to add supplier');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Close the modal
+        const addSupplierModal = new bootstrap.Modal(document.getElementById('addSupplierModal'));
+        addSupplierModal.hide(); // Hide the modal
+
+        // Reset the form
+        document.getElementById('addSupplierForm').reset();
+
+        // Refresh the supplier table
+        fetchSuppliers();
+
+        // Show success message
+        const successMessage = document.getElementById('successMessage');
+        successMessage.classList.remove('d-none');
+        setTimeout(() => successMessage.classList.add('d-none'), 3000); // Hide after 3 seconds
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        
+        // Show error message
+        const errorMessage = document.getElementById('errorMessage');
+        const errorMessageText = document.getElementById('errorMessageText');
+        errorMessageText.textContent = error.message;
+        errorMessage.classList.remove('d-none');
+        setTimeout(() => errorMessage.classList.add('d-none'), 3000); // Hide after 3 seconds
+    });
+}
 
     // Function to fetch and display suppliers
     function fetchSuppliers() {

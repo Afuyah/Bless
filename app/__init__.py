@@ -5,7 +5,9 @@ from flask_socketio import SocketIO
 from flask_login import LoginManager
 from config import Config
 import logging
+import os
 import pytz
+from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from functools import wraps
 
@@ -25,42 +27,37 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
+# Custom decorator to enforce admin requirement
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Assuming you have a way to check if the user is admin
         if not session.get('is_admin', False):  # Replace with your admin check logic
             flash('Access denied. Admins only.', 'danger')  # Flash message for access denial
             return redirect(url_for('home.index'))  # Redirect to a safe page
         return f(*args, **kwargs)
     return decorated_function
 
-    
-
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # Initialize logging
+    # Security configurations
+    app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS in production
+    app.config['TIME_ZONE'] = 'Africa/Nairobi'
+
+    # Logging configuration
     if not app.debug:
         handler = RotatingFileHandler('app.log', maxBytes=10240, backupCount=10)
-        handler.setLevel(logging.INFO)
+        handler.setLevel(logging.WARNING)  # Set logging level to warning for production
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
         app.logger.addHandler(handler)
         app.logger.info('Application startup')
 
-    # Security configurations
-    app.secret_key = 'your_secret_key'  # Set a strong secret key
-    app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
-    app.config['TIME_ZONE'] = 'Africa/Nairobi'
-
-    
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
-    socketio.init_app(app, cors_allowed_origins="*")  # Modify as needed
+    socketio.init_app(app, cors_allowed_origins=['https://yourdomain.com'])  # Use specific domains in production
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'  # Redirect to login if not authenticated
 
@@ -97,15 +94,17 @@ def create_app(config_class=Config):
         app.logger.warning(f"404 Error: {error}, attempted URL: {request.url}")
         return render_template('404.html'), 404  # Render a custom 404 error page
 
+    # Helper to format numbers in templates
     @app.template_filter('number_format')
     def number_format(value, decimals=2):
         """Format numbers to a specified number of decimal places."""
         return f"{value:,.{decimals}f}"
 
+    # Route to display current time in the configured time zone
     @app.route('/current_time')
     def current_time():
         tz = pytz.timezone(app.config['TIME_ZONE'])
         current_time = datetime.now(tz)
-        return f"Current time: {current_time.strftime('%Y-%m-%d %H:%M:%S')}"    
-
+        return f"Current time: {current_time.strftime('%Y-%m-%d %H:%M:%S')}"
+    
     return app

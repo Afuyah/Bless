@@ -95,7 +95,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Credit</a>
+                      
                         <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
                     </div>
                 </li>
@@ -190,13 +190,18 @@
     }
 });
 
-// CSS for scrolled effect
-<style>
-.navbar-scrolled {
-    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent on scroll */
-    transition: background-color 0.3s; /* Smooth transition */
-}
-</style>
+
+
+        // Quantity update effect
+document.querySelectorAll('.cart-item-quantity').forEach(item => {
+    item.addEventListener('click', () => {
+        item.classList.add('bounce');
+        setTimeout(() => {
+            item.classList.remove('bounce');
+        }, 300);
+    });
+});
+
 
     </script>
 </body>

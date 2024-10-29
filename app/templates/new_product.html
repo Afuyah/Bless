@@ -1,10 +1,10 @@
 {% extends "admin_base.html" %}
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Add New Product</h2>
+    <h3 class="text-center mb-4">New Product</h3>
     <form method="POST" action="{{ url_for('stock.new_product') }}" class="p-5 bg-white rounded shadow-lg">
         <div class="form-group mb-4">
-            <label for="name">Product Name:</label>
+            <label for="name"> Name:</label>
             <input type="text" id="name" name="name" class="form-control required" placeholder="Enter product name" required>
         </div>
         <div class="form-group mb-4">
@@ -16,7 +16,7 @@
             <input type="number" id="selling_price" name="selling_price" class="form-control required" step="0.01" placeholder="Enter selling price" required>
         </div>
         <div class="form-group mb-4">
-            <label for="stock">Stock:</label>
+            <label for="stock">Opening Stock:</label>
             <input type="number" id="stock" name="stock" class="form-control required" placeholder="Enter stock quantity" required>
         </div>
         <div class="form-group mb-4">
@@ -30,8 +30,8 @@
         </div>
        
         <div class="form-group mb-4">
-            <label for="combination_size">Combination Size (Pieces):</label>
-            <input type="number" id="combination_size" name="combination_size" class="form-control required" placeholder="Enter combination size" step="1" required>
+            <label for="combination_size">Combination Size (Units):</label>
+            <input type="number" id="combination_size" name="combination_size" class="form-control required" placeholder="combination size e.g 2 " step="1" required>
         </div>
         <div class="form-group mb-4">
             <label for="combination_price">Combination Price (Ksh):</label>

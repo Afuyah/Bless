@@ -7,7 +7,12 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'you-will-never-guess')  
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL') 
+    SECRET_KEY = os.getenv('SECRET_KEY', 'you-will-never-guess')
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:WXcMHqMZHYPUHlhowqNLiOzFJytThxNB@junction.proxy.rlwy.net:14504/railway'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SOCKETIO_MESSAGE_QUEUE = None
+    
+    
+    # Production-specific security configurations
+    SESSION_COOKIE_SECURE = True  
+    SESSION_COOKIE_HTTPONLY = True  
+    PERMANENT_SESSION_LIFETIME = 3600  

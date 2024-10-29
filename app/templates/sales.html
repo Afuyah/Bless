@@ -18,7 +18,7 @@
         </div>
 
         <div class="col-md-7 product-container">
-            <h5>products Section</h5>
+            <h6>Products Section</h65>
             <div class="product-list" id="product-list"></div>
             <p id="no-products" class="alert alert-warning" style="display: none;">No products found for this category.</p>
         </div>
@@ -40,7 +40,7 @@
                 <select id="payment-method" class="form-select" aria-label="Payment Method Selector">
                     <option value="cash">Cash</option>
                     <option value="mpesa">M-Pesa</option>
-                    <option value="credit">Credit</option>
+                    <option value="credit">Not Paid</option>
                 </select>
             </div>
 
@@ -79,7 +79,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    Checkout processed successfully!
+                   Saved Successfully
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -131,8 +131,8 @@ function populateProducts(products) {
     }
 
     products.forEach(product => {
-        let lowStockWarning = product.stock < 5 ? `<span class="text-danger">(Low Stock)</span>` : '';
-        let combinationText = product.combination_size > 1 ? `(${product.combination_size} @ Ksh ${product.combination_price})` : '';
+        let lowStockWarning = product.stock < 5 ? `<span class="text-danger">(Low)</span>` : '';
+        let combinationText = product.combination_size > 1 ? `(${product.combination_size} @  ${product.combination_price})` : '';
 
         $('#product-list').append(`
             <div class="product-item border border-primary rounded p-2 mb-3 ${product.stock === 0 ? 'disabled-card' : 'clickable'}" 

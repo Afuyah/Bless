@@ -201,11 +201,10 @@ class Product(db.Model):
     def __repr__(self):
         return f'<Product {self.name}, Supplier ID {self.supplier_id}>'
 
-
 class Supplier(db.Model):
     __tablename__ = 'suppliers'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), unique=True, nullable=False)
+    name = db.Column(db.String(200), nullable=False)  # Removed unique=True
     phone = db.Column(db.String(20), nullable=True)    
     products = db.relationship('Product', backref='supplier', lazy='joined') 
 
@@ -219,6 +218,7 @@ class Supplier(db.Model):
             'phone': self.phone,
             'products': [product.serialize() for product in self.products]  # Serialize all products
         }
+
 class Expense(db.Model):
     __tablename__ = 'expenses'
     id = db.Column(db.Integer, primary_key=True)

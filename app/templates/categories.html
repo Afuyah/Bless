@@ -2,14 +2,14 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="text-center mb-4">Categories</h1>
-    <a href="{{ url_for('stock.new_category') }}" class="btn btn-primary mb-3">Add New Category</a>
+    <h3 class="text-center mb-4">Categories</h3>
+    <a href="{{ url_for('stock.new_category') }}" class="btn btn-primary mb-3">New Category</a>
     
     <div class="table-responsive">
         <table class="table table-hover" id="categoryTable">
             <thead class="thead-light">
                 <tr>
-                    <th>Category Name</th>
+                    <th>Name</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -30,34 +30,6 @@
     </div>
 </div>
 
-<style>
-/* Custom Styles for Categories Page */
-.category-item {
-    transition: background-color 0.3s, transform 0.3s; /* Smooth background transition */
-}
-
-.category-item:hover {
-    background-color: #f8f9fa; /* Light background on hover */
-    transform: scale(1.01); /* Slight scale on hover */
-}
-
-.category-name {
-    font-weight: bold; /* Bold category name */
-    font-size: 1.1rem; /* Slightly larger font size */
-}
-
-.category-actions .btn {
-    margin-left: 5px; /* Space between action buttons */
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .category-actions {
-        display: flex; /* Flex layout for buttons */
-        justify-content: space-between; /* Space between buttons */
-    }
-}
-</style>
 
 <!-- Include jQuery and DataTables JS/CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
