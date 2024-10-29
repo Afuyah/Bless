@@ -16,7 +16,7 @@
                 <tr>
                     <th>Product</th>
                     <th>Current Stock</th>
-                    <th>Cost Price </th>
+                    <th>Cost Price</th>
                     <th>Selling Price</th>
                     <th>Actions</th>
                 </tr>
@@ -46,7 +46,7 @@
         <div class="modal-content shadow-lg" style="border-radius: 12px;">
             <div class="modal-header border-0">
                 <h5 class="modal-title" id="updateStockModalLabel">Add Stock</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
                 <form id="updateStockForm">
@@ -96,8 +96,8 @@ $(document).ready(function() {
         });
     });
 
-    // Open modal and set product details for updating stock
-    $('.update-stock-button').on('click', function() {
+    // Use event delegation to open modal and set product details for updating stock
+    $(document).on('click', '.update-stock-button', function() {
         $('#productId').val($(this).data('id'));
         $('#productName').val($(this).data('name'));
         $('#updateStockModal').modal('show');
