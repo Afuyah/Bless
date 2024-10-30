@@ -126,6 +126,7 @@ def render_expenses_report():
     return render_template('expenses_report.html')
 
 
+
 @expense_bp.route('/api/expenses_report', methods=['GET'])
 @login_required
 def expenses_report():
@@ -153,9 +154,9 @@ def expenses_report():
         expenses = query.order_by(Expense.date.desc()).all()
         
         # Calculate total expenditures and differentiate categories
-        total_expenditure = sum(exp.amount for exp in expenses)
-        total_stock_expenditure = sum(exp.amount for exp in expenses if exp.category == 'Stock Update')
-        total_daily_expenditure = sum(exp.amount for exp in expenses if exp.category == 'Daily Expenses')
+        total_expenditure = float(sum(exp.amount for exp in expenses))
+        total_stock_expenditure = float(sum(exp.amount for exp in expenses if exp.category == 'Stock Update'))
+        total_daily_expenditure = float(sum(exp.amount for exp in expenses if exp.category == 'Daily Expenses'))
 
         response_data = {
             'success': True,
@@ -165,7 +166,7 @@ def expenses_report():
             'expenses': [{
                 'id': exp.id,
                 'description': exp.description,
-                'amount': exp.amount,
+                'amount': float(exp.amount),
                 'date': exp.date.strftime("%Y-%m-%d %H:%M:%S"),
                 'category': exp.category or 'Daily Expenses'
             } for exp in expenses]
@@ -178,9 +179,6 @@ def expenses_report():
 
 
 
-
-
-        
 @expense_bp.route('/api/todays_expenditure', methods=['GET'])
 @login_required
 def todays_expenditure():
@@ -195,7 +193,8 @@ def todays_expenditure():
             Expense.date <= end_of_day
         ).all()
 
-        total_expenditure = sum(exp.amount for exp in expenses)
+        # Cast total_expenditure to float to ensure it's numeric
+        total_expenditure = float(sum(exp.amount for exp in expenses))
         return jsonify({
             'success': True,
             'total_expenditure': total_expenditure
