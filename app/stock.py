@@ -105,7 +105,6 @@ def products():
 
 @stock_bp.route('/products/new', methods=['GET', 'POST'])
 @login_required
-
 def new_product():
     if not current_user.is_admin():
         flash(FLASH_ACCESS_DENIED)
@@ -115,73 +114,27 @@ def new_product():
     suppliers = Supplier.query.all()
 
     if request.method == 'POST':
-        name = request.form['name'].strip()
-        cost_price = request.form['cost_price'].strip()
-        selling_price = request.form['selling_price'].strip()
-        stock = request.form['stock'].strip()
-        category_id = request.form['category']
-        supplier_id = request.form.get('supplier')
-        combination_size = request.form.get('combination_size', '').strip()
-        combination_price = request.form.get('combination_price', '').strip()
+        product_data = {
+            'name': request.form['name'].strip(),
+            'cost_price': request.form['cost_price'].strip(),
+            'selling_price': request.form['selling_price'].strip(),
+            'stock': request.form['stock'].strip(),
+            'category_id': request.form['category'],
+            'supplier_id': request.form.get('supplier'),
+            'combination_size': request.form.get('combination_size', '').strip(),
+            'combination_price': request.form.get('combination_price', '').strip()
+        }
 
-        # Check if the product already exists
-        if Product.query.filter_by(name=name).first():
-            flash(FLASH_PRODUCT_EXISTS)
+        # Validate and create the product
+        validation_error = validate_product_data(product_data)
+        if validation_error:
+            flash(validation_error)
             return redirect(url_for('stock.new_product'))
 
-        # Validate required fields
-        required_fields = [name, cost_price, selling_price, stock, category_id]
-        if any(not field for field in required_fields):
-            flash("All fields must be filled out.")
-            return redirect(url_for('stock.new_product'))
-
-        # Validate numeric fields
-        try:
-            cost_price = float(cost_price)
-            selling_price = float(selling_price)
-            stock = float(stock)
-
-            if cost_price <= 0 or selling_price <= 0 or stock < 0:
-                flash("Cost price, selling price, and stock must be positive numbers.")
-                return redirect(url_for('stock.new_product'))
-
-        except ValueError:
-            flash("Cost price, selling price, and stock must be valid numbers.")
-            return redirect(url_for('stock.new_product'))
-
-        # Validate combination fields if provided
-        combination_unit_price = None
-        if combination_size and combination_price:
-            try:
-                combination_size = int(combination_size)
-                combination_price = float(combination_price)
-
-                if combination_size <= 0 or combination_price <= 0:
-                    flash("Combination size and price must be positive numbers.")
-                    return redirect(url_for('stock.new_product'))
-
-                combination_unit_price = combination_price / combination_size
-            
-            except ValueError:
-                flash("Combination size and price must be valid positive numbers.")
-                return redirect(url_for('stock.new_product'))
-
-        # Create and save the new product
-        new_product = Product(
-            name=name,
-            cost_price=cost_price,
-            selling_price=selling_price,
-            stock=stock,
-            category_id=category_id,
-            supplier_id=supplier_id,
-            combination_size=combination_size if combination_size else None,
-            combination_price=combination_price if combination_price else None,
-            combination_unit_price=combination_unit_price  # Save calculated combination unit price
-        )
-        
+        new_product = create_product(product_data)
         db.session.add(new_product)
         db.session.commit()
-        flash(FLASH_PRODUCT_ADDED.format(name))
+        flash(FLASH_PRODUCT_ADDED.format(new_product.name))
 
         # Emit socket update
         socketio.emit('stock_updated', {
@@ -193,6 +146,62 @@ def new_product():
         return redirect(url_for('stock.products'))
 
     return render_template('new_product.html', categories=categories, suppliers=suppliers)
+
+def validate_product_data(data):
+    # Check if the product already exists
+    if Product.query.filter_by(name=data['name']).first():
+        return FLASH_PRODUCT_EXISTS
+
+    required_fields = [data['name'], data['cost_price'], data['selling_price'], data['stock'], data['category_id']]
+    if any(not field for field in required_fields):
+        return "All fields must be filled out."
+
+    # Validate numeric fields
+    try:
+        data['cost_price'] = float(data['cost_price'])
+        data['selling_price'] = float(data['selling_price'])
+        data['stock'] = float(data['stock'])
+
+        if data['cost_price'] <= 0 or data['selling_price'] <= 0 or data['stock'] < 0:
+            return "Cost price, selling price, and stock must be positive numbers."
+
+    except ValueError:
+        return "Cost price, selling price, and stock must be valid numbers."
+
+    # Validate combination fields if provided
+    combination_unit_price = None
+    if data['combination_size'] and data['combination_price']:
+        try:
+            data['combination_size'] = int(data['combination_size'])
+            data['combination_price'] = float(data['combination_price'])
+
+            if data['combination_size'] <= 0 or data['combination_price'] <= 0:
+                return "Combination size and price must be positive numbers."
+
+            combination_unit_price = data['combination_price'] / data['combination_size']
+        
+        except ValueError:
+            return "Combination size and price must be valid positive numbers."
+
+    return None  # No errors
+
+def create_product(data):
+    combination_unit_price = None
+    if data['combination_size'] and data['combination_price']:
+        combination_unit_price = float(data['combination_price']) / int(data['combination_size'])
+
+    return Product(
+        name=data['name'],
+        cost_price=float(data['cost_price']),
+        selling_price=float(data['selling_price']),
+        stock=float(data['stock']),
+        category_id=data['category_id'],
+        supplier_id=data['supplier_id'],
+        combination_size=int(data['combination_size']) if data['combination_size'] else None,
+        combination_price=float(data['combination_price']) if data['combination_price'] else None,
+        combination_unit_price=combination_unit_price
+    )
+
 
 
 

@@ -45,9 +45,9 @@ def get_products_by_category(category_id):
         product_list = [{
             'id': product.id,
             'name': product.name,
-            'selling_price': product.selling_price,
-            'combination_price': product.combination_price,
-            'combination_unit_price': product.combination_unit_price,
+            'selling_price': float(product.selling_price) if product.selling_price is not None else None,  # Ensure it's a float
+            'combination_price': float(product.combination_price) if product.combination_price is not None else None,  # Ensure it's a float
+            'combination_unit_price': float(product.combination_unit_price) if product.combination_unit_price is not None else None,  # Ensure it's a float
             'combination_size': product.combination_size,
             'stock': product.stock
         } for product in products]
@@ -57,6 +57,7 @@ def get_products_by_category(category_id):
     except Exception as e:
         logging.error(f"Error fetching products for category {category_id}: {e}")
         return jsonify({'error': 'An error occurred while fetching products.'}), 500
+
 
 
 @sales_bp.route('/add_to_cart', methods=['POST'])

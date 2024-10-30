@@ -4,12 +4,17 @@ from flask_login import UserMixin
 from enum import Enum
 from datetime import datetime
 from sqlalchemy import func, Index, ForeignKey
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship
 from app import db
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import Enum as SQLAlchemyEnum
 import enum
 import logging
+
+from sqlalchemy import Numeric, Integer, Float, ForeignKey, String, DateTime
+
+
+
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -48,24 +53,36 @@ class User(UserMixin, db.Model):
     def is_cashier(self):
         return self.role == Role.CASHIER
 
-# Category Model
 class Category(db.Model):
     __tablename__ = 'categories'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True, nullable=False)
-    products = db.relationship('Product', backref='category', lazy='joined')
 
+    id = db.Column(Integer, primary_key=True)
+    name = db.Column(String(100), unique=True, nullable=False, index=True)  # Added index for faster lookups
+    products = relationship('Product', backref='category', lazy='dynamic')  # Use dynamic loading for efficiency
+
+    def serialize(self):
+        """Serialize category object for API response."""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'products': [product.serialize() for product in self.products]  # Serialize related products if needed
+        }
+
+    def __repr__(self):
+        return f'<Category {self.name}>'
 
 
 class Sale(db.Model):
     __tablename__ = 'sales'
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-    total = db.Column(db.Float, nullable=False)
-    profit = db.Column(db.Float, nullable=True)  # New column for profit
-    payment_method = db.Column(db.String(50), nullable=False)
-    customer_name = db.Column(db.String(200), nullable=True)
-    cart_items = db.relationship('CartItem', back_populates='sale', lazy='joined')
+
+    id = db.Column(Integer, primary_key=True)
+    date = db.Column(DateTime, default=datetime.utcnow, index=True)  # Index for faster query performance
+    total = db.Column(Float, nullable=False)
+    profit = db.Column(Float, nullable=True)  # Store profit if needed for future calculations
+    payment_method = db.Column(String(50), nullable=False)
+    customer_name = db.Column(String(200), nullable=True)
+
+    cart_items = relationship('CartItem', back_populates='sale', lazy='dynamic')  # Use dynamic loading for efficiency
 
     __table_args__ = (
         db.Index('ix_sale_total', 'total'),
@@ -74,12 +91,14 @@ class Sale(db.Model):
 
     @validates('payment_method')
     def validate_payment_method(self, key, value):
+        """Ensure payment method is one of the allowed types."""
         allowed_methods = {'cash', 'mpesa', 'credit'}
         if value not in allowed_methods:
             raise ValueError(f"Invalid payment method: {value}")
         return value
 
     def serialize(self):
+        """Serialize sale object for API response."""
         return {
             'id': self.id,
             'date': self.date.strftime("%Y-%m-%d %H:%M:%S"),
@@ -87,11 +106,12 @@ class Sale(db.Model):
             'profit': self.profit,
             'payment_method': self.payment_method,
             'customer_name': self.customer_name,
-            'items': [item.serialize() for item in self.cart_items],
+            'items': [item.serialize() for item in self.cart_items],  # Serialize cart items
         }
 
     @classmethod
     def create_sale(cls, total, profit, payment_method, customer_name):
+        """Create a new sale instance."""
         return cls(
             date=datetime.utcnow(),
             total=total,
@@ -101,68 +121,87 @@ class Sale(db.Model):
         )
 
     def finalize_sale(self):
+        """Finalize the sale by updating stock and committing to the database."""
         try:
+            # Check stock availability for each cart item
             for item in self.cart_items:
                 if item.product.stock < item.quantity:
                     raise ValueError(f"Not enough stock for {item.product.name}")
 
+            # Update stock and finalize the sale
             for item in self.cart_items:
                 item.product.stock -= item.quantity
 
-            db.session.commit()
+            db.session.commit()  # Commit changes if everything is valid
         except Exception as e:
-            db.session.rollback()
+            db.session.rollback()  # Rollback in case of error
             raise ValueError(f"Error finalizing sale: {str(e)}")
-        finally:
-            db.session.rollback()  # Ensures rollback if commit fails
+
+    def __repr__(self):
+        return f'<Sale id={self.id}, total={self.total}, date={self.date.strftime("%Y-%m-%d %H:%M:%S")}>'
+
+
 
 
 class CartItem(db.Model):
     __tablename__ = 'cart_items'
-    id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    sale_id = db.Column(db.Integer, db.ForeignKey('sales.id'), nullable=False)
+    
+    id = db.Column(Integer, primary_key=True)
+    product_id = db.Column(Integer, ForeignKey('products.id'), nullable=False)
+    quantity = db.Column(Integer, nullable=False)
+    sale_id = db.Column(Integer, ForeignKey('sales.id'), nullable=False)
 
-    product = db.relationship('Product', back_populates='sale_items', lazy='joined')
-    sale = db.relationship('Sale', back_populates='cart_items')
+    product = relationship('Product', back_populates='sale_items', lazy='select')  # Changed to select for efficiency
+    sale = relationship('Sale', back_populates='cart_items')
+
+    __table_args__ = (
+        db.Index('ix_product_sale', 'product_id', 'sale_id'),  # Composite index for faster lookups
+    )
 
     @validates('quantity')
     def validate_quantity(self, key, value):
+        """Ensure the quantity is greater than zero."""
         if value <= 0:
             raise ValueError("Quantity must be greater than zero.")
         return value
+
+    @hybrid_property
+    def total_price(self):
+        """Calculate total price dynamically."""
+        return self.quantity * (self.product.selling_price if self.product else 0.0)
 
     def __repr__(self):
         return f'<CartItem product_id={self.product_id}, quantity={self.quantity}>'
 
     def serialize(self):
-        product = self.product
-        total_price = self.quantity * product.selling_price
+        """Serialize the cart item for API response."""
         return {
-            'product_name': product.name,
+            'product_name': self.product.name if self.product else 'Unknown Product',
             'quantity': self.quantity,
-            'total_price': total_price,
+            'total_price': str(self.total_price),  # Convert to string for JSON serialization
         }
 
 
 class Product(db.Model):
     __tablename__ = 'products'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
-    cost_price = db.Column(db.Float, nullable=False, default=0.0)
-    selling_price = db.Column(db.Float, nullable=False, default=0.0)
-    stock = db.Column(db.Float, nullable=False, default=0.0)
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
-    supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'), nullable=True)
+    cost_price = db.Column(Numeric(10, 2), nullable=False, default=0.00)  # Use Numeric for precision
+    selling_price = db.Column(Numeric(10, 2), nullable=False, default=0.00)
+    stock = db.Column(Integer, nullable=False, default=0)  # Change to Integer if stock is always whole
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False, index=True)  # Index for faster lookup
+    supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'), nullable=True, index=True)
 
-    combination_size = db.Column(db.Integer, nullable=True)
-    combination_price = db.Column(db.Float, nullable=True)
-    combination_unit_price = db.Column(db.Float, nullable=True)
-    sale_items = db.relationship('CartItem', back_populates='product', lazy='joined')
+    combination_size = db.Column(Integer, nullable=True)
+    combination_price = db.Column(Numeric(10, 2), nullable=True)  # Use Numeric for prices
+    combination_unit_price = db.Column(Numeric(10, 2), nullable=True)
+
+    sale_items = db.relationship('CartItem', back_populates='product', lazy='select')  # Use lazy='select' for better memory use
 
     @validates('cost_price', 'selling_price', 'stock')
     def validate_prices_stock(self, key, value):
+        """Ensure prices and stock are non-negative."""
         if key in ['cost_price', 'selling_price'] and value < 0:
             raise ValueError(f"{key.replace('_', ' ').title()} cannot be negative.")
         if key == 'stock' and value < 0:
@@ -171,81 +210,90 @@ class Product(db.Model):
 
     @hybrid_property
     def profit(self):
+        """Calculate profit based on selling and cost price."""
         return self.selling_price - self.cost_price
 
     @hybrid_property
     def profit_margin(self):
+        """Calculate profit margin percentage."""
         return (self.profit / self.selling_price * 100) if self.selling_price > 0 else 0.0
 
-    def calculate_profit(self):
-        return self.profit
-
     def is_low_stock(self):
+        """Check if stock is low."""
         return self.stock < 10
 
     def serialize(self):
+        """Serialize product for API response."""
         return {
             'id': self.id,
             'name': self.name,
-            'cost_price': self.cost_price,
-            'selling_price': self.selling_price,
+            'cost_price': str(self.cost_price),  # Convert Decimal to string for JSON serialization
+            'selling_price': str(self.selling_price),
             'stock': self.stock,
             'combination_size': self.combination_size,
-            'combination_price': self.combination_price,
-            'profit': self.profit,
+            'combination_price': str(self.combination_price),
+            'profit': str(self.profit),
             'profit_margin': self.profit_margin,
             'supplier_id': self.supplier_id
         }
 
     def __repr__(self):
-        return f'<Product {self.name}, Supplier ID {self.supplier_id}>'
+        return f'<Product(name={self.name}, supplier_id={self.supplier_id}, stock={self.stock})>'
 
 class Supplier(db.Model):
     __tablename__ = 'suppliers'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)  # Removed unique=True
-    phone = db.Column(db.String(20), nullable=True)    
-    products = db.relationship('Product', backref='supplier', lazy='joined') 
+    
+    id = db.Column(Integer, primary_key=True)
+    name = db.Column(String(200), nullable=False)  # Removed unique=True
+    phone = db.Column(String(20), nullable=True)
+    
+    products = relationship('Product', backref='supplier', lazy='select')  # Changed to select for efficiency
 
     def __repr__(self):
         return f'<Supplier {self.name}>'
 
     def serialize(self):
+        """Serialize the supplier object."""
         return {
             'id': self.id,
             'name': self.name,
             'phone': self.phone,
+            'product_count': len(self.products),  # Include count of products for context
             'products': [product.serialize() for product in self.products]  # Serialize all products
         }
 
 class Expense(db.Model):
     __tablename__ = 'expenses'
-    id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(db.String(200), nullable=False)
-    amount = db.Column(db.Float, nullable=False) 
-    date = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-    category = db.Column(db.String(100), nullable=True, default="Daily Expenses")  # Default category
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=True)  
-    quantity = db.Column(db.Integer, nullable=True)  
     
-    __table_args__ = (Index('ix_expense_date', 'date'),)
+    id = db.Column(Integer, primary_key=True)
+    description = db.Column(String(200), nullable=False)
+    amount = db.Column(Numeric(10, 2), nullable=False)  # Changed to Numeric for precision
+    date = db.Column(DateTime, default=datetime.utcnow, index=True)
+    category = db.Column(String(100), nullable=True, default="Daily Expenses")  # Default category
+    product_id = db.Column(Integer, ForeignKey('products.id'), nullable=True)
+    quantity = db.Column(Integer, nullable=True)
 
-    product = db.relationship('Product', backref='expenses', lazy='joined')  # Define relationship
+    __table_args__ = (
+        Index('ix_expense_date_category', 'date', 'category'),  # Composite index
+    )
+
+    product = relationship('Product', backref='expenses', lazy='select')  # Changed to select for efficiency
 
     @validates('amount', 'quantity')
     def validate_amount_quantity(self, key, value):
         """Validate that the expense amount and quantity are positive."""
-        if key == 'amount' and value < 0:
-            raise ValueError("Expense amount cannot be negative.")
-        if key == 'quantity' and (value < 0 or value == 0):  # Adjust based on logic
+        if key == 'amount' and value <= 0:  # Allow zero only for quantity
+            raise ValueError("Expense amount must be positive.")
+        if key == 'quantity' and value <= 0:
             raise ValueError("Quantity must be positive.")
         return value
 
     def serialize(self):
+        """Serialize the expense object."""
         return {
             'id': self.id,
             'description': self.description,
-            'amount': self.amount,
+            'amount': str(self.amount),  # Convert to string for JSON serialization
             'date': self.date.strftime("%Y-%m-%d %H:%M:%S"),
             'category': self.category,
             'product_id': self.product_id,
