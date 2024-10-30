@@ -37,6 +37,104 @@ body {
     }
 }
 
+
+        .login-container {
+            background-color: #ffffff; /* White background for the form */
+            max-width: 500px; /* Limit max width */
+            width: 100%; /* Full width on smaller screens */
+            border: 1px solid #ccc; /* Light border */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15); /* Soft shadow */
+            border-radius: 20px; /* Rounded corners */
+            padding: 2rem;
+            margin: auto;
+            margin-top: 10vh;
+            animation: fadeIn 0.5s; /* Fade-in animation for the container */
+            transition: transform 0.3s ease; /* Smooth transform transition */
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px); /* Slight lift effect on hover */
+        }
+
+        /* Button Styles */
+        .btn-custom {
+            background-color: #007bff; /* Primary button color */
+            color: white; /* Button text color */
+            border: none; /* No border */
+            padding: 12px 20px; /* Padding */
+            border-radius: 30px; /* More rounded corners */
+            font-size: 1rem; /* Font size */
+            transition: background-color 0.3s ease, transform 0.2s, box-shadow 0.2s; /* Smooth transition */
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+            transform: scale(1.05); /* Slightly enlarge on hover */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Shadow on hover */
+        }
+
+        /* Input Styles */
+        .form-control {
+            border-radius: 5px; /* Rounded corners */
+            box-shadow: none; /* Remove default shadow */
+            border: 1px solid #ccc; /* Light border */
+            transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+        }
+
+        .form-control:focus {
+            border-color: #007bff; /* Blue border on focus */
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5); /* Light blue shadow */
+            background-color: #f0f8ff; /* Light background on focus */
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            background-color: #ffff; /* Success color */
+            color: #222;
+            font-size: 1.2rem;
+            border-radius: 10px; /* Rounded corners */
+        }
+
+        .modal-content i {
+            font-size: 3rem;
+            color: #ffc107;
+            animation: bounce 1s infinite; /* Bouncing icon animation */
+        }
+
+        .modal-error {
+            background-color: #dc3545; /* Error color */
+            color: white;
+            font-size: 1.2rem;
+            border-radius: 10px; /* Rounded corners */
+        }
+
+        .modal-error i {
+            font-size: 3rem;
+            color: #fff;
+            animation: bounce 1s infinite; /* Bouncing icon animation */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
 /* Category List Styles */
 .category-list {
     max-height: 300px;

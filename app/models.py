@@ -57,17 +57,20 @@ class Category(db.Model):
 
 
 
-# Sale Model with Auto Stock Update and Total Price Indexing
 class Sale(db.Model):
     __tablename__ = 'sales'
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     total = db.Column(db.Float, nullable=False)
-    payment_method = db.Column(db.String(50), nullable=False)  # 'cash', 'mpesa', 'credit'
+    profit = db.Column(db.Float, nullable=True)  # New column for profit
+    payment_method = db.Column(db.String(50), nullable=False)
     customer_name = db.Column(db.String(200), nullable=True)
-    cart_items = db.relationship('CartItem', backref='sale', lazy='joined')
+    cart_items = db.relationship('CartItem', back_populates='sale', lazy='joined')
 
-    __table_args__ = (Index('ix_sale_total', 'total'), Index('ix_sale_date', 'date'))
+    __table_args__ = (
+        db.Index('ix_sale_total', 'total'),
+        db.Index('ix_sale_date', 'date'),
+    )
 
     @validates('payment_method')
     def validate_payment_method(self, key, value):
@@ -77,24 +80,27 @@ class Sale(db.Model):
         return value
 
     def serialize(self):
-        """Convert the Sale object to a dictionary format for JSON serialization."""
         return {
             'id': self.id,
             'date': self.date.strftime("%Y-%m-%d %H:%M:%S"),
             'total': self.total,
+            'profit': self.profit,
             'payment_method': self.payment_method,
             'customer_name': self.customer_name,
             'items': [item.serialize() for item in self.cart_items],
-            'total_profit': self.calculate_profit()
         }
 
-    def calculate_profit(self):
-        """Calculate total profit for this sale."""
-        total_cost = sum(item.product.cost_price * item.quantity for item in self.cart_items)
-        return self.total - total_cost
+    @classmethod
+    def create_sale(cls, total, profit, payment_method, customer_name):
+        return cls(
+            date=datetime.utcnow(),
+            total=total,
+            profit=profit,
+            payment_method=payment_method,
+            customer_name=customer_name
+        )
 
     def finalize_sale(self):
-        """Automatically updates stock after a sale."""
         try:
             for item in self.cart_items:
                 if item.product.stock < item.quantity:
@@ -105,11 +111,12 @@ class Sale(db.Model):
 
             db.session.commit()
         except Exception as e:
-            db.session.rollback()  # Rollback the session in case of error
+            db.session.rollback()
             raise ValueError(f"Error finalizing sale: {str(e)}")
+        finally:
+            db.session.rollback()  # Ensures rollback if commit fails
 
 
-# CartItem Model
 class CartItem(db.Model):
     __tablename__ = 'cart_items'
     id = db.Column(db.Integer, primary_key=True)
@@ -117,9 +124,11 @@ class CartItem(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     sale_id = db.Column(db.Integer, db.ForeignKey('sales.id'), nullable=False)
 
+    product = db.relationship('Product', back_populates='sale_items', lazy='joined')
+    sale = db.relationship('Sale', back_populates='cart_items')
+
     @validates('quantity')
     def validate_quantity(self, key, value):
-        """Validate that the quantity is greater than zero."""
         if value <= 0:
             raise ValueError("Quantity must be greater than zero.")
         return value
@@ -128,19 +137,13 @@ class CartItem(db.Model):
         return f'<CartItem product_id={self.product_id}, quantity={self.quantity}>'
 
     def serialize(self):
-        """Convert the CartItem object to a dictionary format for JSON serialization."""
         product = self.product
         total_price = self.quantity * product.selling_price
-        profit_per_item = product.calculate_profit()
         return {
             'product_name': product.name,
             'quantity': self.quantity,
-            'total_price': total_price,  # Calculate total based on selling price
-            'profit_per_item': profit_per_item,
-            'total_profit': profit_per_item * self.quantity  # Total profit for this cart item
+            'total_price': total_price,
         }
-
-
 
 
 class Product(db.Model):
@@ -149,14 +152,14 @@ class Product(db.Model):
     name = db.Column(db.String(200), nullable=False)
     cost_price = db.Column(db.Float, nullable=False, default=0.0)
     selling_price = db.Column(db.Float, nullable=False, default=0.0)
-    stock = db.Column(db.Float, nullable=False, default=0.0)  # Represents count for pieces
+    stock = db.Column(db.Float, nullable=False, default=0.0)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'), nullable=True)
-   
-    combination_size = db.Column(db.Integer, nullable=True)  # For combination sales
-    combination_price = db.Column(db.Float, nullable=True)  # For combination sales
+
+    combination_size = db.Column(db.Integer, nullable=True)
+    combination_price = db.Column(db.Float, nullable=True)
     combination_unit_price = db.Column(db.Float, nullable=True)
-    sale_items = db.relationship('CartItem', backref='product', lazy='joined')
+    sale_items = db.relationship('CartItem', back_populates='product', lazy='joined')
 
     @validates('cost_price', 'selling_price', 'stock')
     def validate_prices_stock(self, key, value):
@@ -175,22 +178,18 @@ class Product(db.Model):
         return (self.profit / self.selling_price * 100) if self.selling_price > 0 else 0.0
 
     def calculate_profit(self):
-        """Calculate profit for the product based on selling and cost price."""
-        return self.profit  # This will return the profit per unit
+        return self.profit
 
     def is_low_stock(self):
-        """Determine if stock is low, with a threshold of 10 for piece-based products."""
         return self.stock < 10
 
     def serialize(self):
-        """Serialize product details for JSON responses."""
         return {
             'id': self.id,
             'name': self.name,
             'cost_price': self.cost_price,
             'selling_price': self.selling_price,
             'stock': self.stock,
-           
             'combination_size': self.combination_size,
             'combination_price': self.combination_price,
             'profit': self.profit,

@@ -1,4 +1,4 @@
-2024-10-30 19:33:14,739 - ERROR - Exception on /auth/admin_dashboard [GET]
+2024-10-30 19:32:25,448 - ERROR - Exception on /auth/admin_dashboard [GET]
 Traceback (most recent call last):
   File "/home/bha/Desktop/mini/supermarket/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1808, in _execute_context
     self.dialect.do_execute(
@@ -68,4 +68,4 @@ FROM sales ORDER BY sales.date DESC
  LIMIT %(param_1)s) AS anon_1 LEFT OUTER JOIN cart_items AS cart_items_1 ON anon_1.sales_id = cart_items_1.sale_id LEFT OUTER JOIN products AS products_1 ON products_1.id = cart_items_1.product_id ORDER BY anon_1.sales_date DESC]
 [parameters: {'param_1': 5}]
 (Background on this error at: https://sqlalche.me/e/14/f405)
-2024-10-30 19:33:14,746 - ERROR - Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
+2024-10-30 19:32:25,451 - ERROR - Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.

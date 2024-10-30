@@ -94,6 +94,10 @@ def add_to_cart():
         'combination_price': product.combination_price,
         'subtotal': subtotal  # Return calculated subtotal
     })
+
+
+
+    
 @sales_bp.route('/checkout', methods=['POST'])
 @login_required
 def checkout():
@@ -106,10 +110,11 @@ def checkout():
         return jsonify({'success': False, 'message': 'Cart is empty'}), 400
 
     total_amount = 0
+    total_cost = 0  # Initialize total cost for profit calculation
     items_to_update_stock = []
 
     for item in cart:
-        product = Product.query.get(item['id'])  # Ensure you're using the correct key for product ID
+        product = Product.query.get(item['id'])
         if product is None:
             return jsonify({'success': False, 'message': 'Product not found'}), 404
 
@@ -134,15 +139,23 @@ def checkout():
         subtotal += min(individual_remainder_cost, additional_combination_cost)
 
         total_amount += subtotal
+
+        # Calculate the total cost for profit calculation
+        total_cost += (full_combinations * product.cost_price * product.combination_size) + (remaining_units * product.cost_price)
+
         items_to_update_stock.append((product, quantity))
 
-    # Create the Sale object
+    # Create the Sale object with profit calculation
     sale = Sale(
         date=datetime.utcnow(),
         total=total_amount,
         payment_method=payment_method,
-        customer_name=customer_name if payment_method == 'credit' else None
+        customer_name=customer_name if payment_method == 'credit' else None,
     )
+    
+    # Calculate profit
+    sale_profit = total_amount - total_cost  # Profit = Total Sales - Total Cost
+    sale.profit = sale_profit  # Set the profit calculated for this sale
     db.session.add(sale)
 
     try:
@@ -163,7 +176,7 @@ def checkout():
             if check_low_stock(product):  # Check for low stock
                 socketio.emit('low_stock_alert', {'product_name': product.name, 'stock': product.stock}, broadcast=True)
 
-        return jsonify({'success': True, 'message': 'Sale completed successfully'})
+        return jsonify({'success': True, 'message': 'Sale completed successfully', 'profit': sale_profit})
     except IntegrityError as e:
         db.session.rollback()
         logging.error(f'Integrity error during transaction: {e}')
@@ -180,34 +193,40 @@ def todays_total_sales():
     # Get today's date
     today = datetime.today().date()
     
-    # Fetch sales for today
-    sales = Sale.query.filter(func.date(Sale.date) == today).all()
-    
-    # Calculate total sales
-    total_sales = sum(sale.total for sale in sales)
-    
-    # Calculate total transactions
-    total_transactions = len(sales)
-    
-    # Return total sales as JSON
-    return jsonify({
-        'total_sales': round(total_sales, 2),
-        'total_transactions': total_transactions
-    })
+    try:
+        # Query for today's total sales and transaction count
+        total_sales = db.session.query(func.coalesce(func.sum(Sale.total), 0)).filter(func.date(Sale.date) == today).scalar()
+        total_transactions = db.session.query(func.count(Sale.id)).filter(func.date(Sale.date) == today).scalar()
+        
+        # Return total sales as JSON
+        return jsonify({
+            'total_sales': round(total_sales, 2),
+            'total_transactions': total_transactions
+        })
+
+    except Exception as e:
+        logging.error(f"Error fetching today's sales: {e}")
+        return jsonify({'error': 'Failed to fetch sales data'}), 500
 
 
+from collections import Counter
 
 @sales_bp.route('/reports/daily', methods=['GET'])
 @login_required
 def daily_sales_report():
     # Get the date from request arguments, defaulting to today
     date_str = request.args.get('date', datetime.today().date().strftime('%Y-%m-%d'))
-    report_date = datetime.strptime(date_str, '%Y-%m-%d').date()
     
+    try:
+        report_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        flash("Invalid date format. Please use YYYY-MM-DD.", "danger")
+        return redirect(url_for('sales_bp.daily_sales_report'))
+
     # Fetch sales for the specified date
     sales = Sale.query.filter(func.date(Sale.date) == report_date).all()
 
-    # If no sales are found for the date, flash a message and exit
+    # If no sales are found for the date, display empty report
     if not sales:
         flash("No sales data available for the selected date", "info")
         return render_template('daily_sales_report.html', 
@@ -219,44 +238,21 @@ def daily_sales_report():
                                most_sold_item=None, 
                                most_sold_quantity=0)
 
-    # Initialize values for total sales and transactions count
+    # Calculate total sales, transactions, and daily profit
     total_sales = sum(sale.total for sale in sales)
     total_transactions = len(sales)
+    daily_profit = sum(sale.profit for sale in sales)
 
-    # Initialize tracking for daily profit and most sold item details
-    daily_profit = 0
-    item_sales = {}
-
-    # Calculate profit per sale and add to daily profit
+    # Track quantity sold for each item
+    item_sales = Counter()
     for sale in sales:
-        sale_profit = 0
         for item in sale.cart_items:
-            product = item.product
-            quantity = item.quantity
-
-            # Calculate profit per item based on combination/unit pricing
-            if product.combination_size and quantity >= product.combination_size:
-                profit_per_unit = product.combination_unit_price - product.cost_price
-            else:
-                profit_per_unit = product.selling_price - product.cost_price
-
-            # Total profit for this item in this sale
-            item_profit = profit_per_unit * quantity
-            sale_profit += item_profit
-
-            # Track quantity sold for the most-sold item
-            if product.name in item_sales:
-                item_sales[product.name] += quantity
-            else:
-                item_sales[product.name] = quantity
-
-        # Add the sale's profit to the daily profit
-        daily_profit += sale_profit
+            item_sales[item.product.name] += item.quantity
 
     # Determine the most sold item based on quantities
     most_sold_item, most_sold_quantity = max(item_sales.items(), key=lambda x: x[1], default=(None, 0))
 
-    # Format the total sales and daily profit to two decimal places
+    # Format the totals to two decimal places
     total_sales = round(total_sales, 2)
     daily_profit = round(daily_profit, 2)
 
@@ -270,7 +266,7 @@ def daily_sales_report():
                            most_sold_item=most_sold_item, 
                            most_sold_quantity=most_sold_quantity)
 
-
+from collections import Counter
 
 @sales_bp.route('/reports/filter', methods=['GET'])
 @login_required
@@ -282,9 +278,15 @@ def filter_sales_report():
         flash("Please provide both start and end dates", "warning")
         return redirect(url_for('sales_bp.daily_sales_report'))
 
-    start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
-    end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+    # Parse dates with error handling
+    try:
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+    except ValueError:
+        flash("Invalid date format. Please use YYYY-MM-DD.", "danger")
+        return redirect(url_for('sales_bp.daily_sales_report'))
 
+    # Fetch sales within the specified date range
     sales = Sale.query.filter(Sale.date >= start_date, Sale.date <= end_date).all()
 
     if not sales:
@@ -299,32 +301,18 @@ def filter_sales_report():
                                most_sold_item=None, 
                                most_sold_quantity=0)
 
+    # Calculate total sales, transactions, and total profit
     total_sales = sum(sale.total for sale in sales)
     total_transactions = len(sales)
-    total_profit = 0
-    item_sales = {}
+    total_profit = sum(sale.profit for sale in sales)
 
+    # Track quantity sold for each item
+    item_sales = Counter()
     for sale in sales:
-        sale_profit = 0
         for item in sale.cart_items:
-            product = item.product
-            quantity = item.quantity
+            item_sales[item.product.name] += item.quantity
 
-            if product.combination_size and quantity >= product.combination_size:
-                profit_per_unit = product.combination_unit_price - product.cost_price
-            else:
-                profit_per_unit = product.selling_price - product.cost_price
-
-            item_profit = profit_per_unit * quantity
-            sale_profit += item_profit
-
-            if product.name in item_sales:
-                item_sales[product.name] += quantity
-            else:
-                item_sales[product.name] = quantity
-
-        total_profit += sale_profit
-
+    # Determine the most sold item based on quantities
     most_sold_item, most_sold_quantity = max(item_sales.items(), key=lambda x: x[1], default=(None, 0))
 
     # Calculate average sale value and unique products

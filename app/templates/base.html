@@ -89,20 +89,30 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('sales.sales_screen') }}">Shop</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('expense.expenses_page') }}">Expenses</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('supplier.suppliers_page') }}">Suppliers</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More</a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      
-                        <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
-                    </div>
-                </li>
+                
+                {% if current_user.is_authenticated %}
+                    <!-- Links for authenticated users -->
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('sales.sales_screen') }}">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('expense.expenses_page') }}">Expenses</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('supplier.suppliers_page') }}">Suppliers</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ url_for('auth.change_password') }}">Change Password</a>
+                            <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
+                        </div>
+                    </li>
+                
+                {% else %}
+                   
+                
+                {% endif %}
+                
             </ul>
         </div>
     </div>
 </nav>
+
 
 
     
