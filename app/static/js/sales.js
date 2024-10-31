@@ -78,6 +78,12 @@ $(document).on('click', '.product-item.clickable', function () {
     const productCombinationUnitPrice = parseFloat($(this).data('combination-unit-price')) || 0; 
     const productStock = parseInt($(this).data('stock')) || 0;
 
+    // Prevent adding out-of-stock items
+    if (productStock === 0) {
+        showError(`"${productName}" is currently out of stock.`);
+        return;
+    }
+
     const existingItem = cart.find(item => item.id === productId);
 
     // Check if the item is already in the cart and if there is stock available
@@ -85,7 +91,7 @@ $(document).on('click', '.product-item.clickable', function () {
         if (existingItem.quantity < productStock) {
             existingItem.quantity += 1; // Increment quantity if there's stock
         } else {
-            showError('Cannot add more of this item. Stock limit reached.');
+            showError(`Cannot add more of "${productName}". Stock limit reached.`);
             return;
         }
     } else {
@@ -100,12 +106,22 @@ $(document).on('click', '.product-item.clickable', function () {
                 combination_size: $(this).data('combination-size') || 1
             });
         } else {
-            showError('Cannot add this item. Stock limit reached.');
+            showError(`"${productName}" is currently out of stock.`);
             return;
         }
     }
     updateCart();
 });
+
+function showError(message) {
+    // Customize this function to display the error in your desired format
+    alert(message); // Example: using alert; replace with modal or toast notification if needed
+}
+
+function updateCart() {
+    // Function to update the cart display (to be implemented as per your setup)
+}
+
 
 // Handle removing items from cart
 $(document).on('click', '.remove-from-cart', function () {

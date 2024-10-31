@@ -27,28 +27,16 @@
             <h5 class="text-center mb-3">Cart Summary</h5>
             
             <!-- Cart Items Display -->
-            <div id="cart-items" class="cart-items mb-3" style="max-height: 200px; overflow-y: auto;"></div>
+            <div id="cart-items" class="cart-items mb-3" style="max-height: 400px; overflow-y: auto;"></div>
             
             <div class="d-flex justify-content-between mt-2 fw-bold">
                 <span>Total:</span>
-                <span id="total-amount" class="text-success fw-bold">Ksh 0.00</span> <!-- Enhanced visibility for total -->
+                <span id="total-amount" class="text-success fw-bold">Ksh 0.00</span>
             </div>
 
-            <!-- Payment Method Selector -->
-            <div class="mt-3">
-                <label for="payment-method" class="form-label">Payment Method:</label>
-                <select id="payment-method" class="form-select" aria-label="Payment Method Selector">
-                    <option value="cash">Cash</option>
-                    <option value="mpesa">M-Pesa</option>
-                    <option value="credit">Not Paid</option>
-                </select>
-            </div>
 
-            <!-- Customer Name Input -->
-            <div class="mt-2" id="customer-name-container" style="display: none;">
-                <label for="customer-name" class="form-label">Customer Name:</label>
-                <input type="text" id="customer-name" class="form-control" placeholder="Enter customer name" />
-            </div>
+
+            
 
             <!-- Checkout Button -->
             <button id="checkout-btn" class="btn btn-success mt-3 w-100">Checkout</button>
@@ -56,10 +44,8 @@
             <!-- Loading Indicator -->
             <div class="alert alert-info mt-2" id="checkout-loading" style="display: none;">Processing your checkout...</div>
 
-            <!-- Error and Success Messages -->
-            <div id="error-message" class="mt-2 text-danger" style="display: none;"></div>
-            <div id="success-message" class="mt-2 text-success" style="display: none;"></div>
-        </div>
+          
+           
     </div>
 
     <!-- Low Stock Notification -->
@@ -72,13 +58,13 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="successModalLabel">Successful</h5>
+                <h5 class="modal-title" id="successModalLabel">Success!!!</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <span id="successMessage">Saved Successfully</span> <!-- Dynamic message -->
+                <span id="successMessage">Checkout Successful</span> <!-- Dynamic message -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -88,29 +74,46 @@
 </div>
 
 
-
 <!-- Checkout Confirmation Modal -->
-<div class="modal fade" id="checkoutConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="checkoutConfirmationModalLabel" aria-hidden="true">
+<div class="modal fade" id="checkoutConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="checkoutConfirmationModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content border border-dark">
-            <div class="modal-header">
-                <h5 class="modal-title" id="checkoutConfirmationModalLabel">Confirm Your Checkout</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+        <div class="modal-content receipt-modal border-0 shadow">
+            <div class="modal-header bg-light text-primary">
+                <h5 class="modal-title mx-auto">Checkout Summary</h5>
             </div>
-            <div class="modal-body">
-                <div class="receipt-header">
-                    <strong>Your Order Summary</strong>
+            <div class="modal-body px-4 py-3">
+                <div class="receipt-header text-center mb-2">
+                   
+                    <p class="small text-muted">Review the sales details before checkout</p>
                 </div>
-                <div id="checkout-items-list" class="checkout-items-list"></div>
-                <div class="divider"></div> <!-- Divider for separation -->
-                <div class="d-flex justify-content-between mt-2 fw-bold">
-                    <span>Total Amount:</span>
-                    <span id="checkout-total-amount" class="text-success fw-bold fs-5">Ksh 0.00</span>
+                <div id="checkout-items-list" class="checkout-items-list mb-3"></div>
+                <div class="divider"></div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <span class="fw-bold text-secondary">Total Amount:</span>
+                    <span id="checkout-total-amount" class="text-success fs-5 fw-bold">Ksh 0.00</span>
+                </div>
+                <div class="mt-2">
+                    <label for="payment-method" class="form-label fw-bold">Payment Method</label>
+                    <select id="payment-method" class="form-select">
+                      
+                        <option value="cash">Cash</option>
+                        <option value="mpesa">M-Pesa</option>
+                        <option value="credit">Not Paid</option>
+                    </select>
+                </div>
+
+                <!-- Customer Name Input -->
+                <div class="mt-2" id="customer-name-container" style="display: none;">
+                    <label for="customer-name" class="form-label">Customer Name:</label>
+                    <input type="text" id="customer-name" class="form-control" placeholder="Enter customer name" />
+                </div>
+
+                <!-- Error Message Display -->
+                <div id="error-message" class="mt-3 text-danger" style="display: none;">
+                    <small>Please fill out all required fields and try again.</small>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer d-flex justify-content-between p-3 border-0">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button type="button" id="confirm-checkout-btn" class="btn btn-primary">Confirm Checkout</button>
             </div>
@@ -118,86 +121,117 @@
     </div>
 </div>
 
-
-
-
 <style>
-    /* Modal Styles */
-    .modal-content {
-        border: 2px solid #007bff; /* Blue border for professionalism */
-        border-radius: 0.5rem; /* Slightly rounded corners */
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Shadow for depth */
-    }
+/* Receipt Modal Styling */
+.receipt-modal {
+    border-radius: 10px;
+    font-family: 'Roboto', sans-serif;
+    max-width: 500px;
+}
 
-    .modal-header {
-        background-color: #007bff; /* Blue header background */
-        color: white; /* White text color for contrast */
-        border-bottom: none; /* Remove bottom border */
-        padding: 15px 20px; /* Add padding for better spacing */
-    }
+.modal-header {
+    border-bottom: 0;
+    padding: 20px;
+    background-color: #f8f9fa; /* Lighter header color */
+    color: #007bff; /* Primary text color */
+}
 
-    .modal-title {
-        font-family: 'Arial', sans-serif; /* Clean, professional font */
-        font-weight: bold; /* Bold font for the title */
-        font-size: 1.5rem; /* Larger font size for visibility */
-    }
+.modal-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
 
-    .modal-body {
-        padding: 20px; /* Adequate padding */
-    }
+.modal-body {
+    padding: 20px 30px;
+}
 
-    .checkout-items-list {
-        max-height: 300px; /* Limit height for scrolling */
-        overflow-y: auto; /* Enable vertical scrolling */
-        margin-bottom: 20px; /* Space below items */
-        border: 1px solid #ccc; /* Light border for items list */
-        border-radius: 0.5rem; /* Rounded corners */
-        padding: 10px; /* Padding inside the items list */
-    }
+.receipt-header h6 {
+    font-size: 1.2rem;
+    color: #333;
+    font-weight: bold;
+}
 
-    .checkout-item {
-        padding: 10px 0; /* Padding between items */
-        display: flex; /* Flex layout for alignment */
-        justify-content: space-between; /* Space between name and price */
-        border-bottom: 1px solid #ddd; /* Divider between items */
-    }
+.receipt-header p {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 5px;
+}
 
-    .checkout-item:last-child {
-        border-bottom: none; /* Remove last item's divider */
-    }
+.checkout-items-list {
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 0.95rem;
+}
 
-    .text-success {
-        font-size: 1.5rem; /* Larger font size for visibility */
-        font-weight: bold; /* Make total amount bold */
-    }
+.checkout-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #ddd;
+    font-size: 0.95rem;
+}
 
-    .modal-footer {
-        padding: 15px 20px; /* Padding for footer */
-    }
+.checkout-item:last-child {
+    border-bottom: none;
+}
 
-    .btn {
-        font-weight: bold; /* Bold text for buttons */
-    }
+.divider {
+    height: 1px;
+    background-color: #eee;
+    margin: 15px 0;
+}
 
-    /* Additional Styling */
-    .receipt-header {
-        text-align: center; /* Center the header */
-        font-size: 1.25rem; /* Slightly larger font for header */
-        margin-bottom: 20px; /* Space below header */
-    }
+.text-success {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
 
-    .divider {
-        border-top: 1px dashed #ddd; /* Dashed line for separation */
-        margin: 15px 0; /* Margin above and below */
-    }
+.modal-footer {
+    border-top: 0;
+}
 
-    @media (max-width: 768px) {
-        .modal-content {
-            width: 100%; /* Full width on smaller screens */
-            margin: 0; /* No margin on mobile */
-        }
+.form-select,
+.btn {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* Error message styling */
+#error-message {
+    display: none; /* Initially hidden */
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .receipt-modal {
+        width: 95%;
+        margin: auto;
     }
+}
 </style>
+
+<script>
+document.getElementById("confirm-checkout-btn").addEventListener("click", function() {
+    const paymentMethod = document.getElementById("payment-method").value;
+    const errorMessage = document.getElementById("error-message");
+
+    // Example validation check: Ensure payment method is selected
+    if (!paymentMethod) {
+        errorMessage.style.display = "block";
+    } else {
+        errorMessage.style.display = "none";
+        // Proceed with checkout actions here
+    }
+});
+</script>
+
+
+
 
 
 <script src="{{ url_for('static', filename='js/sales.js') }}"></script>

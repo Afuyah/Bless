@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, jsonify, redirect, url_fo
 from flask_login import login_required, current_user
 from app.models import db, Product, Category, Supplier, Expense  # Include Expense model
 from app import socketio
+from decimal import Decimal, InvalidOperation
+
 import logging
 stock_bp = Blueprint('stock', __name__)
 
@@ -152,38 +154,34 @@ def validate_product_data(data):
     if Product.query.filter_by(name=data['name']).first():
         return FLASH_PRODUCT_EXISTS
 
+    # Check required fields
     required_fields = [data['name'], data['cost_price'], data['selling_price'], data['stock'], data['category_id']]
-    if any(not field for field in required_fields):
-        return "All fields must be filled out."
+    for field, value in zip(['Name', 'Cost Price', 'Selling Price', 'Stock', 'Category'], required_fields):
+        if not value:
+            return f"{field} is required."
 
     # Validate numeric fields
     try:
-        data['cost_price'] = float(data['cost_price'])
-        data['selling_price'] = float(data['selling_price'])
-        data['stock'] = float(data['stock'])
-
+        data['cost_price'] = Decimal(data['cost_price'])
+        data['selling_price'] = Decimal(data['selling_price'])
+        data['stock'] = int(data['stock'])
         if data['cost_price'] <= 0 or data['selling_price'] <= 0 or data['stock'] < 0:
             return "Cost price, selling price, and stock must be positive numbers."
-
-    except ValueError:
+    except (ValueError, InvalidOperation):
         return "Cost price, selling price, and stock must be valid numbers."
 
     # Validate combination fields if provided
-    combination_unit_price = None
     if data['combination_size'] and data['combination_price']:
         try:
             data['combination_size'] = int(data['combination_size'])
-            data['combination_price'] = float(data['combination_price'])
-
+            data['combination_price'] = Decimal(data['combination_price'])
             if data['combination_size'] <= 0 or data['combination_price'] <= 0:
                 return "Combination size and price must be positive numbers."
-
-            combination_unit_price = data['combination_price'] / data['combination_size']
-        
-        except ValueError:
+        except (ValueError, InvalidOperation):
             return "Combination size and price must be valid positive numbers."
 
     return None  # No errors
+
 
 def create_product(data):
     combination_unit_price = None
