@@ -1,10 +1,13 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import login_required, current_user
-from app.models import db, Product, Category, Supplier, Expense  # Include Expense model
+from app.models import db, Product, Category, Supplier, Expense ,AdjustmentType, StockLog 
 from app import socketio
 from decimal import Decimal, InvalidOperation
 
 import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 stock_bp = Blueprint('stock', __name__)
 
 # Constants for flash messages
@@ -96,13 +99,23 @@ def delete_category(id: int):
     return redirect(url_for('stock.categories'))
 
 
+
 # Route to manage products
 @stock_bp.route('/products', methods=['GET'])
 @login_required
 def products():
     search_query = request.args.get('search', '')
     products = Product.query.filter(Product.name.contains(search_query)).all()
-    return render_template('products.html', products=products, search_query=search_query)
+    
+    # Use the methods to check the user's role
+    if current_user.is_admin():
+        return render_template('products.html', products=products, search_query=search_query)
+    elif current_user.is_cashier():
+        return render_template('cashier_products_view.html', products=products, search_query=search_query)
+    else:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home.index'))  # Redirect to a safe place if the user role is not recognized
+
 
 
 @stock_bp.route('/products/new', methods=['GET', 'POST'])
@@ -402,3 +415,93 @@ def get_low_stock_products():
         'low_stock_count': low_stock_count,
         'products': products_data  # Return detailed product data
     })
+
+@stock_bp.route('/adjust-stock/<int:product_id>', methods=['GET', 'POST'])
+@login_required
+def adjust_stock(product_id):
+    product = Product.query.get_or_404(product_id)
+    
+    # Check user roles
+    is_admin = current_user.is_admin()
+    is_cashier = current_user.is_cashier()
+
+    if request.method == 'POST':
+        try:
+            # Retrieve data from form
+            adjustment_quantity = int(request.form['adjustment_quantity'])
+            change_reason = request.form.get('change_reason', '').strip()  # Change reason is optional
+            adjustment_type = request.form.get('adjustment_type')
+
+            # Validate adjustment quantity
+            if adjustment_quantity < 1:
+                flash('Adjustment quantity must be greater than zero.', 'danger')
+                logger.warning(f'Invalid quantity {adjustment_quantity} attempted by user {current_user.id} on product {product.id}')
+                return redirect(url_for('stock.product_detail', product_id=product.id))
+
+            # Validate change reason if provided
+            if change_reason and len(change_reason) < 5:
+                flash('If provided, change reason must be at least 5 characters long.', 'danger')
+                logger.warning(f'Insufficient reason length by user {current_user.id} on product {product.id}')
+                return redirect(url_for('stock.product_detail', product_id=product.id))
+
+            # Determine allowed adjustment types based on user role
+            allowed_types = ['addition', 'reduction', 'return'] if is_cashier else [e.value for e in AdjustmentType]
+            
+            # Validate the adjustment type
+            if adjustment_type not in allowed_types:
+                flash('Unauthorized adjustment type for your role.', 'danger')
+                logger.warning(f'Unauthorized adjustment attempt by user {current_user.id} on product {product.id}: {adjustment_type}')
+                return redirect(url_for('stock.product_detail', product_id=product.id))
+
+            # Calculate the new stock level based on the adjustment type
+            if adjustment_type == 'addition':
+                new_stock = product.stock + adjustment_quantity
+            elif adjustment_type == 'reduction':
+                new_stock = max(product.stock - adjustment_quantity, 0)  # Ensures stock can't go negative
+            elif adjustment_type == 'return':
+                new_stock = product.stock + adjustment_quantity  # Increase stock for returned items
+            elif adjustment_type in ['spoilage', 'damage', 'theft']:
+                new_stock = max(product.stock - adjustment_quantity, 0)  # Decrease stock for spoilage, damage, or theft
+            elif adjustment_type == 'inventory_adjustment':
+                new_stock = adjustment_quantity  # Set stock to the provided amount
+            else:
+                flash('Invalid adjustment type.', 'danger')
+                logger.warning(f'Invalid adjustment type {adjustment_type} attempted by user {current_user.id} on product {product.id}')
+                return redirect(url_for('stock.product_detail', product_id=product.id))
+
+            # Log the stock update
+            stock_log = StockLog(
+                product_id=product.id,
+                user_id=current_user.id,
+                previous_stock=product.stock,
+                new_stock=new_stock,
+                adjustment_type=adjustment_type,
+                change_reason=change_reason or None  # Log None if no reason is provided
+            )
+            
+            # Update the product's stock in the database
+            product.stock = new_stock
+            
+            db.session.add(stock_log)
+            db.session.commit()
+            
+            flash(f'Stock for {product.name} updated successfully.', 'success')
+            logger.info(f'Stock for {product.name} updated from {product.stock} to {new_stock} by user {current_user.id} with adjustment type {adjustment_type}')
+            return redirect(url_for('stock.products'))
+
+        except ValueError as ve:
+            flash('Invalid input for quantity. Please enter a valid number.', 'danger')
+            logger.error(f'ValueError: {str(ve)} by user {current_user.id} on product {product.id}')
+        except SQLAlchemyError as e:
+            db.session.rollback()  # Rollback in case of database errors
+            flash('An error occurred while updating stock. Please try again.', 'danger')
+            logger.error(f'Database error: {str(e)} by user {current_user.id} on product {product.id}')
+        except Exception as e:
+            flash('An unexpected error occurred. Please try again.', 'danger')
+            logger.error(f'Unexpected error: {str(e)} by user {current_user.id} on product {product.id}')
+
+    # Render the appropriate template based on user role
+    template_name = 'adjust_stock_cashier.html' if is_cashier else 'adjust_stock_admin.html'
+    allowed_types = ['addition', 'return'] if is_cashier else [e.value for e in AdjustmentType]
+    
+    return render_template(template_name, product=product, allowed_types=allowed_types)

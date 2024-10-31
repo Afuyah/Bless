@@ -57,11 +57,11 @@
             color: #ffffff;
         }
         .dropdown-menu {
-            background-color: #343a40;
-            border: none;
+            background-color: lightslategrey;
+           
         }
         .dropdown-item {
-            color: #ffffff;
+            color: #fff;
         }
         .dropdown-item:hover {
             background-color: #495057;
@@ -83,7 +83,7 @@
     <!-- Navbar -->
    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="#">Nawiri's Enterprise</a>
+        <a class="navbar-brand" href="#">Salesta</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -98,8 +98,10 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More</a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ url_for('auth.change_password') }}">Change Password</a>
-                            <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
+
+                         <a class="dropdown-item" href="{{ url_for('stock.products') }}">Stock Updates</a>
+                         <a class="dropdown-item" href="{{ url_for('auth.change_password') }}">Change Password</a>
+                         <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
                         </div>
                     </li>
                 

@@ -1,20 +1,17 @@
-{% extends 'admin_base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Products{% endblock %}
 
 {% block content %}
 <div class="container mt-3">
     <h3 class="text-center">Product Inventory</h3>
-    <div class="text-right mb-3">
-        <a href="{{ url_for('stock.new_product') }}" class="btn btn-custom"> New Product</a>
-    </div>
+   
     <div class="table-responsive">
         <table class="table table-hover table-light table-bordered shadow" id="productTable">
             <thead class="thead-light">
                 <tr>
                     <th>Name</th>
                     <th>In Stock</th>
-                    <th>Cost Price</th>
                     <th>Selling Price</th>
                     <th>Action</th> <!-- New Action Column -->
                 </tr>
@@ -24,10 +21,9 @@
                 <tr>
                     <td>{{ product.name }}</td>
                     <td>{{ product.stock }}</td>
-                    <td>Ksh {{ product.cost_price }}</td>
                     <td>Ksh {{ product.selling_price }}</td>
                     <td>
-                        <a href="{{ url_for('stock.adjust_stock', product_id=product.id) }}" class="btn btn-sm btn-primary">Adjust Stock</a>
+                        <a href="{{ url_for('stock.adjust_stock', product_id=product.id) }}" class="btn btn-sm btn-primary">Update Stock</a>
                     </td> <!-- Action Link -->
                 </tr>
                 {% endfor %}
@@ -38,7 +34,37 @@
 
 <!-- Custom Styling for Product Page -->
 <style>
-    /* Your existing custom styling here */
+    /* Style adjustments for the table and container */
+    .container {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+        font-family: 'Arial', sans-serif;
+        color: #343a40;
+        margin-bottom: 20px;
+    }
+
+    .table {
+        border-collapse: collapse;
+    }
+
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .btn-primary {
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
 </style>
 
 <!-- Include jQuery and DataTables JS/CSS -->
@@ -51,12 +77,21 @@ $(document).ready(function() {
         searching: true,
         paging: true,
         ordering: true,
+        order: [[ 0, "asc" ]], // Default order by Name column
         columnDefs: [
-            { orderable: false, targets: [4] } // Disable ordering on Action column
+            { orderable: false, targets: [3] } // Disable ordering on Action column
         ],
         language: {
             searchPlaceholder: "Search products...",
-            search: ""
+            search: "",
+            lengthMenu: "Display _MENU_ products per page",
+            info: "Showing _START_ to _END_ of _TOTAL_ products",
+            paginate: {
+                first: "First",
+                last: "Last",
+                next: "Next",
+                previous: "Previous"
+            }
         }
     });
 });

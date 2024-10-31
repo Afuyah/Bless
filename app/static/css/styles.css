@@ -43,12 +43,11 @@ body, .modal-title, .modal-body {
 
 
         .login-container {
-            background-color: #ffffff; /* White background for the form */
-            max-width: 500px; /* Limit max width */
+            background-color: inherit; /* White background for the form */
+            max-width: 600px; /* Limit max width */
             width: 100%; /* Full width on smaller screens */
             border: 1px solid #ccc; /* Light border */
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15); /* Soft shadow */
-            border-radius: 20px; /* Rounded corners */
+           
             padding: 2rem;
             margin: auto;
             margin-top: 10vh;

@@ -11,7 +11,7 @@ from sqlalchemy import Enum as SQLAlchemyEnum
 import enum
 import logging
 
-from sqlalchemy import Numeric, Integer, Float, ForeignKey, String, DateTime
+from sqlalchemy import Numeric, Integer, Float, ForeignKey, String, DateTime, JSON
 
 
 
@@ -28,6 +28,20 @@ class UnitType(enum.Enum):
 class Role(Enum):
     ADMIN = 'admin'
     CASHIER = 'cashier'
+import enum
+
+class AdjustmentType(enum.Enum):
+    addition = "addition"  # Adding stock
+    reduction = "reduction"  # Reducing stock
+    spoilage = "spoilage"  # Stock that is no longer sellable due to spoilage
+    theft = "theft"  # Stock lost due to theft
+    returned = "returned"  # Stock returned from sales
+    inventory_adjustment = "inventory_adjustment"  # Adjustments made during inventory counts
+    damage = "damage"  # Stock that is damaged and unsellable
+
+    def __str__(self):
+        return self.value.capitalize()  # Capitalizes the string representation
+
 
 # User Model with Role-based Access
 class User(UserMixin, db.Model):
@@ -300,3 +314,28 @@ class Expense(db.Model):
             'quantity': self.quantity,
             'product_name': self.product.name if self.product else None  # Optional product name
         }
+
+
+
+class StockLog(db.Model):
+    __tablename__ = 'stock_logs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    date = db.Column(db.DateTime, default=func.now())
+    previous_stock = db.Column(db.Integer, nullable=False)
+    new_stock = db.Column(db.Integer, nullable=False)
+    adjustment_type = db.Column(SQLAlchemyEnum(AdjustmentType), nullable=False)  # Use the defined Enum class
+    change_reason = db.Column(db.String(200), nullable=True)
+    log_metadata = db.Column(JSON, nullable=True)  # Renamed from metadata to log_metadata
+    
+    product = db.relationship('Product', back_populates='stock_logs')
+    user = db.relationship('User', back_populates='stock_logs')
+    
+    def __repr__(self):
+        return f"<StockLog(product_id={self.product_id}, previous_stock={self.previous_stock}, new_stock={self.new_stock})>"
+
+# Adding stock_logs relationship to Product and User models
+Product.stock_logs = db.relationship('StockLog', order_by=StockLog.date, back_populates='product')
+User.stock_logs = db.relationship('StockLog', back_populates='user')        
