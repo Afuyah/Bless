@@ -42,7 +42,7 @@ def login():
             flash('Invalid username or password.', category='error')
             return redirect(url_for('auth.login'))
 
-    return render_template('login.html')
+    return render_template('auth/login.html')
 
 
 
@@ -69,7 +69,7 @@ def change_password():
         flash('Your password has been updated successfully!', category='success')
         return redirect(url_for('auth.admin_dashboard' if current_user.is_admin() else 'auth.cashier_dashboard'))
 
-    return render_template('change_password.html')
+    return render_template('auth/change_password.html')
 
 
 
@@ -103,7 +103,7 @@ def admin_dashboard():
     low_stock_products = Product.query.filter(Product.stock <= low_stock_threshold).all()
 
     return render_template(
-        'admin_dashboard.html',
+        'auth/admin_dashboard.html',
         total_sales=total_sales,
         total_transactions=total_transactions,
         total_revenue=total_revenue,
@@ -134,7 +134,7 @@ def user_management():
     # Fetch all users from the database
     users = User.query.all()
 
-    return render_template('user_management.html', users=users)
+    return render_template('auth/user_management.html', users=users)
 
 
 
@@ -153,16 +153,16 @@ def add_user():
         # Check if username is only numbers
         if username.isdigit():
             flash('Username cannot contain only numbers.', 'danger')
-            return render_template('add_user.html')
+            return render_template('auth/add_user.html')
 
         # Ensure role is valid
         if role.upper() not in Role.__members__:
             flash('Invalid role selected.', 'danger')
-            return render_template('add_user.html')
+            return render_template('auth/add_user.html')
 
         if User.query.filter_by(username=username).first():
             flash('Username already exists.', 'danger')
-            return render_template('add_user.html')
+            return render_template('auth/add_user.html')
 
         new_user = User(username=username, role=Role[role.upper()])
         new_user.set_password(password)
@@ -172,7 +172,7 @@ def add_user():
         flash(f'{role.capitalize()} "{username}" added successfully!', 'success')
         return redirect(url_for('auth.user_management'))
 
-    return render_template('add_user.html')
+    return render_template('auth/add_user.html')
 
 
 @auth_bp.route('/edit_user/<int:id>', methods=['GET', 'POST'])
@@ -191,17 +191,17 @@ def edit_user(id: int):
         # Check if username is only numbers
         if username.isdigit():
             flash('Username cannot contain only numbers.', 'danger')
-            return render_template('edit_user.html', user=user, Role=Role)
+            return render_template('auth/edit_user.html', user=user, Role=Role)
 
         # Ensure role is valid
         if role.upper() not in Role.__members__:
             flash('Invalid role selected.', 'danger')
-            return render_template('edit_user.html', user=user, Role=Role)
+            return render_template('auth/tedit_user.html', user=user, Role=Role)
 
         # Check if the username already exists (but not for the current user)
         if User.query.filter_by(username=username).first() and username != user.username:
             flash('Username already exists.', 'danger')
-            return render_template('edit_user.html', user=user, Role=Role)
+            return render_template('auth/edit_user.html', user=user, Role=Role)
 
         # Update user details
         user.username = username
@@ -212,5 +212,5 @@ def edit_user(id: int):
         flash(f'User "{username}" updated successfully!', 'success')
         return redirect(url_for('auth.user_management'))
 
-    return render_template('edit_user.html', user=user, Role=Role)
+    return render_template('auth/edit_user.html', user=user, Role=Role)
 

@@ -476,7 +476,7 @@ def adjust_stock(product_id):
                 previous_stock=product.stock,
                 new_stock=new_stock,
                 adjustment_type=adjustment_type,
-                change_reason=change_reason or None  # Log None if no reason is provided
+                change_reason=change_reason or None  
             )
             
             # Update the product's stock in the database
