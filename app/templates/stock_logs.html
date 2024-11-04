@@ -1,0 +1,60 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Logs{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h1 class="text-center">Stock Logs</h1>
+    <div class="table-responsive">
+        <table id="stockLogTable" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>  <!-- Changed from Product ID to Product Name -->
+                    <th>User Name</th>      <!-- Changed from User ID to User Name -->
+                    <th>Date</th>
+                    <th>Previous Stock</th>
+                    <th>New Stock</th>
+                    <th>Adjustment Type</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Stock log entries will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable
+        $('#stockLogTable').DataTable({
+            ajax: {
+                url: '/stock/api/stock-logs', // Adjusted endpoint to fetch JSON data
+                dataSrc: 'stock_logs'   // Adjusts for the JSON structure
+            },
+            columns: [
+                { data: 'id' },
+                { data: 'product_name' },  // Changed from product_id to product_name
+                { data: 'user_name' },      // Changed from user_id to user_name
+                { data: 'date' },
+                { data: 'previous_stock' },
+                { data: 'new_stock' },
+                { data: 'adjustment_type' }
+               
+            ],
+            order: [[0, 'desc']] // Order by ID descending
+        });
+    });
+</script>
+
+{% endblock %}

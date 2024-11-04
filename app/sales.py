@@ -267,8 +267,6 @@ def daily_sales_report():
                            most_sold_item=most_sold_item, 
                            most_sold_quantity=most_sold_quantity)
 
-from collections import Counter
-
 @sales_bp.route('/reports/filter', methods=['GET'])
 @login_required
 def filter_sales_report():
@@ -283,6 +281,10 @@ def filter_sales_report():
     try:
         start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
         end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+        
+        if start_date > end_date:
+            flash("Start date must be before or equal to end date.", "warning")
+            return redirect(url_for('sales_bp.daily_sales_report'))
     except ValueError:
         flash("Invalid date format. Please use YYYY-MM-DD.", "danger")
         return redirect(url_for('sales_bp.daily_sales_report'))

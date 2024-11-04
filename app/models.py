@@ -336,3 +336,6 @@ class StockLog(db.Model):
 # Adding stock_logs relationship to Product and User models
 Product.stock_logs = db.relationship('StockLog', order_by=StockLog.date, back_populates='product')
 User.stock_logs = db.relationship('StockLog', back_populates='user')        
+
+
+

@@ -1,14 +1,17 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import login_required, current_user
-from app.models import db, Product, Category, Supplier, Expense ,AdjustmentType, StockLog 
+from app.models import db, Product, Category, Supplier, Expense ,AdjustmentType, StockLog, User 
 from app import socketio
 from decimal import Decimal, InvalidOperation
+from sqlalchemy.exc import IntegrityError
 
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 stock_bp = Blueprint('stock', __name__)
+
+MAX_STOCK_LIMIT = 1000
 
 # Constants for flash messages
 FLASH_ACCESS_DENIED = 'Access denied.'
@@ -307,50 +310,106 @@ def update_product_stock(product, quantity_to_add, total_amount):
     )
     db.session.add(new_expense)
 
-@stock_bp.route('/admin_update_stock', methods=['GET', 'POST'])
+# Route to display the product management page
+@stock_bp.route('/admin_update_stock', methods=['GET'])
 @login_required
-def update_stock():
-    if request.method == 'POST':
-        product_id = request.form['productId']
-        quantity_to_add = int(request.form['newStock'])
-        total_amount = float(request.form['totalAmount'])
-
-        # Validate form inputs
-        if quantity_to_add <= 0:
-            flash("Quantity must be a positive integer.", "error")
-            return redirect(url_for('stock.update_stock'))
-        if total_amount < 0:
-            flash("Total amount cannot be negative.", "error")
-            return redirect(url_for('stock.update_stock'))
-
-        product = Product.query.get_or_404(product_id)
-
-        try:
-            update_product_stock(product, quantity_to_add, total_amount)
-            db.session.commit()
-            flash(f"Stock updated successfully for {product.name}.", "success")
-            
-            # Emit real-time stock update
-            socketio.emit('stock_updated', {
-                'id': product.id,
-                'name': product.name,
-                'stock': product.stock,
-                'cost_price': product.cost_price
-            }, broadcast=True)
-
-        except ValueError as ve:
-            db.session.rollback()
-            flash(str(ve), "error")  # Display specific validation error
-            return redirect(url_for('stock.update_stock'))
-        except Exception as e:
-            db.session.rollback()
-            flash('An error occurred while updating stock. Please try again.', "error")
-            return redirect(url_for('stock.update_stock'))
-
-        return redirect(url_for('stock.update_stock'))
-
+def update_stock_page():
     products = Product.query.all()
     return render_template('update_stock.html', products=products)
+
+@stock_bp.route('/products/<int:product_id>/update_stock', methods=['POST'])
+@login_required
+def update_stock(product_id):
+    product = Product.query.get_or_404(product_id)
+
+    quantity = request.form.get('quantity')
+    
+    if quantity is None:
+        return jsonify({'message': 'Quantity is required'}), 400
+    
+    try:
+        quantity = int(quantity)
+    except ValueError:
+        return jsonify({'message': 'Quantity must be a number'}), 400
+
+    if quantity < 0:
+        return jsonify({'message': 'Quantity cannot be negative'}), 400
+
+    try:
+        product.stock += quantity
+
+        # Optional: Check for max stock limit
+        if product.stock > MAX_STOCK_LIMIT:
+            return jsonify({'message': 'Stock cannot exceed maximum limit'}), 400
+
+        db.session.commit()
+
+        # Log the update
+        logger.info(f'User {current_user.id} updated stock for product {product_id} by {quantity}. New stock: {product.stock}')
+
+        return jsonify({
+            'message': 'Stock updated successfully',
+            'new_stock': product.stock,
+            'product_id': product.id,
+            'product_name': product.name  # Assuming you have a name attribute
+        }), 200
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({'message': 'Error updating stock due to database integrity issues'}), 500
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'An unexpected error occurred: {str(e)}'}), 500
+
+# Route to update selling price
+@stock_bp.route('/products/<int:product_id>/update_selling_price', methods=['POST'])
+@login_required
+def update_selling_price(product_id):
+    product = Product.query.get_or_404(product_id)
+    new_selling_price = request.form.get('selling_price', type=float)
+
+    if new_selling_price is None or new_selling_price < 0:
+        return jsonify({'message': 'Invalid selling price value'}), 400
+
+    try:
+        product.selling_price = new_selling_price
+        db.session.commit()
+        return jsonify({
+            'message': 'Selling price updated successfully',
+            'selling_price': str(product.selling_price)
+        }), 200
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({'message': 'Error updating selling price'}), 500
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'An unexpected error occurred: {str(e)}'}), 500
+
+# Route to update cost price
+@stock_bp.route('/products/<int:product_id>/update_cost_price', methods=['POST'])
+@login_required
+def update_cost_price(product_id):
+    product = Product.query.get_or_404(product_id)
+    new_cost_price = request.form.get('cost_price', type=float)
+
+    if new_cost_price is None or new_cost_price < 0:
+        return jsonify({'message': 'Invalid cost price value'}), 400
+
+    try:
+        product.cost_price = new_cost_price
+        db.session.commit()
+        return jsonify({
+            'message': 'Cost price updated successfully',
+            'cost_price': str(product.cost_price)
+        }), 200
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({'message': 'Error updating cost price'}), 500
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'An unexpected error occurred: {str(e)}'}), 500
+
+
+
 
 @stock_bp.route('/products/<int:product_id>/update_stock_modal', methods=['GET'])
 @login_required
@@ -445,7 +504,7 @@ def adjust_stock(product_id):
                 return redirect(url_for('stock.product_detail', product_id=product.id))
 
             # Determine allowed adjustment types based on user role
-            allowed_types = ['addition', 'reduction', 'return'] if is_cashier else [e.value for e in AdjustmentType]
+            allowed_types = ['addition', 'reduction', 'returned'] if is_cashier else [e.value for e in AdjustmentType]
             
             # Validate the adjustment type
             if adjustment_type not in allowed_types:
@@ -458,7 +517,7 @@ def adjust_stock(product_id):
                 new_stock = product.stock + adjustment_quantity
             elif adjustment_type == 'reduction':
                 new_stock = max(product.stock - adjustment_quantity, 0)  # Ensures stock can't go negative
-            elif adjustment_type == 'return':
+            elif adjustment_type == 'returned':
                 new_stock = product.stock + adjustment_quantity  # Increase stock for returned items
             elif adjustment_type in ['spoilage', 'damage', 'theft']:
                 new_stock = max(product.stock - adjustment_quantity, 0)  # Decrease stock for spoilage, damage, or theft
@@ -505,3 +564,43 @@ def adjust_stock(product_id):
     allowed_types = ['addition', 'return'] if is_cashier else [e.value for e in AdjustmentType]
     
     return render_template(template_name, product=product, allowed_types=allowed_types)
+
+
+@stock_bp.route('/stock-logs', methods=['GET'])
+@login_required
+def stock_logs():
+    # Fetch all stock logs ordered by date, most recent first
+    logs = StockLog.query.order_by(StockLog.date.desc()).all()
+    
+    # Render the template and pass the logs
+    return render_template('stock_logs.html', logs=logs)
+
+@stock_bp.route('/api/stock-logs', methods=['GET'])
+@login_required
+def get_stock_logs():
+    try:
+        # Fetch all stock logs from the database, joining with Product and User to get their names
+        stock_logs = db.session.query(
+            StockLog,
+            Product.name.label('product_name'),  # Get the product name
+            User.username.label('user_name')      # Get the user name
+        ).join(Product).join(User).all()
+
+        # Convert stock logs to a list of dictionaries
+        stock_logs_data = [{
+            'id': log.id,
+            'product_name': log.product_name,    # Use product_name from the query
+            'user_name': log.user_name,          # Use user_name from the query
+            'date': log.date.isoformat(),        # Convert datetime to string
+            'previous_stock': log.previous_stock,
+            'new_stock': log.new_stock,
+            'adjustment_type': log.adjustment_type.value,  # Make sure to call .value on the Enum
+            'change_reason': log.change_reason,
+            'log_metadata': log.log_metadata
+        } for log, log.product_name, log.user_name in stock_logs]  # Unpacking the query results
+
+        return jsonify({'stock_logs': stock_logs_data}), 200
+
+    except Exception as e:
+        # Handle any unexpected errors
+        return jsonify({'message': 'An error occurred while fetching stock logs: ' + str(e)}), 500
