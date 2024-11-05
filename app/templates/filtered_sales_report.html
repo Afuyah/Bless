@@ -7,21 +7,48 @@
         <div class="card-body">
             <h5 class="card-title text-primary">Sales Summary</h5>
             <h6 class="card-subtitle mb-2 text-muted">Overview of the sales data</h6>
-            <div class="row">
-                <div class="col-md-4">
-                    <p>Total Sales: <strong>Ksh {{ total_sales }}</strong></p>
+            <div class="row text-center">
+                <div class="col-md-4 mb-3">
+                    <div class="summary-box bg-light border rounded p-3">
+                        <h6>Total Sales</h6>
+                        <p class="lead">Ksh <strong>{{ total_sales }}</strong></p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <p>Total Transactions: <strong>{{ total_transactions }}</strong></p>
+                <div class="col-md-4 mb-3">
+                    <div class="summary-box bg-light border rounded p-3">
+                        <h6>Total Transactions</h6>
+                        <p class="lead"><strong>{{ total_transactions }}</strong></p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <p>Total Profit: <strong>Ksh {{ total_profit }}</strong></p>
+                <div class="col-md-4 mb-3">
+                    <div class="summary-box bg-light border rounded p-3">
+                        <h6>Total Profit</h6>
+                        <p class="lead">Ksh <strong>{{ total_profit }}</strong></p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <p>Average Sale Value: <strong>Ksh {{ avg_sale_value }}</strong></p>
+                <div class="col-md-4 mb-3">
+                    <div class="summary-box bg-light border rounded p-3">
+                        <h6>Average Sale Value</h6>
+                        <p class="lead">Ksh <strong>{{ avg_sale_value }}</strong></p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <p>Unique Products Sold: <strong>{{ unique_products }}</strong></p>
+                <div class="col-md-4 mb-3">
+                    <div class="summary-box bg-light border rounded p-3">
+                        <h6>Unique Products Sold</h6>
+                        <p class="lead"><strong>{{ unique_products }}</strong></p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="summary-box bg-light border rounded p-3">
+                        <h6>M-Pesa Total</h6>
+                        <p class="lead">Ksh <strong>{{ mpesa_total }}</strong></p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="summary-box bg-light border rounded p-3">
+                        <h6>Credit Total</h6>
+                        <p class="lead">Ksh <strong>{{ credit_total }}</strong></p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -104,6 +131,16 @@
         padding: 20px;
     }
 
+    .summary-box {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+
+    .summary-box:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+    }
+
     .table {
         margin-top: 20px;
         border-radius: 8px;
@@ -113,6 +150,11 @@
     .table th {
         background-color: #007bff;
         color: white;
+        transition: background-color 0.3s ease;
+    }
+
+    .table th:hover {
+        background-color: #0056b3; /* Darker blue on hover */
     }
 
     .table th, .table td {
@@ -131,12 +173,16 @@
         text-align: center;
         margin-top: 20px;
         font-size: 1.1em;
+        padding: 15px; /* Increased padding for better visibility */
     }
 
     /* Responsive Design */
     @media (max-width: 768px) {
         .card-title, .card-subtitle {
             text-align: center;
+        }
+        .row > div {
+            margin-bottom: 15px; /* Spacing for mobile devices */
         }
     }
 </style>

@@ -2,9 +2,8 @@
 
 {% block content %}
 
- <h4 class="mb-4 text-center">Sales Reports</h4>
+<h4 class="mb-4 text-center">Sales Reports</h4>
 <div class="container mt-3">
-   
 
     <!-- Date Range Filter Form -->
     <form method="get" action="{{ url_for('sales.filter_sales_report') }}" class="mb-4 text-center">
@@ -32,12 +31,20 @@
             <p class="fs-4">Ksh {{ total_sales }}</p>
         </div>
         <div class="card summary-card">
-            <h6>Total Transactions</h6>
+            <h6>All Transactions</h6>
             <p class="fs-4">{{ total_transactions }}</p>
         </div>
         <div class="card summary-card">
             <h6>Daily Profit</h6>
             <p class="fs-4">Ksh {{ daily_profit }}</p>
+        </div>
+        <div class="card summary-card">
+            <h6> via M-Pesa</h6>
+            <p class="fs-4">Ksh {{ mpesa_total }}</p>
+        </div>
+        <div class="card summary-card">
+            <h6> On Credit</h6>
+            <p class="fs-4">Ksh {{ credit_total }}</p>
         </div>
     </div>
 
@@ -59,9 +66,8 @@
                     <tr>
                         <th>#</th>
                         <th>Date</th>
-                        <th>Total </th>
+                        <th>Total</th>
                         <th>Payment Method</th>
-                       
                         <th>Items</th>
                     </tr>
                 </thead>
@@ -72,12 +78,11 @@
                         <td>{{ sale.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                         <td>Ksh {{ sale.total }}</td>
                         <td>{{ sale.payment_method }}</td>
-                      
                         <td>
                             <ul class="list-unstyled">
                                 {% for item in sale.cart_items %}
                                 <li>
-                                    {{ item.product.name }} - {{ item.quantity }} 
+                                    {{ item.product.name }} - {{ item.quantity }}
                                 </li>
                                 {% endfor %}
                             </ul>
@@ -163,13 +168,15 @@ $(document).ready(function() {
         color: #ffffff;
         padding: 20px;
         border-radius: 8px;
-        flex: 1 1 calc(33% - 20px);
+        flex: 1 1 calc(20% - 20px); /* Adjust for 5 cards */
         margin: 10px;
         transition: transform 0.3s;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
     }
 
     .summary-card:hover {
         transform: translateY(-5px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
 
     .table {

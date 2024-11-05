@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@500&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -23,21 +24,17 @@
     <!-- Sidebar Navigation -->
     <div class="sidebar" id="sidebar">
         <h3>Nawiri's Enterprise</h3>
-        <a href="{{ url_for('auth.admin_dashboard') }}" class="active">Dashboard</a>
-        <a href="{{ url_for('sales.daily_sales_report') }}">Sales Reports</a>
-        <a href="{{ url_for('sales.monthly_sales_report') }}" class="nav-link">Monthly Sales Report</a>
-
-        <a href="{{ url_for('stock.products') }}">Product Management</a>
-        <a href="{{ url_for('stock.categories') }}">Manage Categories</a>
-        <a href="{{ url_for('stock.update_stock_page') }}">Prices  Updates</a>
-       
-        <a href="{{ url_for('auth.user_management') }}">User Management</a>
-
-        <a href="{{ url_for('stock.stock_logs') }}" class="nav-link">View Stock Logs</a>
-
-         <a class="dropdown-item" href="{{ url_for('auth.change_password') }}">Change Password</a>
+        <a href="{{ url_for('auth.admin_dashboard') }}" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{{ url_for('sales.daily_sales_report') }}"><i class="fas fa-chart-line"></i> Sales Reports</a>
+        <a href="{{ url_for('sales.monthly_sales_report') }}" class="nav-link"><i class="fas fa-calendar-alt"></i> Monthly Sales Report</a>
+        <a href="{{ url_for('stock.products') }}"><i class="fas fa-box"></i> Product Management</a>
+        <a href="{{ url_for('stock.categories') }}"><i class="fas fa-tags"></i> Manage Categories</a>
+        <a href="{{ url_for('stock.update_stock_page') }}"><i class="fas fa-dollar-sign"></i> Prices Updates</a>
+        <a href="{{ url_for('auth.user_management') }}"><i class="fas fa-user-cog"></i> User Management</a>
+        <a href="{{ url_for('stock.stock_logs') }}" class="nav-link"><i class="fas fa-file-alt"></i> View Stock Logs</a>
+        <a class="dropdown-item" href="{{ url_for('auth.change_password') }}"><i class="fas fa-lock"></i> Change Password</a>
         <hr style="border-color: #6c757d; margin: 10px 0;">
-        <a href="{{ url_for('auth.logout') }}" class="text-danger">Logout</a>
+        <a href="{{ url_for('auth.logout') }}" class="text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 
     <!-- Main Content -->
@@ -76,6 +73,7 @@
 
             sidebarToggle.on('click', function() {
                 sidebar.toggleClass('sidebar-hidden');
+                $('body').toggleClass('sidebar-visible');
             });
         });
     </script>

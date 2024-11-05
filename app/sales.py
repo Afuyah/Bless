@@ -215,7 +215,6 @@ from collections import Counter
 @sales_bp.route('/reports/daily', methods=['GET'])
 @login_required
 def daily_sales_report():
-    # Get the date from request arguments, defaulting to today
     date_str = request.args.get('date', datetime.today().date().strftime('%Y-%m-%d'))
     
     try:
@@ -224,10 +223,9 @@ def daily_sales_report():
         flash("Invalid date format. Please use YYYY-MM-DD.", "danger")
         return redirect(url_for('sales_bp.daily_sales_report'))
 
-    # Fetch sales for the specified date
+    # Query sales data for the selected date
     sales = Sale.query.filter(func.date(Sale.date) == report_date).all()
-
-    # If no sales are found for the date, display empty report
+    
     if not sales:
         flash("No sales data available for the selected date", "info")
         return render_template('daily_sales_report.html', 
@@ -236,13 +234,19 @@ def daily_sales_report():
                                total_sales=0, 
                                total_transactions=0, 
                                daily_profit=0, 
+                               mpesa_total=0,  # Include M-Pesa total
+                               credit_total=0,  # Include credit total
                                most_sold_item=None, 
                                most_sold_quantity=0)
 
-    # Calculate total sales, transactions, and daily profit
+    # Calculate sales data including M-Pesa and credit totals
     total_sales = sum(sale.total for sale in sales)
     total_transactions = len(sales)
     daily_profit = sum(sale.profit for sale in sales)
+    
+    # Totals based on payment methods
+    mpesa_total = sum(sale.total for sale in sales if sale.payment_method.lower() == 'mpesa')
+    credit_total = sum(sale.total for sale in sales if sale.payment_method.lower() == 'credit')
 
     # Track quantity sold for each item
     item_sales = Counter()
@@ -250,23 +254,18 @@ def daily_sales_report():
         for item in sale.cart_items:
             item_sales[item.product.name] += item.quantity
 
-    # Determine the most sold item based on quantities
     most_sold_item, most_sold_quantity = max(item_sales.items(), key=lambda x: x[1], default=(None, 0))
 
-    # Format the totals to two decimal places
-    total_sales = round(total_sales, 2)
-    daily_profit = round(daily_profit, 2)
-
-    # Render the report template with calculated values
     return render_template('daily_sales_report.html', 
                            sales=sales, 
                            today=report_date, 
-                           total_sales=total_sales, 
+                           total_sales=round(total_sales, 2), 
                            total_transactions=total_transactions, 
-                           daily_profit=daily_profit, 
+                           daily_profit=round(daily_profit, 2), 
+                           mpesa_total=round(mpesa_total, 2),  # Include M-Pesa total
+                           credit_total=round(credit_total, 2),  # Include credit total
                            most_sold_item=most_sold_item, 
                            most_sold_quantity=most_sold_quantity)
-
 @sales_bp.route('/reports/filter', methods=['GET'])
 @login_required
 def filter_sales_report():
@@ -275,7 +274,7 @@ def filter_sales_report():
 
     if not start_date_str or not end_date_str:
         flash("Please provide both start and end dates", "warning")
-        return redirect(url_for('sales.daily_sales_report'))
+        return redirect(url_for('sales_bp.daily_sales_report'))
 
     # Parse dates with error handling
     try:
@@ -302,7 +301,9 @@ def filter_sales_report():
                                avg_sale_value=0, 
                                unique_products=0, 
                                most_sold_item=None, 
-                               most_sold_quantity=0)
+                               most_sold_quantity=0,
+                               mpesa_total=0,
+                               credit_total=0)
 
     # Calculate total sales, transactions, and total profit
     total_sales = sum(sale.total for sale in sales)
@@ -322,6 +323,10 @@ def filter_sales_report():
     avg_sale_value = total_sales / total_transactions if total_transactions else 0
     unique_products = len(set(item.product.name for sale in sales for item in sale.cart_items))
 
+    # Calculate totals based on payment methods
+    mpesa_total = sum(sale.total for sale in sales if sale.payment_method.lower() == 'mpesa')
+    credit_total = sum(sale.total for sale in sales if sale.payment_method.lower() == 'credit')
+
     return render_template('filtered_sales_report.html', 
                            sales=sales, 
                            total_sales=round(total_sales, 2), 
@@ -330,13 +335,15 @@ def filter_sales_report():
                            avg_sale_value=round(avg_sale_value, 2), 
                            unique_products=unique_products, 
                            most_sold_item=most_sold_item, 
-                           most_sold_quantity=most_sold_quantity)
-
+                           most_sold_quantity=most_sold_quantity,
+                           mpesa_total=round(mpesa_total, 2),  # Include M-Pesa total
+                           credit_total=round(credit_total, 2))  # Include credit total
 
 @sales_bp.route('/reports/monthly', methods=['GET'])
 @login_required
 def monthly_sales_report():
     month_str = request.args.get('month', datetime.today().strftime('%Y-%m'))
+    
     try:
         report_month = datetime.strptime(month_str, '%Y-%m').date()
     except ValueError:
@@ -358,4 +365,4 @@ def monthly_sales_report():
                            total_sales=round(total_sales, 2), 
                            total_transactions=total_transactions, 
                            total_profit=round(total_profit, 2),
-                           datetime=datetime) 
+                           report_month=report_month)  # Pass the report_month for display
