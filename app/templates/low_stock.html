@@ -99,7 +99,7 @@
     </div>
 </div>
 
-<!-- Include jQuery and Bootstrap scripts -->
+<!-- Include jQuery, Bootstrap, and DataTables scripts -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
@@ -108,7 +108,7 @@
 <script>
 $(document).ready(function() {
     // Initialize DataTable
-    const productTable = $('#productTable').DataTable({
+    var table = $('#productTable').DataTable({
         responsive: true,
         searching: true,
         paging: true,
@@ -152,28 +152,18 @@ $(document).ready(function() {
                 $('#updateSellingPriceModal').find('button[type=submit]').attr('disabled', true).text('Updating...');
             },
             success: function(response) {
-                const rowIdx = productTable.rows().eq(0).filter(function(idx) {
-                    return productTable.cell(idx, 0).data() === $('#sellingProductName').val();
-                });
-
-                if (rowIdx.length) {
-                    const rowData = productTable.row(rowIdx[0]).data() || []; // Ensure rowData is an array
-
-                    // Update the row data safely
-                    productTable.row(rowIdx[0]).data({
-                        0: $('#sellingProductName').val(),
-                        1: response.new_stock !== undefined ? response.new_stock : rowData[1], // Keep current if undefined
-                        2: `Ksh ${response.cost_price}`, // Keep cost price
-                        3: `Ksh ${response.selling_price}`, // Updated selling price
-                        4: rowData[4] !== undefined ? rowData[4] : 'N/A' // Keep actions column if available
-                    }).draw(false);
-                } else {
-                    console.error("Row not found for updating selling price.");
-                }
+                // Update the DataTable row with new data
+                table.row($(this).closest('tr')).data([
+                    $('#sellingProductName').val(),
+                    response.new_stock,
+                    `Ksh ${response.cost_price}`,
+                    `Ksh ${response.selling_price}`,
+                    $(this).closest('tr').find('td:last-child').html() // Keep actions column as is
+                ]).draw(false);
 
                 $('#updateSellingPriceModal').modal('hide');
                 $('#updateSellingPriceForm')[0].reset(); // Reset the form fields
-                alert(response.message); // Show success message
+                alert(response.message); // Success message
             },
             error: function(xhr) {
                 alert(xhr.responseJSON.message || 'An error occurred. Please try again.');
@@ -210,28 +200,18 @@ $(document).ready(function() {
                 $('#updateCostPriceModal').find('button[type=submit]').attr('disabled', true).text('Updating...');
             },
             success: function(response) {
-                const rowIdx = productTable.rows().eq(0).filter(function(idx) {
-                    return productTable.cell(idx, 0).data() === $('#costProductName').val();
-                });
-
-                if (rowIdx.length) {
-                    const rowData = productTable.row(rowIdx[0]).data() || []; // Ensure rowData is an array
-
-                    // Update the row data safely
-                    productTable.row(rowIdx[0]).data({
-                        0: $('#costProductName').val(),
-                        1: rowData[1], // Keep current stock as is
-                        2: `Ksh ${response.cost_price}`, // Updated cost price
-                        3: rowData[3], // Keep selling price as is
-                        4: rowData[4] // Keep actions column as is
-                    }).draw(false);
-                } else {
-                    console.error("Row not found for updating cost price.");
-                }
+                // Update the DataTable row with new data
+                table.row($(this).closest('tr')).data([
+                    $('#costProductName').val(),
+                    $(this).closest('tr').find('td:nth-child(2)').text(), // Keep current stock as is
+                    `Ksh ${response.cost_price}`,
+                    $(this).closest('tr').find('td:nth-child(4)').text(), // Keep selling price as is
+                    $(this).closest('tr').find('td:last-child').html() // Keep actions column as is
+                ]).draw(false);
 
                 $('#updateCostPriceModal').modal('hide');
                 $('#updateCostPriceForm')[0].reset(); // Reset the form fields
-                alert(response.message); // Show success message
+                alert(response.message); // Success message
             },
             error: function(xhr) {
                 alert(xhr.responseJSON.message || 'An error occurred. Please try again.');
@@ -242,9 +222,5 @@ $(document).ready(function() {
         });
     });
 });
-
 </script>
-
-<!-- Include DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/bootstrap4.min.css">
 {% endblock %}

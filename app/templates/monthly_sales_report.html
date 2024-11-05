@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container-fluid mt-4">
-    <h1 class="text-center mb-4">Monthly Sales Report for {{ sales[0].date.strftime('%B %Y') if sales else 'N/A' }}</h1>
+    <h3 class="text-center mb-4">Monthly Sales Report for {{ sales[0].date.strftime('%B %Y') if sales else 'N/A' }}</h3>
 
     <form method="GET" action="{{ url_for('sales.monthly_sales_report') }}" class="mb-4">
         <div class="form-group">

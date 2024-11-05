@@ -20,11 +20,11 @@ def create_admin():
     if not admin_user:
         admin_user = User(
             username='admin',
-            role=Role.ADMIN  # Assuming Role is an Enum or constant for roles
+            role=Role.ADMIN  
         )
-        admin_user.set_password('12x12x')  # Set and hash the password
+        admin_user.set_password('12x')  
         db.session.add(admin_user)
-        db.session.commit()  # Commit the new admin
+        db.session.commit()  
 
         print("New admin user created successfully!")
     else:
