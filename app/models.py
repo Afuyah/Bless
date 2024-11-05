@@ -32,6 +32,7 @@ import enum
 
 class AdjustmentType(enum.Enum):
     addition = "addition"  # Adding stock
+    reduction = "reduction"
     returned = "returned"  # Stock returned from sales
     inventory_adjustment = "inventory_adjustment"  # Adjustments made during inventory counts
     damage = "damage"  # Stock that is damaged and unsellable
