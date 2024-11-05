@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container-fluid mt-4">
-    <h4 class="text-center mb-4 display-4 font-weight-bold" style="color: #007bff;">Sales Report for {{ sales[0].date.strftime('%B %Y') if sales else 'N/A' }}</h4>
+    <h4 class="text-center mb-4 display-5 " style="color: #007bff;">Sales Report for {{ sales[0].date.strftime('%B %Y') if sales else 'N/A' }}</h4>
 
     <form method="GET" action="{{ url_for('sales.monthly_sales_report') }}" class="mb-4">
         <div class="form-group">
@@ -17,19 +17,19 @@
         <div class="card text-white bg-success shadow">
             <div class="card-body text-center">
                 <h5 class="card-title">Total Sales</h5>
-                <p class="card-text display-4 font-weight-bold">Ksh {{ total_sales }}</p>
+                <p class="card-text display-5 font-weight-bold">Ksh {{ total_sales }}</p>
             </div>
         </div>
         <div class="card text-white bg-info shadow">
             <div class="card-body text-center">
                 <h5 class="card-title">Total Transactions</h5>
-                <p class="card-text display-4 font-weight-bold">{{ total_transactions }}</p>
+                <p class="card-text display-5 font-weight-bold">{{ total_transactions }}</p>
             </div>
         </div>
         <div class="card text-white bg-warning shadow">
             <div class="card-body text-center">
                 <h5 class="card-title">Total Profit</h5>
-                <p class="card-text display-4 font-weight-bold">Ksh {{ total_profit }}</p>
+                <p class="card-text display-5 font-weight-bold">Ksh {{ total_profit }}</p>
             </div>
         </div>
     </div>
