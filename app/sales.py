@@ -274,7 +274,7 @@ def filter_sales_report():
 
     if not start_date_str or not end_date_str:
         flash("Please provide both start and end dates", "warning")
-        return redirect(url_for('sales_bp.daily_sales_report'))
+        return redirect(url_for('sales.daily_sales_report'))
 
     # Parse dates with error handling
     try:
@@ -283,10 +283,10 @@ def filter_sales_report():
         
         if start_date > end_date:
             flash("Start date must be before or equal to end date.", "warning")
-            return redirect(url_for('sales_bp.daily_sales_report'))
+            return redirect(url_for('sales.daily_sales_report'))
     except ValueError:
         flash("Invalid date format. Please use YYYY-MM-DD.", "danger")
-        return redirect(url_for('sales_bp.daily_sales_report'))
+        return redirect(url_for('sales.daily_sales_report'))
 
     # Fetch sales within the specified date range
     sales = Sale.query.filter(Sale.date >= start_date, Sale.date <= end_date).all()
@@ -343,7 +343,6 @@ def filter_sales_report():
 @login_required
 def monthly_sales_report():
     month_str = request.args.get('month', datetime.today().strftime('%Y-%m'))
-    
     try:
         report_month = datetime.strptime(month_str, '%Y-%m').date()
     except ValueError:
@@ -365,4 +364,4 @@ def monthly_sales_report():
                            total_sales=round(total_sales, 2), 
                            total_transactions=total_transactions, 
                            total_profit=round(total_profit, 2),
-                           report_month=report_month)  # Pass the report_month for display
+                           datetime=datetime) 

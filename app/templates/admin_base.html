@@ -34,13 +34,15 @@
     <div class="sidebar" id="sidebar">
         <h3>Nawiri's Enterprise</h3>
         <a href="{{ url_for('auth.admin_dashboard') }}" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <a href="{{ url_for('sales.daily_sales_report') }}"><i class="fas fa-chart-line"></i> Sales Reports</a>
-        <a href="{{ url_for('sales.monthly_sales_report') }}" class="nav-link"><i class="fas fa-calendar-alt"></i> Monthly Sales Report</a>
+        
         <a href="{{ url_for('stock.products') }}"><i class="fas fa-box"></i> Product Management</a>
         <a href="{{ url_for('stock.categories') }}"><i class="fas fa-tags"></i> Manage Categories</a>
         <a href="{{ url_for('stock.update_stock_page') }}"><i class="fas fa-dollar-sign"></i> Prices Updates</a>
-        <a href="{{ url_for('auth.user_management') }}"><i class="fas fa-user-cog"></i> User Management</a>
+        <a href="{{ url_for('sales.daily_sales_report') }}"><i class="fas fa-chart-line"></i> Daily Sales Reports</a>
+        <a href="{{ url_for('sales.monthly_sales_report') }}" class="nav-link"><i class="fas fa-calendar-alt"></i> Monthly Sales Report</a>
+        
         <a href="{{ url_for('stock.stock_logs') }}" class="nav-link"><i class="fas fa-file-alt"></i> View Stock Logs</a>
+        <a href="{{ url_for('auth.user_management') }}"><i class="fas fa-user-cog"></i> User Management</a>
         <a class="dropdown-item" href="{{ url_for('auth.change_password') }}"><i class="fas fa-lock"></i> Change Password</a>
         <hr style="border-color: #6c757d; margin: 10px 0;">
         <a href="{{ url_for('auth.logout') }}" class="text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>

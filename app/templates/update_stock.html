@@ -6,12 +6,13 @@
 <div class="container mt-5">
     <h3 class="text-center mb-4 font-weight-bold text-primary">Stock Overview</h3>
 
-    <div class="mb-4">
+    <div class="mb-4 d-flex justify-content-between">
         <input type="text" id="productSearch" class="form-control rounded-pill shadow-sm border-0" placeholder="Search products..." aria-label="Search products">
+        <button id="resetSearch" class="btn btn-outline-secondary shadow-sm ms-2 rounded-pill">Reset Search</button>
     </div>
 
-    <div class="table-responsive shadow-sm">
-        <table class="table table-striped table-bordered" id="productTable">
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered" id="productTable">
             <thead class="thead-dark">
                 <tr>
                     <th>Product</th>
@@ -29,8 +30,12 @@
                     <td>Ksh {{ product.cost_price }}</td>
                     <td>Ksh {{ product.selling_price }}</td>
                     <td>
-                        <button class="btn btn-danger btn-sm shadow-sm update-cost-price-button" data-id="{{ product.id }}" data-price="{{ product.cost_price }}" data-name="{{ product.name }}">Update Cost Price</button>
-                        <button class="btn btn-primary btn-sm shadow-sm update-selling-price-button" data-id="{{ product.id }}" data-price="{{ product.selling_price }}" data-name="{{ product.name }}">Update Selling Price</button>
+                        <button class="btn btn-danger btn-sm shadow-sm update-cost-price-button" data-id="{{ product.id }}" data-price="{{ product.cost_price }}" data-name="{{ product.name }}">
+                            <i class="fas fa-edit"></i> Cost Price
+                        </button>
+                        <button class="btn btn-primary btn-sm shadow-sm update-selling-price-button" data-id="{{ product.id }}" data-price="{{ product.selling_price }}" data-name="{{ product.name }}">
+                            <i class="fas fa-edit"></i> Selling Price
+                        </button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -42,7 +47,7 @@
 <!-- Modal for updating selling price -->
 <div class="modal fade" id="updateSellingPriceModal" tabindex="-1" aria-labelledby="updateSellingPriceModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg border-0" style="border-radius: 15px;">
+        <div class="modal-content shadow-lg border-0 rounded-3">
             <div class="modal-header bg-warning text-dark">
                 <h5 class="modal-title" id="updateSellingPriceModalLabel">Update Selling Price</h5>
                 <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
@@ -66,7 +71,9 @@
                         <input type="number" class="form-control" id="combinationPrice" name="combinationPrice" min="0">
                     </div>
                     <input type="hidden" id="sellingProductId" name="sellingProductId">
-                    <button type="submit" class="btn btn-warning w-100 rounded-pill mt-3 shadow-sm">Update Selling Price</button>
+                    <button type="submit" class="btn btn-warning w-100 rounded-pill mt-3 shadow-sm">
+                        <span id="sellingPriceLoader" class="spinner-border spinner-border-sm d-none"></span> Update Selling Price
+                    </button>
                 </form>
             </div>
         </div>
@@ -76,7 +83,7 @@
 <!-- Modal for updating cost price -->
 <div class="modal fade" id="updateCostPriceModal" tabindex="-1" aria-labelledby="updateCostPriceModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg border-0" style="border-radius: 15px;">
+        <div class="modal-content shadow-lg border-0 rounded-3">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="updateCostPriceModalLabel">Update Cost Price</h5>
                 <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
@@ -92,7 +99,9 @@
                         <input type="number" class="form-control" id="newCostPrice" name="newCostPrice" min="0" required>
                     </div>
                     <input type="hidden" id="costProductId" name="costProductId">
-                    <button type="submit" class="btn btn-danger w-100 rounded-pill mt-3 shadow-sm">Update Cost Price</button>
+                    <button type="submit" class="btn btn-danger w-100 rounded-pill mt-3 shadow-sm">
+                        <span id="costPriceLoader" class="spinner-border spinner-border-sm d-none"></span> Update Cost Price
+                    </button>
                 </form>
             </div>
         </div>
@@ -244,7 +253,5 @@ $(document).ready(function() {
 });
 
 </script>
-
-<!-- Include DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/bootstrap4.min.css">
 {% endblock %}
