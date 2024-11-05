@@ -101,33 +101,26 @@ def delete_category(id: int):
         flash(f"An error occurred while deleting the category: {str(e)}", "danger")
     return redirect(url_for('stock.categories'))
 
-
 @stock_bp.route('/products', methods=['GET'])
 @login_required
 def products():
     # Get the search query from the URL parameters
     search_query = request.args.get('search', '')
-    
-    # Define pagination variables
-    page = request.args.get('page', 1, type=int)  # Get current page, default is 1
-    per_page = 10  # Number of items per page
-    
-    # Query the database and apply pagination
-    products_query = Product.query.filter(Product.name.contains(search_query))
-    pagination = products_query.paginate(page=page, per_page=per_page)
 
-    # Get the actual items for the current page
-    products = pagination.items
+    # Query the database without pagination
+    products_query = Product.query.filter(Product.name.contains(search_query))
     
-    # Use the methods to check the user's role
+    # Get all products
+    products = products_query.all()
+
+    # Render the template with all products
     if current_user.is_admin():
-        return render_template('products.html', products=products, pagination=pagination, search_query=search_query)
+        return render_template('products.html', products=products, search_query=search_query)
     elif current_user.is_cashier():
-        return render_template('cashier_products_view.html', products=products, pagination=pagination, search_query=search_query)
+        return render_template('cashier_products_view.html', products=products, search_query=search_query)
     else:
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('home.index'))  # Redirect to a safe place if the user role is not recognized
-
 
 @stock_bp.route('/products/new', methods=['GET', 'POST'])
 @login_required

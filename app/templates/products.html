@@ -136,8 +136,10 @@ $(document).ready(function() {
     // Initialize DataTable
     const productTable = $('#productTable').DataTable({
         searching: true,
-        paging: true,
+        paging: true, // Keep this true to allow DataTables to handle pagination
         ordering: true,
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]], // Options for number of entries per page
+        pageLength: 10, // Set the default display length to 10
         language: {
             searchPlaceholder: "Search products...",
             search: ""
@@ -154,19 +156,30 @@ $(document).ready(function() {
     $('#stockFilter').on('change', function() {
         const filterValue = $(this).val();
         productTable.rows().every(function() {
-            const data = this.data();
             const rowNode = this.node();
 
             if (filterValue === 'all' || 
                 (filterValue === 'low' && $(rowNode).hasClass('stock-level-low')) ||
                 (filterValue === 'medium' && $(rowNode).hasClass('stock-level-medium')) ||
                 (filterValue === 'high' && $(rowNode).hasClass('stock-level-high'))) {
-                $(rowNode).show();
+                $(rowNode).show(); // Show row if it matches the filter
             } else {
-                $(rowNode).hide();
+                $(rowNode).hide(); // Hide row if it doesn't match
             }
         });
+
+        // Redraw the table after filtering
+        productTable.draw();
+    });
+
+    // Handle "All" length menu selection
+    $('#productTable_length select').on('change', function() {
+        const perPage = $(this).val();
+        // Set the DataTable page length
+        productTable.page.len(perPage).draw();
     });
 });
 </script>
+
+
 {% endblock %}
