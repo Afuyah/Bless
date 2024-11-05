@@ -29,7 +29,6 @@
                     <td>Ksh {{ product.cost_price }}</td>
                     <td>Ksh {{ product.selling_price }}</td>
                     <td>
-                        <!--<button class="btn btn-info btn-sm shadow-sm update-stock-button" data-id="{{ product.id }}" data-name="{{ product.name }}">Add Stock</button>-->
                         <button class="btn btn-danger btn-sm shadow-sm update-cost-price-button" data-id="{{ product.id }}" data-price="{{ product.cost_price }}" data-name="{{ product.name }}">Update Cost Price</button>
                         <button class="btn btn-primary btn-sm shadow-sm update-selling-price-button" data-id="{{ product.id }}" data-price="{{ product.selling_price }}" data-name="{{ product.name }}">Update Selling Price</button>
                     </td>
@@ -37,32 +36,6 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-</div>
-
-<!-- Modal for updating stock -->
-<div class="modal fade" id="updateStockModal" tabindex="-1" aria-labelledby="updateStockModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg border-0" style="border-radius: 15px;">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="updateStockModalLabel">Add Stock</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form id="updateStockForm">
-                    <div class="mb-3">
-                        <label for="productName" class="form-label">Product Name</label>
-                        <input type="text" class="form-control bg-light border-0" id="productName" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="newStock" class="form-label">New Stock Quantity</label>
-                        <input type="number" class="form-control" id="newStock" name="newStock" min="1" required>
-                    </div>
-                    <input type="hidden" id="productId" name="productId">
-                    <button type="submit" class="btn btn-primary w-100 rounded-pill mt-3 shadow-sm">Update Stock</button>
-                </form>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -83,6 +56,14 @@
                     <div class="mb-3">
                         <label for="newSellingPrice" class="form-label">New Selling Price (Ksh)</label>
                         <input type="number" class="form-control" id="newSellingPrice" name="newSellingPrice" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="combinationSize" class="form-label">Combination Size (optional)</label>
+                        <input type="number" class="form-control" id="combinationSize" name="combinationSize" min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="combinationPrice" class="form-label">Combination Price (optional)</label>
+                        <input type="number" class="form-control" id="combinationPrice" name="combinationPrice" min="0">
                     </div>
                     <input type="hidden" id="sellingProductId" name="sellingProductId">
                     <button type="submit" class="btn btn-warning w-100 rounded-pill mt-3 shadow-sm">Update Selling Price</button>
@@ -121,176 +102,106 @@
 <!-- Include jQuery and Bootstrap scripts -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
-<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
 
 <script>
 $(document).ready(function() {
-    // Initialize DataTable
-    $('#productTable').DataTable({
-        searching: false,
-        paging: true,
-        order: [],
-        columnDefs: [
-            { orderable: false, targets: 4 }
-        ]
-    });
-
-    // Real-time product search
-    $('#productSearch').on('keyup', function() {
-        let searchTerm = $(this).val().toLowerCase();
-        $('#productTable tbody tr').filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(searchTerm) > -1);
-        });
-    });
-
-    // Open modals with product details
-    $(document).on('click', '.update-stock-button, .update-selling-price-button, .update-cost-price-button', function() {
-        const action = $(this).hasClass('update-stock-button') ? 'stock' : 
-                       $(this).hasClass('update-selling-price-button') ? 'sellingPrice' : 'costPrice';
+    // Open the selling price modal and populate fields
+    $(document).on('click', '.update-selling-price-button', function() {
         const productId = $(this).data('id');
         const productName = $(this).data('name');
+        const sellingPrice = $(this).data('price');
 
-        if (action === 'stock') {
-            $('#productId').val(productId);
-            $('#productName').val(productName);
-            $('#updateStockModal').modal('show');
-        } else if (action === 'sellingPrice') {
-            $('#sellingProductId').val(productId);
-            $('#sellingProductName').val(productName);
-            $('#newSellingPrice').val($(this).data('price'));
-            $('#updateSellingPriceModal').modal('show');
-        } else if (action === 'costPrice') {
-            $('#costProductId').val(productId);
-            $('#costProductName').val(productName);
-            $('#newCostPrice').val($(this).data('price'));
-            $('#updateCostPriceModal').modal('show');
-        }
+        $('#sellingProductId').val(productId);
+        $('#sellingProductName').val(productName);
+        $('#newSellingPrice').val(sellingPrice);
+        $('#combinationSize').val('');  // Reset fields
+        $('#combinationPrice').val('');
+        $('#updateSellingPriceModal').modal('show');
     });
 
-    // Handle form submissions with AJAX
-    const handleFormSubmit = (formSelector, urlFunc, dataFunc, modalToClose, successCallback) => {
-        $(formSelector).on('submit', function(event) {
-            event.preventDefault();
+    // Handle selling price update form submission
+    $('#updateSellingPriceForm').on('submit', function(event) {
+        event.preventDefault();
 
-            const url = typeof urlFunc === 'function' ? urlFunc() : urlFunc;
-            const data = typeof dataFunc === 'function' ? dataFunc() : dataFunc;
+        const sellingPriceData = {
+            selling_price: $('#newSellingPrice').val(),
+            combination_size: $('#combinationSize').val() || null,
+            combination_price: $('#combinationPrice').val() || null
+        };
 
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: data,
-                success: function(response) {
-                    $(modalToClose).modal('hide'); // Close the modal
-                    alert(response.message); // Show success message
-                    successCallback(response);
-                },
-                error: function(xhr) {
-                    alert(xhr.responseJSON.message || 'An error occurred.'); // Show error message
-                }
-            });
-        });
-    };
-
-    // Update stock
-    handleFormSubmit('#updateStockForm', function() {
-        return `/stock/products/${$('#productId').val()}/update_stock`;
-    }, function() {
-        return { quantity: $('#newStock').val() };
-    }, '#updateStockModal', function(response) {
-        $(`#productTable tbody tr`).each(function() {
-            if ($(this).find('td:eq(0)').text() === $('#productName').val()) {
-                const currentStock = parseInt($(this).find('td:eq(1)').text());
-                $(this).find('td:eq(1)').text(currentStock + parseInt($('#newStock').val()));
+        $.ajax({
+            type: 'POST',
+            url: `/stock/products/${$('#sellingProductId').val()}/update_selling_price`,
+            data: sellingPriceData,
+            beforeSend: function() {
+                $('#updateSellingPriceModal').find('button[type=submit]').attr('disabled', true).text('Updating...');
+            },
+            success: function(response) {
+                $(`#productTable tbody tr`).each(function() {
+                    if ($(this).find('td:eq(0)').text() === $('#sellingProductName').val()) {
+                        $(this).find('td:eq(3)').text(`Ksh ${response.selling_price}`);
+                        if (response.combination_size) {
+                            // Optionally show combination details
+                            $(this).attr('data-combination', `Size: ${response.combination_size}, Price: Ksh ${response.combination_price}`);
+                        }
+                    }
+                });
+                alert(response.message);
+                $('#updateSellingPriceModal').modal('hide');
+                $('#updateSellingPriceForm')[0].reset(); // Reset the form fields
+            },
+            error: function(xhr) {
+                alert(xhr.responseJSON.message || 'An error occurred. Please try again.');
+            },
+            complete: function() {
+                $('#updateSellingPriceModal').find('button[type=submit]').attr('disabled', false).text('Update Selling Price');
             }
         });
     });
 
-    // Update selling price
-    handleFormSubmit('#updateSellingPriceForm', function() {
-        return `/stock/products/${$('#sellingProductId').val()}/update_selling_price`;
-    }, function() {
-        return { selling_price: $('#newSellingPrice').val() };
-    }, '#updateSellingPriceModal', function(response) {
-        $(`#productTable tbody tr`).each(function() {
-            if ($(this).find('td:eq(0)').text() === $('#sellingProductName').val()) {
-                $(this).find('td:eq(3)').text(`Ksh ${$('#newSellingPrice').val()}`);
-            }
-        });
+    // Open the cost price modal and populate fields
+    $(document).on('click', '.update-cost-price-button', function() {
+        const productId = $(this).data('id');
+        const productName = $(this).data('name');
+        const costPrice = $(this).data('price');
+
+        $('#costProductId').val(productId);
+        $('#costProductName').val(productName);
+        $('#newCostPrice').val(costPrice);
+        $('#updateCostPriceModal').modal('show');
     });
 
-    // Update cost price
-    handleFormSubmit('#updateCostPriceForm', function() {
-        return `/stock/products/${$('#costProductId').val()}/update_cost_price`;
-    }, function() {
-        return { cost_price: $('#newCostPrice').val() };
-    }, '#updateCostPriceModal', function(response) {
-        $(`#productTable tbody tr`).each(function() {
-            if ($(this).find('td:eq(0)').text() === $('#costProductName').val()) {
-                $(this).find('td:eq(2)').text(`Ksh ${$('#newCostPrice').val()}`);
+    // Handle cost price update form submission
+    $('#updateCostPriceForm').on('submit', function(event) {
+        event.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: `/stock/products/${$('#costProductId').val()}/update_cost_price`,
+            data: {
+                cost_price: $('#newCostPrice').val()
+            },
+            beforeSend: function() {
+                $('#updateCostPriceModal').find('button[type=submit]').attr('disabled', true).text('Updating...');
+            },
+            success: function(response) {
+                $(`#productTable tbody tr`).each(function() {
+                    if ($(this).find('td:eq(0)').text() === $('#costProductName').val()) {
+                        $(this).find('td:eq(2)').text(`Ksh ${response.cost_price}`);
+                    }
+                });
+                alert(response.message);
+                $('#updateCostPriceModal').modal('hide');
+                $('#updateCostPriceForm')[0].reset(); // Reset the form fields
+            },
+            error: function(xhr) {
+                alert(xhr.responseJSON.message || 'An error occurred. Please try again.');
+            },
+            complete: function() {
+                $('#updateCostPriceModal').find('button[type=submit]').attr('disabled', false).text('Update Cost Price');
             }
         });
     });
 });
 </script>
-
-<style>
-    body {
-        background-color: #f8f9fa; /* Light background for a clean look */
-    }
-
-    .table th {
-        background-color: #343a40; /* Dark background for table headers */
-        color: white;
-        text-align: center; /* Center align headers */
-    }
-
-    .table td {
-        vertical-align: middle; /* Center content vertically */
-        text-align: center; /* Center align cell content */
-    }
-
-    .modal-content {
-        transition: transform 0.3s ease;
-        border-radius: 15px; /* Rounded corners for modals */
-    }
-
-    .modal-header {
-        border-bottom: none; /* Remove bottom border */
-    }
-
-    .modal-body {
-        padding: 2rem; /* Increased padding for a spacious look */
-    }
-
-    .btn {
-        transition: background-color 0.3s, color 0.3s; /* Smooth transition for buttons */
-    }
-
-    .btn:hover {
-        opacity: 0.9; /* Slight opacity change on hover */
-    }
-
-    /* Button colors */
-    .btn-info {
-        background-color: #17a2b8; /* Bootstrap info color */
-        border-color: #17a2b8;
-    }
-
-    .btn-danger {
-        background-color: #dc3545; /* Bootstrap danger color */
-        border-color: #dc3545;
-    }
-
-    .btn-primary {
-        background-color: #007bff; /* Bootstrap primary color */
-        border-color: #007bff;
-    }
-
-    .btn-warning {
-        background-color: #ffc107; /* Bootstrap warning color */
-        border-color: #ffc107;
-    }
-</style>
-
 {% endblock %}

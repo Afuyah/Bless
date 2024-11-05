@@ -25,6 +25,8 @@
         <h3>Nawiri's Enterprise</h3>
         <a href="{{ url_for('auth.admin_dashboard') }}" class="active">Dashboard</a>
         <a href="{{ url_for('sales.daily_sales_report') }}">Sales Reports</a>
+        <a href="{{ url_for('sales.monthly_sales_report') }}" class="nav-link">Monthly Sales Report</a>
+
         <a href="{{ url_for('stock.products') }}">Product Management</a>
         <a href="{{ url_for('stock.categories') }}">Manage Categories</a>
         <a href="{{ url_for('stock.update_stock_page') }}">Prices  Updates</a>

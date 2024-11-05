@@ -359,23 +359,45 @@ def update_stock(product_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': f'An unexpected error occurred: {str(e)}'}), 500
-
-# Route to update selling price
 @stock_bp.route('/products/<int:product_id>/update_selling_price', methods=['POST'])
 @login_required
 def update_selling_price(product_id):
     product = Product.query.get_or_404(product_id)
-    new_selling_price = request.form.get('selling_price', type=float)
 
-    if new_selling_price is None or new_selling_price < 0:
+    # Get the form data
+    new_selling_price = request.form.get('selling_price', type=float)
+    combination_size = request.form.get('combination_size', type=int)
+    combination_price = request.form.get('combination_price', type=float)
+
+    # Validate inputs
+    if new_selling_price is None and (combination_size is None or combination_price is None):
+        return jsonify({'message': 'Invalid selling price or combination values'}), 400
+    if new_selling_price is not None and new_selling_price < 0:
         return jsonify({'message': 'Invalid selling price value'}), 400
+    if combination_size is not None and combination_price is not None:
+        if combination_size <= 0 or combination_price <= 0:
+            return jsonify({'message': 'Combination size and price must be positive values'}), 400
 
     try:
-        product.selling_price = new_selling_price
+        # Update the selling price directly
+        if new_selling_price is not None:
+            product.selling_price = new_selling_price
+        
+        # Update combination details if provided
+        if combination_size is not None and combination_price is not None:
+            product.combination_size = combination_size
+            product.combination_price = combination_price
+            product.combination_unit_price = combination_price / combination_size if combination_size > 0 else None
+
+        # Commit the changes to the database
         db.session.commit()
+
         return jsonify({
             'message': 'Selling price updated successfully',
-            'selling_price': str(product.selling_price)
+            'selling_price': str(product.selling_price),
+            'combination_size': product.combination_size,
+            'combination_price': str(product.combination_price),
+            'combination_unit_price': str(product.combination_unit_price) if product.combination_unit_price is not None else None
         }), 200
     except IntegrityError:
         db.session.rollback()

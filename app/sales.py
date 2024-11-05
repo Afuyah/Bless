@@ -5,7 +5,7 @@ from app import  socketio
 from flask_socketio import emit
 from collections import defaultdict
 from sqlalchemy import func
-
+from datetime import datetime
 
 from datetime import datetime, timedelta
 
@@ -275,7 +275,7 @@ def filter_sales_report():
 
     if not start_date_str or not end_date_str:
         flash("Please provide both start and end dates", "warning")
-        return redirect(url_for('sales_bp.daily_sales_report'))
+        return redirect(url_for('sales.daily_sales_report'))
 
     # Parse dates with error handling
     try:
@@ -331,3 +331,31 @@ def filter_sales_report():
                            unique_products=unique_products, 
                            most_sold_item=most_sold_item, 
                            most_sold_quantity=most_sold_quantity)
+
+
+@sales_bp.route('/reports/monthly', methods=['GET'])
+@login_required
+def monthly_sales_report():
+    month_str = request.args.get('month', datetime.today().strftime('%Y-%m'))
+    try:
+        report_month = datetime.strptime(month_str, '%Y-%m').date()
+    except ValueError:
+        flash("Invalid month format. Please use YYYY-MM.", "danger")
+        return redirect(url_for('sales_bp.monthly_sales_report'))
+
+    # Fetch sales for the specified month
+    sales = Sale.query.filter(func.extract('year', Sale.date) == report_month.year,
+                               func.extract('month', Sale.date) == report_month.month).all()
+
+    # Calculate total sales, transactions, and profit
+    total_sales = sum(sale.total for sale in sales)
+    total_transactions = len(sales)
+    total_profit = sum(sale.profit for sale in sales)
+
+    # Render the report template with calculated values and the datetime module
+    return render_template('monthly_sales_report.html', 
+                           sales=sales, 
+                           total_sales=round(total_sales, 2), 
+                           total_transactions=total_transactions, 
+                           total_profit=round(total_profit, 2),
+                           datetime=datetime) 
