@@ -616,9 +616,8 @@ def get_stock_logs():
             'date': log.date.isoformat(),        # Convert datetime to string
             'previous_stock': log.previous_stock,
             'new_stock': log.new_stock,
-            'adjustment_type': log.adjustment_type.value,  # Make sure to call .value on the Enum
-            'change_reason': log.change_reason,
-            'log_metadata': log.log_metadata
+            'adjustment_type': log.adjustment_type.value
+            
         } for log, log.product_name, log.user_name in stock_logs]  # Unpacking the query results
 
         return jsonify({'stock_logs': stock_logs_data}), 200

@@ -102,9 +102,24 @@
 <!-- Include jQuery and Bootstrap scripts -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
 
 <script>
 $(document).ready(function() {
+    // Initialize DataTable
+    $('#productTable').DataTable({
+        responsive: true,
+        searching: true,
+        paging: true,
+        order: [[ 0, 'asc' ]],
+        language: {
+            search: "Search:",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+        }
+    });
+
     // Open the selling price modal and populate fields
     $(document).on('click', '.update-selling-price-button', function() {
         const productId = $(this).data('id');
@@ -137,20 +152,23 @@ $(document).ready(function() {
                 $('#updateSellingPriceModal').find('button[type=submit]').attr('disabled', true).text('Updating...');
             },
             success: function(response) {
-                $(`#productTable tbody tr`).each(function() {
-                    if ($(this).find('td:eq(0)').text() === $('#sellingProductName').val()) {
-                        $(this).find('td:eq(3)').text(`Ksh ${response.selling_price}`);
-                        if (response.combination_size) {
-                            // Optionally show combination details
-                            $(this).attr('data-combination', `Size: ${response.combination_size}, Price: Ksh ${response.combination_price}`);
-                        }
-                    }
-                });
-                alert(response.message);
+                $('#productTable').DataTable().row((idx, data) => {
+                    return data[0] === $('#sellingProductName').val();
+                }).data({
+                    0: $('#sellingProductName').val(),
+                    1: response.new_stock,
+                    2: `Ksh ${response.cost_price}`,
+                    3: `Ksh ${response.selling_price}`,
+                    4: data[4] // keep actions column as is
+                }).draw(false);
+
                 $('#updateSellingPriceModal').modal('hide');
                 $('#updateSellingPriceForm')[0].reset(); // Reset the form fields
+                // Optional: Show success message (consider using a toast notification instead)
+                alert(response.message);
             },
             error: function(xhr) {
+                // Display error in a more user-friendly way, consider using a modal or toast
                 alert(xhr.responseJSON.message || 'An error occurred. Please try again.');
             },
             complete: function() {
@@ -185,16 +203,23 @@ $(document).ready(function() {
                 $('#updateCostPriceModal').find('button[type=submit]').attr('disabled', true).text('Updating...');
             },
             success: function(response) {
-                $(`#productTable tbody tr`).each(function() {
-                    if ($(this).find('td:eq(0)').text() === $('#costProductName').val()) {
-                        $(this).find('td:eq(2)').text(`Ksh ${response.cost_price}`);
-                    }
-                });
-                alert(response.message);
+                $('#productTable').DataTable().row((idx, data) => {
+                    return data[0] === $('#costProductName').val();
+                }).data({
+                    0: $('#costProductName').val(),
+                    1: data[1], // keep current stock as is
+                    2: `Ksh ${response.cost_price}`,
+                    3: data[3], // keep selling price as is
+                    4: data[4] // keep actions column as is
+                }).draw(false);
+
                 $('#updateCostPriceModal').modal('hide');
                 $('#updateCostPriceForm')[0].reset(); // Reset the form fields
+                // Optional: Show success message
+                alert(response.message);
             },
             error: function(xhr) {
+                // Display error in a more user-friendly way
                 alert(xhr.responseJSON.message || 'An error occurred. Please try again.');
             },
             complete: function() {
@@ -204,4 +229,7 @@ $(document).ready(function() {
     });
 });
 </script>
+
+<!-- Include DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/bootstrap4.min.css">
 {% endblock %}
