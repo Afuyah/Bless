@@ -87,7 +87,6 @@
     .stock-level-low td {
         color: #dc3545;
         font-weight: bold;
-        background-color: #ffe5e5; /* Light red background for visibility */
     }
     .stock-level-medium td {
         color: #fd7e14;
@@ -145,30 +144,7 @@ $(document).ready(function() {
         },
         columnDefs: [
             { orderable: false, targets: [4] } // Disable ordering on the Action column
-        ],
-        // Custom sorting for stock levels
-        rowCallback: function(row, data, index) {
-            const stockLevel = $(row).attr('class');
-            if (stockLevel.includes('stock-level-low')) {
-                $(row).addClass('highlight-low'); // Add class for low stock highlighting
-            }
-        }
-    });
-
-    // Sort by stock level first
-    productTable.on('order.dt', function() {
-        const order = productTable.order();
-        if (order[0][0] === 1) {
-            const data = productTable.rows().data().toArray();
-            const sortedData = data.sort((a, b) => {
-                const stockA = $(a).hasClass('stock-level-low') ? 0 :
-                               $(a).hasClass('stock-level-medium') ? 1 : 2;
-                const stockB = $(b).hasClass('stock-level-low') ? 0 :
-                               $(b).hasClass('stock-level-medium') ? 1 : 2;
-                return stockA - stockB;
-            });
-            productTable.clear().rows.add(sortedData).draw();
-        }
+        ]
     });
 
     // Initialize Bootstrap Tooltips

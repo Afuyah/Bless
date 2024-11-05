@@ -494,7 +494,7 @@ def get_low_stock_products():
             'id': product.id,
             'name': product.name,
             'stock': product.stock,
-            'cost_price': product.cost_price,  # Include cost price
+            'cost_price': product.cost_price,  
             'selling_price': product.selling_price  # Include selling price
         }
         for product in low_stock_products
