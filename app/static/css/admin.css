@@ -20,6 +20,7 @@ body {
     transition: transform 0.3s ease-in-out;
     overflow-y: auto;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 100; /* Ensure sidebar is above content */
 }
 
 .sidebar h3 {
@@ -61,9 +62,10 @@ body {
 
 /* Main content styles */
 .content {
-    margin-left: 260px;
-    padding: 25px;
+    margin-left: 300px;
+    
     transition: margin-left 0.3s;
+    max-width: calc(100% - 300px); /* Occupy full width minus sidebar on large screens */
 }
 
 /* Sidebar hidden for small screens */
@@ -92,6 +94,8 @@ footer {
 
     .content {
         margin-left: 0;
+       
+        max-width: 100%; /* Full width on small screens */
     }
 
     .sidebar-toggle {
@@ -104,6 +108,6 @@ footer {
     }
 
     .sidebar-visible .content {
-        margin-left: 250px;
+        margin-left: 0; /* Content takes full width when sidebar is visible on small screens */
     }
 }

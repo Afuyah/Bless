@@ -46,7 +46,7 @@ body, .modal-title, .modal-body {
             background-color: inherit; /* White background for the form */
             max-width: 600px; /* Limit max width */
             width: 100%; /* Full width on smaller screens */
-            border: 1px solid #ccc; /* Light border */
+            
            
             padding: 2rem;
             margin: auto;
