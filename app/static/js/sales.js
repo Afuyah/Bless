@@ -1,47 +1,41 @@
 
 
-let cart = [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 // Fetch products based on category
 $(document).on('click', '.category-item', function () {
     const categoryId = $(this).data('category');
 
-    // Optimistically update the UI
-    $('#product-list').html('<p>Loading products...</p>'); // Show loading indicator
-    $('#no-products').hide(); // Hide no-products message
-
-    // Optionally display a temporary product list (can be empty or cached data)
-    // Example of temporary placeholder (You can modify or remove this part)
-    const temporaryProducts = [
-        { name: "Loading...", selling_price: "0.00", stock: "..." }
-    ];
-    populateProducts(temporaryProducts);
+    // Show loading indicator while products load
+    $('#product-list').html('<p>Loading products...</p>');
+    $('#no-products').hide();
 
     $.ajax({
-        url: `/sales/api/products/${categoryId}`, // Flask API endpoint to fetch products by category
+        url: `/sales/api/products/${categoryId}`,  // Flask API endpoint
         method: 'GET',
         success: function (data) {
             if (data.products && data.products.length > 0) {
-                populateProducts(data.products); // Update with actual data
+                populateProducts(data.products);  // Populate with fetched data
             } else {
-                $('#product-list').empty(); // Clear product list
-                $('#no-products').show(); // Show fallback when no products are found
+                $('#product-list').empty();
+                $('#no-products').show();
             }
         },
         error: function () {
             showError('Failed to load products. Please try again.');
-            $('#product-list').empty(); // Clear the product list on error
+            $('#product-list').empty();
         }
     });
 });
 
-
+// Format currency for product prices
 function formatCurrency(value) {
     return parseFloat(value).toFixed(2);
 }
 
+// Populate products list dynamically
 function populateProducts(products) {
-    $('#product-list').empty(); // Clear previous product listings
+    $('#product-list').empty();
 
     if (products.length === 0) {
         $('#product-list').append('<p class="text-muted">No products available.</p>');
@@ -69,7 +63,63 @@ function populateProducts(products) {
     });
 }
 
-// Make the entire card clickable to add to cart
+// Example showError function for displaying errors (toast or modal can be used here)
+function showError(message) {
+    alert(message);  // Replace this with a toast or modal for better UX
+}
+
+
+
+
+// Function to save cart to localStorage
+function saveCartToLocalStorage() {
+    localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+// Function to update cart display and calculate total
+function updateCart() {
+    $('#cart-items').empty();
+    let total = 0;
+
+    cart.forEach(item => {
+        let subtotal = 0;
+        const combinationSize = item.combination_size || 1;
+        const fullCombinations = Math.floor(item.quantity / combinationSize);
+        const remainingUnits = item.quantity % combinationSize;
+        
+        subtotal += fullCombinations * item.combination_price;
+        const individualRemainderPrice = remainingUnits * item.selling_price;
+        
+        if (remainingUnits > 0) {
+            subtotal += Math.min(individualRemainderPrice, item.combination_price);
+        }
+        
+        total += subtotal;
+
+        $('#cart-items').append(`
+            <div class="cart-item">
+                ${item.name} - Ksh ${item.selling_price.toFixed(2)} x ${item.quantity} = Ksh ${subtotal.toFixed(2)}
+                <button class="btn btn-danger btn-sm remove-from-cart" data-id="${item.id}">X</button>
+            </div>
+        `);
+    });
+
+    $('#total-amount').text(total.toFixed(2));
+
+    if (cart.length === 0) {
+        $('#cart-items').append('<p class="text-muted">Your cart is empty.</p>');
+    }
+
+    saveCartToLocalStorage();
+}
+
+// Logout button event to clear the cart
+$(document).on('click', '#logout-button', function () {
+    localStorage.removeItem('cart');
+    window.location.href = "/auth/logout";
+});
+
+// Add item to cart on product click
 $(document).on('click', '.product-item.clickable', function () {
     const productId = $(this).data('id');
     const productName = $(this).data('name');
@@ -78,7 +128,6 @@ $(document).on('click', '.product-item.clickable', function () {
     const productCombinationUnitPrice = parseFloat($(this).data('combination-unit-price')) || 0; 
     const productStock = parseInt($(this).data('stock')) || 0;
 
-    // Prevent adding out-of-stock items
     if (productStock === 0) {
         showError(`"${productName}" is currently out of stock.`);
         return;
@@ -86,16 +135,15 @@ $(document).on('click', '.product-item.clickable', function () {
 
     const existingItem = cart.find(item => item.id === productId);
 
-    // Check if the item is already in the cart and if there is stock available
     if (existingItem) {
         if (existingItem.quantity < productStock) {
-            existingItem.quantity += 1; // Increment quantity if there's stock
+            existingItem.quantity += 1;
         } else {
             showError(`Cannot add more of "${productName}". Stock limit reached.`);
             return;
         }
     } else {
-        if (productStock > 0) { // Ensure there's stock to add
+        if (productStock > 0) {
             cart.push({
                 id: productId,
                 name: productName,
@@ -113,66 +161,37 @@ $(document).on('click', '.product-item.clickable', function () {
     updateCart();
 });
 
-function showError(message) {
-    // Customize this function to display the error in your desired format
-    alert(message); // Example: using alert; replace with modal or toast notification if needed
-}
-
-function updateCart() {
-    // Function to update the cart display (to be implemented as per your setup)
-}
-
-
-// Handle removing items from cart
+// Remove item from cart event
 $(document).on('click', '.remove-from-cart', function () {
     const productId = $(this).data('id');
     cart = cart.filter(item => item.id !== productId);
     updateCart();
 });
 
-// Update the cart summary
-function updateCart() {
-    $('#cart-items').empty();
-    let total = 0;
-
-    cart.forEach(item => {
-        let subtotal = 0;
-
-        // Safeguard against division by zero
-        const combinationSize = item.combination_size || 1; // Default to 1 if undefined
-        const fullCombinations = Math.floor(item.quantity / combinationSize);
-        const remainingUnits = item.quantity % combinationSize;
-
-        // Calculate price using combination pricing for full combinations
-        subtotal += fullCombinations * item.combination_price;
-
-        // Calculate the remaining items' price
-        const individualRemainderPrice = remainingUnits * item.selling_price;
-
-        // Compare remaining items' individual price vs an extra combination price if there are remaining units
-        if (remainingUnits > 0) {
-            subtotal += Math.min(individualRemainderPrice, item.combination_price);
-        }
-
-        total += subtotal;
-
-        // Append item to cart display
-        $('#cart-items').append(`
-            <div class="cart-item">
-                ${item.name} - Ksh ${item.selling_price.toFixed(2)} x ${item.quantity} = Ksh ${subtotal.toFixed(2)}
-                <button class="btn btn-danger btn-sm remove-from-cart" data-id="${item.id}">X</button>
-            </div>
-        `);
-    });
-
-    // Update the total amount display
-    $('#total-amount').text(total.toFixed(2));
-
-    // Optional: Display a message if the cart is empty
-    if (cart.length === 0) {
-        $('#cart-items').append('<p class="text-muted">Your cart is empty.</p>');
+// Clear cart button event
+$(document).on('click', '#clear-cart', function () {
+    if (confirm("Are you sure you want to clear the cart?")) {
+        cart = [];
+        localStorage.removeItem('cart');
+        updateCart();
     }
+});
+
+
+
+
+// Initialize the cart UI on page load
+$(document).ready(function() {
+    updateCart(); // Update the UI based on the loaded cart from local storage
+});
+
+function showError(message) {
+    // Customize this function to display the error in your desired format
+    alert(message); // Example: using alert; replace with modal or toast notification if needed
 }
+
+
+
 // Handle payment method change
 $('#payment-method').change(function () {
     const selectedMethod = $(this).val();
@@ -361,3 +380,19 @@ function showError(message) {
         $('#error-message').hide(); // Hide after 5 seconds
     }, 5000); // Hide after 5 seconds
 }
+
+
+// Function to handle card animations and display adjustments
+function animateCardsOnHover() {
+    const productItems = document.querySelectorAll('.product-item');
+    productItems.forEach(item => {
+        item.addEventListener('mouseover', () => {
+            item.style.transform = 'scale(1.02)';
+        });
+        item.addEventListener('mouseleave', () => {
+            item.style.transform = 'scale(1)';
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', animateCardsOnHover);

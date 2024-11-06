@@ -74,7 +74,7 @@
             <table id="low-stock-table" class="table table-striped table-bordered" style="width:100%">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        
                         <th>Name</th>
                         <th>Stock</th>
                     </tr>
@@ -143,7 +143,7 @@
                         lowStockTable.clear();
 
                         data.products.forEach(product => {
-                            tbody.append(`<tr><td>${product.id}</td><td>${product.name}</td><td>${product.stock}</td></tr>`);
+                            tbody.append(`<tr><td>${product.name}</td><td>${product.stock}</td></tr>`);
                         });
 
                         lowStockTable.rows.add(tbody.find('tr')).draw();

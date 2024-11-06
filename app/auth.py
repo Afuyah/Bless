@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, session
 from flask_login import login_user, logout_user, current_user, login_required
 from sqlalchemy import func
 from app.models import User, db, Role, Sale, Product
@@ -94,7 +94,11 @@ def change_password():
 @login_required
 def logout():
     logger.info(f"User {current_user.username} logged out.")
-    logout_user()
+    
+    # Clear the session (including cart data)
+    session.clear()
+    
+    logout_user()  # Log out the user
     flash('Logged out successfully.', 'success')
     return redirect(url_for('home.index'))
 

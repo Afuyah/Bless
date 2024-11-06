@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for, session
 from flask_login import  current_user, login_required
 from app.models import db, Product, Sale, CartItem, Category
 from app import  socketio
@@ -59,7 +59,6 @@ def get_products_by_category(category_id):
         return jsonify({'error': 'An error occurred while fetching products.'}), 500
 
 
-
 @sales_bp.route('/add_to_cart', methods=['POST'])
 @login_required
 def add_to_cart():
@@ -75,28 +74,38 @@ def add_to_cart():
     if product.stock < quantity:
         return jsonify({'success': False, 'message': 'Insufficient stock'}), 400
 
-    # Determine the subtotal based on quantity
+    # Calculate subtotal based on quantity
     subtotal = 0
     if quantity < product.combination_size:
-        # Use selling price for a single item or quantities below combination size
         subtotal = product.selling_price * quantity
     else:
-        # Use combination price for multiples of the combination size
         subtotal = (quantity // product.combination_size) * product.combination_price
         if quantity % product.combination_size != 0:
-            subtotal += (quantity % product.combination_size) * product.selling_price  # Add the remainder at selling price
+            subtotal += (quantity % product.combination_size) * product.selling_price
 
-    return jsonify({
-        'success': True,
-        'product_id': product.id,
-        'product_name': product.name,
-        'quantity': quantity,
-        'selling_price': product.selling_price,
-        'combination_price': product.combination_price,
-        'subtotal': subtotal  # Return calculated subtotal
-    })
+    # Initialize the cart in session if it doesn't exist
+    if 'cart' not in session:
+        session['cart'] = []
 
+    # Add or update the item in the session cart
+    cart = session['cart']
+    for item in cart:
+        if item['product_id'] == product_id:
+            item['quantity'] += quantity
+            item['subtotal'] += subtotal
+            break
+    else:
+        cart.append({
+            'product_id': product.id,
+            'product_name': product.name,
+            'quantity': quantity,
+            'selling_price': product.selling_price,
+            'combination_price': product.combination_price,
+            'subtotal': subtotal
+        })
 
+    session['cart'] = cart  # Update session cart
+    return jsonify({'success': True, 'cart': session['cart']})
 
     
 @sales_bp.route('/checkout', methods=['POST'])
