@@ -3,7 +3,6 @@
 {% block content %}
 
 <h4 class="mb-4 text-center">Sales Reports</h4>
-<div class="container mt-3">
 
     <!-- Date Range Filter Form -->
     <form method="get" action="{{ url_for('sales.filter_sales_report') }}" class="mb-4 text-center">
@@ -94,7 +93,6 @@
             No sales data found for the selected date range.
         </div>
     {% endif %}
-</div>
 
 <!-- Include external CSS and JS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
