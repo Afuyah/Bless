@@ -5,8 +5,8 @@ from app import  socketio
 from flask_socketio import emit
 from collections import defaultdict
 from sqlalchemy import func
-from datetime import datetime
-
+from collections import Counter
+from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, timedelta
 
 from sqlalchemy.exc import IntegrityError
@@ -17,7 +17,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-sales_bp = Blueprint('sales', __name__)
+sales_bp = Blueprint('sales_v1', __name__, url_prefix='/v1/sales')
+
 
 # Helper function to check low stock
 def check_low_stock(product):
@@ -28,7 +29,7 @@ def check_low_stock(product):
 @login_required
 def sales_screen():
     categories = Category.query.all()  # Fetch all categories
-    return render_template('sales.html', categories=categories)
+    return render_template('sales/sales.html', categories=categories)
 
 
 # Route for cashier to view sales screen
@@ -59,12 +60,21 @@ def get_products_by_category(category_id):
         return jsonify({'error': 'An error occurred while fetching products.'}), 500
 
 
+def calculate_subtotal(product, quantity):
+    """Calculate the subtotal based on combination pricing logic."""
+    full_combinations = quantity // product.combination_size
+    remaining_units = quantity % product.combination_size
+    subtotal = (full_combinations * product.combination_price) + (remaining_units * product.selling_price)
+    return subtotal
+
+
 @sales_bp.route('/add_to_cart', methods=['POST'])
 @login_required
 def add_to_cart():
+    """Adds a product to the cart session, ensuring stock availability and correct pricing."""
     data = request.json
     product_id = data.get('product_id')
-    quantity = data.get('quantity', 1)  # Default to 1 if not provided
+    quantity = data.get('quantity', 1)
 
     product = Product.query.get(product_id)
     if not product:
@@ -74,25 +84,18 @@ def add_to_cart():
     if product.stock < quantity:
         return jsonify({'success': False, 'message': 'Insufficient stock'}), 400
 
-    # Calculate subtotal based on quantity
-    subtotal = 0
-    if quantity < product.combination_size:
-        subtotal = product.selling_price * quantity
-    else:
-        subtotal = (quantity // product.combination_size) * product.combination_price
-        if quantity % product.combination_size != 0:
-            subtotal += (quantity % product.combination_size) * product.selling_price
+    # Calculate subtotal
+    subtotal = calculate_subtotal(product, quantity)
 
-    # Initialize the cart in session if it doesn't exist
-    if 'cart' not in session:
-        session['cart'] = []
+    # Initialize cart if not exists
+    session.setdefault('cart', [])
 
-    # Add or update the item in the session cart
+    # Update or add product to cart
     cart = session['cart']
     for item in cart:
         if item['product_id'] == product_id:
             item['quantity'] += quantity
-            item['subtotal'] += subtotal
+            item['subtotal'] = calculate_subtotal(product, item['quantity'])
             break
     else:
         cart.append({
@@ -104,13 +107,15 @@ def add_to_cart():
             'subtotal': subtotal
         })
 
-    session['cart'] = cart  # Update session cart
+    session.modified = True  # Ensure session updates persist
+
     return jsonify({'success': True, 'cart': session['cart']})
 
-    
+
 @sales_bp.route('/checkout', methods=['POST'])
 @login_required
 def checkout():
+    """Processes the checkout transaction, updates stock, and records the sale."""
     data = request.json
     cart = data.get('cart', [])
     payment_method = data.get('payment_method', 'cash')
@@ -120,112 +125,104 @@ def checkout():
         return jsonify({'success': False, 'message': 'Cart is empty'}), 400
 
     total_amount = 0
-    total_cost = 0  # Initialize total cost for profit calculation
-    items_to_update_stock = []
-
-    for item in cart:
-        product = Product.query.get(item['id'])
-        if product is None:
-            return jsonify({'success': False, 'message': 'Product not found'}), 404
-
-        quantity = item['quantity']
-
-        # Check stock availability before any calculations
-        if product.stock < quantity:
-            return jsonify({'success': False, 'message': f'Insufficient stock for {product.name}'}), 400
-
-        # Calculate subtotal using combination-first approach
-        full_combinations = quantity // product.combination_size
-        remaining_units = quantity % product.combination_size
-
-        # Calculate cost for full combinations
-        subtotal = full_combinations * product.combination_price
-
-        # Calculate cost for remaining units and choose the cheaper option
-        individual_remainder_cost = remaining_units * product.selling_price
-        additional_combination_cost = product.combination_price  # Cost of an extra combination
-
-        # Add the cheaper of the two options for the remaining units
-        subtotal += min(individual_remainder_cost, additional_combination_cost)
-
-        total_amount += subtotal
-
-        # Calculate the total cost for profit calculation
-        total_cost += (full_combinations * product.cost_price * product.combination_size) + (remaining_units * product.cost_price)
-
-        items_to_update_stock.append((product, quantity))
-
-    # Create the Sale object with profit calculation
-    sale = Sale(
-        date=datetime.utcnow(),
-        total=total_amount,
-        payment_method=payment_method,
-        customer_name=customer_name if payment_method == 'credit' else None,
-    )
-    
-    # Calculate profit
-    sale_profit = total_amount - total_cost  # Profit = Total Sales - Total Cost
-    sale.profit = sale_profit  # Set the profit calculated for this sale
-    db.session.add(sale)
+    total_cost = 0  
+    stock_updates = []
+    cart_items = []
 
     try:
-        # Commit the sale to get a valid sale_id
+        for item in cart:
+            product = Product.query.get(item['id'])  
+            if not product:
+                return jsonify({'success': False, 'message': f'Product {item["product_id"]} not found'}), 404
+
+            quantity = item['quantity']
+
+            # Check stock availability
+            if product.stock < quantity:
+                return jsonify({'success': False, 'message': f'Insufficient stock for {product.name}'}), 400
+
+            # Calculate subtotal & cost
+            subtotal = calculate_subtotal(product, quantity)
+            total_amount += subtotal
+
+            full_combinations = quantity // product.combination_size
+            remaining_units = quantity % product.combination_size
+            product_cost_price = product.cost_price if product.cost_price else 0
+
+            total_cost += (full_combinations * product_cost_price * product.combination_size) + (remaining_units * product_cost_price)
+
+            # Prepare stock updates
+            stock_updates.append({'id': product.id, 'stock': product.stock - quantity})
+            cart_items.append(CartItem(product_id=product.id, quantity=quantity, sale_id=None))  # Sale ID added after commit
+
+        # Create Sale record
+        sale = Sale(
+            date=datetime.utcnow(),
+            total=total_amount,
+            payment_method=payment_method,
+            customer_name=customer_name if payment_method == 'credit' else None,
+            profit=total_amount - total_cost
+        )
+        db.session.add(sale)
+        db.session.commit()  # Ensure sale ID is generated
+
+        # Attach Sale ID to Cart Items
+        for item in cart_items:
+            item.sale_id = sale.id
+
+        # Bulk update stock and save cart items
+        db.session.bulk_update_mappings(Product, stock_updates)
+        db.session.bulk_save_objects(cart_items)
         db.session.commit()
 
-        # Update stock and create CartItem records
-        for product, quantity in items_to_update_stock:
-            product.stock -= quantity
-            cart_item = CartItem(product_id=product.id, quantity=quantity, sale_id=sale.id)
-            db.session.add(cart_item)
-
-        db.session.commit()
-
-        # Emit real-time updates after successful commit
-        for product, quantity in items_to_update_stock:
-            socketio.emit('stock_updated', {'id': product.id, 'name': product.name, 'stock': product.stock}, broadcast=True)
-            if check_low_stock(product):  # Check for low stock
+        # Emit stock update events
+        for product_update in stock_updates:
+            socketio.emit('stock_updated', product_update, broadcast=True)
+            product = Product.query.get(product_update['id'])
+            if check_low_stock(product):
                 socketio.emit('low_stock_alert', {'product_name': product.name, 'stock': product.stock}, broadcast=True)
 
-        return jsonify({'success': True, 'message': 'Sale completed successfully', 'profit': sale_profit})
+        return jsonify({'success': True, 'message': 'Sale completed successfully', 'profit': sale.profit})
+
     except IntegrityError as e:
         db.session.rollback()
-        logging.error(f'Integrity error during transaction: {e}')
-        return jsonify({'success': False, 'message': 'Integrity error during transaction'}), 400
+        logging.error(f'Integrity error during checkout: {e}')
+        return jsonify({'success': False, 'message': 'Database integrity error. Please try again.'}), 400
     except Exception as e:
         db.session.rollback()
-        logging.error(f'Error during transaction: {e}')
-        return jsonify({'success': False, 'message': str(e)}), 500
+        logging.error(f'Unexpected error during checkout: {e}')
+        return jsonify({'success': False, 'message': 'An unexpected error occurred. Please contact support.'}), 500
+
 
 
 @sales_bp.route('/api/todays-total-sales', methods=['GET'])
 @login_required
 def todays_total_sales():
-    # Get today's date
+    """Fetch today's total sales and number of transactions."""
     today = datetime.today().date()
-    
+
     try:
-        # Query for today's total sales and transaction count
-        total_sales = db.session.query(func.coalesce(func.sum(Sale.total), 0)).filter(func.date(Sale.date) == today).scalar()
-        total_transactions = db.session.query(func.count(Sale.id)).filter(func.date(Sale.date) == today).scalar()
-        
-        # Return total sales as JSON
+        total_sales, total_transactions = db.session.query(
+            func.coalesce(func.sum(Sale.total), 0),  # Ensure no NULL values
+            func.count(Sale.id)
+        ).filter(func.date(Sale.date) == today).first()
+
         return jsonify({
             'total_sales': round(total_sales, 2),
             'total_transactions': total_transactions
         })
 
-    except Exception as e:
+    except SQLAlchemyError as e:
         logging.error(f"Error fetching today's sales: {e}")
         return jsonify({'error': 'Failed to fetch sales data'}), 500
 
 
-from collections import Counter
-
 @sales_bp.route('/reports/daily', methods=['GET'])
 @login_required
 def daily_sales_report():
-    date_str = request.args.get('date', datetime.today().date().strftime('%Y-%m-%d'))
-    
+    """Generates a daily sales report based on a provided date."""
+    date_str = request.args.get('date', datetime.today().strftime('%Y-%m-%d'))
+
     try:
         report_date = datetime.strptime(date_str, '%Y-%m-%d').date()
     except ValueError:
@@ -236,28 +233,34 @@ def daily_sales_report():
     sales = Sale.query.filter(func.date(Sale.date) == report_date).all()
     
     if not sales:
-        flash("No sales data available for the selected date", "info")
+        flash("No sales data available for the selected date.", "info")
         return render_template('daily_sales_report.html', 
                                sales=[], 
                                today=report_date, 
                                total_sales=0, 
                                total_transactions=0, 
                                daily_profit=0, 
-                               mpesa_total=0,  # Include M-Pesa total
-                               credit_total=0,  # Include credit total
+                               mpesa_total=0, 
+                               credit_total=0, 
                                most_sold_item=None, 
                                most_sold_quantity=0)
 
-    # Calculate sales data including M-Pesa and credit totals
+    # Calculate sales-related data
     total_sales = sum(sale.total for sale in sales)
     total_transactions = len(sales)
     daily_profit = sum(sale.profit for sale in sales)
-    
-    # Totals based on payment methods
-    mpesa_total = sum(sale.total for sale in sales if sale.payment_method.lower() == 'mpesa')
-    credit_total = sum(sale.total for sale in sales if sale.payment_method.lower() == 'credit')
 
-    # Track quantity sold for each item
+    # Calculate totals based on payment methods
+    payment_totals = {
+        'mpesa': 0,
+        'credit': 0
+    }
+    for sale in sales:
+        payment_method = sale.payment_method.lower()
+        if payment_method in payment_totals:
+            payment_totals[payment_method] += sale.total
+
+    # Determine the most sold item
     item_sales = Counter()
     for sale in sales:
         for item in sale.cart_items:
@@ -271,10 +274,13 @@ def daily_sales_report():
                            total_sales=round(total_sales, 2), 
                            total_transactions=total_transactions, 
                            daily_profit=round(daily_profit, 2), 
-                           mpesa_total=round(mpesa_total, 2),  # Include M-Pesa total
-                           credit_total=round(credit_total, 2),  # Include credit total
+                           mpesa_total=round(payment_totals['mpesa'], 2),  
+                           credit_total=round(payment_totals['credit'], 2),  
                            most_sold_item=most_sold_item, 
                            most_sold_quantity=most_sold_quantity)
+
+
+
 @sales_bp.route('/reports/filter', methods=['GET'])
 @login_required
 def filter_sales_report():
