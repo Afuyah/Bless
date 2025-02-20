@@ -17,8 +17,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-sales_bp = Blueprint('sales_v1', __name__, url_prefix='/v1/sales')
-
+sales_bp = Blueprint('sales', __name__)
 
 # Helper function to check low stock
 def check_low_stock(product):
