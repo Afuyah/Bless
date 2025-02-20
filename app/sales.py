@@ -28,7 +28,7 @@ def check_low_stock(product):
 @login_required
 def sales_screen():
     categories = Category.query.all()  # Fetch all categories
-    return render_template('sales/sales.html', categories=categories)
+    return render_template('sales/pos.html', categories=categories)
 
 
 # Route for cashier to view sales screen
