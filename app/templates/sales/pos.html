@@ -69,20 +69,29 @@ body {
 /* Category Sidebar */
 .category-sidebar {
     height: 90vh;
+    display: flex;
+    flex-direction: column;
+    
+}
+
+/* Fixed Title and Search Bar */
+.category-sidebar h5,
+.category-sidebar .search-box {
+    position: sticky;
+    top: 0;
+    background: rgba(15, 23, 42, 0.9); /* Match sidebar background */
+    z-index: 10;
+    padding: 2px;
+}
+
+/* Scrollable Category List */
+.category-list {
+    flex-grow: 1;
     overflow-y: auto;
+    margin-top: 10px;
+    padding-right: 5px; /* Avoid scrollbar overlap */
 }
-.category-item {
-    padding: 12px;
-    margin-bottom: 5px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.05);
-}
-.category-item:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateX(5px);
-}
+
 
 /* Product Display */
 .product-container {
