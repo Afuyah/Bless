@@ -10,6 +10,7 @@ import pytz
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from functools import wraps
+from flask_caching import Cache
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -17,7 +18,14 @@ migrate = Migrate()
 socketio = SocketIO()
 login_manager = LoginManager()
 
-# Custom decorator to enforce login requirement
+cache = Cache(config={
+    'CACHE_TYPE': 'RedisCache', 
+    'CACHE_REDIS_URL': 'redis://default:wdgVWOdyHwQjrrVlmikGPOAhTireHqLn@metro.proxy.rlwy.net:33921',
+    'CACHE_DEFAULT_TIMEOUT': 300 
+})
+
+
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -60,6 +68,8 @@ def create_app(config_class=Config):
     socketio.init_app(app, cors_allowed_origins=['https://yourdomain.com'])  # Use specific domains in production
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'  # Redirect to login if not authenticated
+    cache.init_app(app)
+    
 
     # Register Blueprints
     from .auth import auth_bp

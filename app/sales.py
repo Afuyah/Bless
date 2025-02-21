@@ -1,14 +1,13 @@
 from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for, session
 from flask_login import  current_user, login_required
 from app.models import db, Product, Sale, CartItem, Category
-from app import  socketio
+from app import  socketio, cache
 from flask_socketio import emit
 from collections import defaultdict
 from sqlalchemy import func
 from collections import Counter
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, timedelta
-
 from sqlalchemy.exc import IntegrityError
 import logging
 
@@ -27,7 +26,13 @@ def check_low_stock(product):
 @sales_bp.route('/sales')
 @login_required
 def sales_screen():
-    categories = Category.query.all()  # Fetch all categories
+    # Cache category retrieval for 5 minutes to reduce database load
+    categories = cache.get('categories')
+
+    if not categories:
+        categories = Category.query.all()
+        cache.set('categories', categories, timeout=300)  # Cache for 5 minutes
+
     return render_template('sales/pos.html', categories=categories)
 
 
@@ -36,35 +41,34 @@ def sales_screen():
 @login_required
 def get_products_by_category(category_id):
     try:
-        # Fetch products by category, including all relevant fields
-        products = Product.query.filter_by(category_id=category_id).all()  
+        cache_key = f'products_{category_id}'
+        products = cache.get(cache_key)
+
         if not products:
-            return jsonify({'message': 'No products found in this category'}), 404
+            products = Product.query.filter_by(category_id=category_id).all()
 
-        # Constructing the product list to include necessary fields
-        product_list = [{
-            'id': product.id,
-            'name': product.name,
-            'selling_price': float(product.selling_price) if product.selling_price is not None else None,  # Ensure it's a float
-            'combination_price': float(product.combination_price) if product.combination_price is not None else None,  # Ensure it's a float
-            'combination_unit_price': float(product.combination_unit_price) if product.combination_unit_price is not None else None,  # Ensure it's a float
-            'combination_size': product.combination_size,
-            'stock': product.stock
-        } for product in products]
+            if not products:
+                return jsonify({'message': 'No products found in this category'}), 404
 
-        return jsonify({'products': product_list})
+            # Convert product data to JSON-friendly format before caching
+            products = [{
+                'id': product.id,
+                'name': product.name,
+                'selling_price': float(product.selling_price) if product.selling_price is not None else None,
+                'combination_price': float(product.combination_price) if product.combination_price is not None else None,
+                'combination_unit_price': float(product.combination_unit_price) if product.combination_unit_price is not None else None,
+                'combination_size': product.combination_size,
+                'stock': product.stock
+            } for product in products]
+
+            cache.set(cache_key, products, timeout=300)  # Cache for 5 minutes
+
+        return jsonify({'products': products})
 
     except Exception as e:
         logging.error(f"Error fetching products for category {category_id}: {e}")
         return jsonify({'error': 'An error occurred while fetching products.'}), 500
 
-
-def calculate_subtotal(product, quantity):
-    """Calculate the subtotal based on combination pricing logic."""
-    full_combinations = quantity // product.combination_size
-    remaining_units = quantity % product.combination_size
-    subtotal = (full_combinations * product.combination_price) + (remaining_units * product.selling_price)
-    return subtotal
 
 
 @sales_bp.route('/add_to_cart', methods=['POST'])
