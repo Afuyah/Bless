@@ -1,41 +1,58 @@
 
-
+/**
+ * Retrieve the shopping cart data from local storage or initialize an empty cart.
+ * This ensures that cart data persists across page reloads.
+ */
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-// Fetch products based on category
+/**
+ * Event listener for category selection.
+ * Fetches and displays products for the selected category using an AJAX request.
+ */
 $(document).on('click', '.category-item', function () {
-    const categoryId = $(this).data('category');
+    const categoryId = $(this).data('category'); // Get selected category ID
 
-    // Show loading indicator while products load
+    // Show a loading message while fetching products
     $('#product-list').html('<p>Loading products...</p>');
     $('#no-products').hide();
 
     $.ajax({
-        url: `/sales/api/products/${categoryId}`,  // Flask API endpoint
+        url: `/sales/api/products/${categoryId}`,  // API endpoint for fetching products by category
         method: 'GET',
         success: function (data) {
             if (data.products && data.products.length > 0) {
-                populateProducts(data.products);  // Populate with fetched data
+                populateProducts(data.products);  // Populate the product list with fetched data
             } else {
-                $('#product-list').empty();
-                $('#no-products').show();
+                $('#product-list').empty(); // Clear product list
+                $('#no-products').show();  // Show "No products available" message
             }
         },
         error: function () {
-            showError('Failed to load products. Please try again.');
+            showError('Failed to load products. Please try again.'); // Handle API request failure
             $('#product-list').empty();
         }
     });
 });
 
-// Format currency for product prices
+/**
+ * Utility function to format currency values consistently.
+ * Ensures prices have two decimal places.
+ * 
+ * @param {number} value - The numeric value to format
+ * @returns {string} - Formatted currency string
+ */
 function formatCurrency(value) {
     return parseFloat(value).toFixed(2);
 }
 
-// Populate products list dynamically
+/**
+ * Populates the product list dynamically based on fetched product data.
+ * Generates HTML elements for each product and appends them to the product list.
+ * 
+ * @param {Array} products - Array of product objects to display
+ */
 function populateProducts(products) {
-    $('#product-list').empty();
+    $('#product-list').empty(); // Clear previous products
 
     if (products.length === 0) {
         $('#product-list').append('<p class="text-muted">No products available.</p>');
@@ -43,9 +60,15 @@ function populateProducts(products) {
     }
 
     products.forEach(product => {
+        // Display a low stock warning if stock is below 5
         let lowStockWarning = product.stock < 5 ? `<span class="text-danger">(Low)</span>` : '';
-        let combinationText = product.combination_size > 1 ? `(${product.combination_size} @ Ksh ${formatCurrency(product.combination_price || 0)})` : '';
+        
+        // Display combination pricing if applicable
+        let combinationText = product.combination_size > 1 
+            ? `(${product.combination_size} @ Ksh ${formatCurrency(product.combination_price || 0)})` 
+            : '';
 
+        // Append product card to the list
         $('#product-list').append(`
             <div class="product-item border border-primary rounded p-2 mb-3 ${product.stock === 0 ? 'disabled-card' : 'clickable'}" 
                  data-id="${product.id}" 
@@ -63,17 +86,29 @@ function populateProducts(products) {
     });
 }
 
-// Example showError function for displaying errors (toast or modal can be used here)
+/**
+ * Displays error messages in a user-friendly way.
+ * Can be enhanced to use a toast notification or modal instead of an alert.
+ * 
+ * @param {string} message - The error message to display
+ */
 function showError(message) {
-    alert(message);  // Replace this with a toast or modal for better UX
+    alert(message);  // Replace with a better UI notification if needed
 }
-
 
 
 
 // Function to save cart to localStorage
 function saveCartToLocalStorage() {
     localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+// Function to load cart from localStorage (ensure persistence)
+function loadCartFromLocalStorage() {
+    const storedCart = localStorage.getItem('cart');
+    if (storedCart) {
+        cart = JSON.parse(storedCart);
+    }
 }
 
 // Function to update cart display and calculate total
@@ -97,9 +132,10 @@ function updateCart() {
         total += subtotal;
 
         $('#cart-items').append(`
-            <div class="cart-item">
-                ${item.name} - Ksh ${item.selling_price.toFixed(2)} x ${item.quantity} = Ksh ${subtotal.toFixed(2)}
-                <button class="btn btn-danger btn-sm remove-from-cart" data-id="${item.id}">X</button>
+            <div class="cart-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                <span>${item.name} - Ksh ${item.selling_price.toFixed(2)} x ${item.quantity}</span>
+                <span class="fw-bold text-primary">= Ksh ${subtotal.toFixed(2)}</span>
+                <button class="btn btn-danger btn-sm remove-from-cart" data-id="${item.id}">&times;</button>
             </div>
         `);
     });
@@ -107,11 +143,24 @@ function updateCart() {
     $('#total-amount').text(total.toFixed(2));
 
     if (cart.length === 0) {
-        $('#cart-items').append('<p class="text-muted">Your cart is empty.</p>');
+        $('#cart-items').append('<p class="text-muted text-center">Your cart is empty.</p>');
     }
 
     saveCartToLocalStorage();
 }
+
+// Remove item from cart with animation
+$(document).on('click', '.remove-from-cart', function () {
+    const itemId = $(this).data('id');
+    const index = cart.findIndex(item => item.id === itemId);
+
+    if (index !== -1) {
+        $(this).closest('.cart-item').fadeOut(300, function () {
+            cart.splice(index, 1);
+            updateCart();
+        });
+    }
+});
 
 // Logout button event to clear the cart
 $(document).on('click', '#logout-button', function () {
@@ -119,21 +168,30 @@ $(document).on('click', '#logout-button', function () {
     window.location.href = "/auth/logout";
 });
 
+// Load cart from localStorage when the page loads
+$(document).ready(function () {
+    loadCartFromLocalStorage();
+    updateCart();
+});
+
+
+
 // Add item to cart on product click
 $(document).on('click', '.product-item.clickable', function () {
     const productId = $(this).data('id');
     const productName = $(this).data('name');
     const productSellingPrice = parseFloat($(this).data('selling-price')) || 0;
     const productCombinationPrice = parseFloat($(this).data('combination-price')) || 0;
-    const productCombinationUnitPrice = parseFloat($(this).data('combination-unit-price')) || 0; 
+    const productCombinationUnitPrice = parseFloat($(this).data('combination-unit-price')) || 0;
     const productStock = parseInt($(this).data('stock')) || 0;
+    const combinationSize = parseInt($(this).data('combination-size')) || 1;
 
     if (productStock === 0) {
         showError(`"${productName}" is currently out of stock.`);
         return;
     }
 
-    const existingItem = cart.find(item => item.id === productId);
+    let existingItem = cart.find(item => item.id === productId);
 
     if (existingItem) {
         if (existingItem.quantity < productStock) {
@@ -143,33 +201,40 @@ $(document).on('click', '.product-item.clickable', function () {
             return;
         }
     } else {
-        if (productStock > 0) {
-            cart.push({
-                id: productId,
-                name: productName,
-                selling_price: productSellingPrice,
-                combination_price: productCombinationPrice,
-                combination_unit_price: productCombinationUnitPrice,
-                quantity: 1,
-                combination_size: $(this).data('combination-size') || 1
-            });
-        } else {
-            showError(`"${productName}" is currently out of stock.`);
-            return;
-        }
+        cart.push({
+            id: productId,
+            name: productName,
+            selling_price: productSellingPrice,
+            combination_price: productCombinationPrice,
+            combination_unit_price: productCombinationUnitPrice,
+            quantity: 1,
+            combination_size: combinationSize
+        });
     }
+
     updateCart();
 });
 
-// Remove item from cart event
+// Remove item from cart with animation
 $(document).on('click', '.remove-from-cart', function () {
     const productId = $(this).data('id');
-    cart = cart.filter(item => item.id !== productId);
-    updateCart();
+    const itemIndex = cart.findIndex(item => item.id === productId);
+
+    if (itemIndex !== -1) {
+        $(this).closest('.cart-item').fadeOut(300, function () {
+            cart.splice(itemIndex, 1);
+            updateCart();
+        });
+    }
 });
 
 // Clear cart button event
 $(document).on('click', '#clear-cart', function () {
+    if (cart.length === 0) {
+        showError("Cart is already empty.");
+        return;
+    }
+
     if (confirm("Are you sure you want to clear the cart?")) {
         cart = [];
         localStorage.removeItem('cart');
@@ -177,20 +242,73 @@ $(document).on('click', '#clear-cart', function () {
     }
 });
 
+// Function to save cart to localStorage
+function saveCartToLocalStorage() {
+    localStorage.setItem('cart', JSON.stringify(cart));
+}
 
+// Function to load cart from localStorage (ensuring persistence)
+function loadCartFromLocalStorage() {
+    const storedCart = localStorage.getItem('cart');
+    if (storedCart) {
+        cart = JSON.parse(storedCart);
+    }
+}
 
+// Function to update cart display and calculate total
+function updateCart() {
+    $('#cart-items').empty();
+    let total = 0;
 
-// Initialize the cart UI on page load
-$(document).ready(function() {
-    updateCart(); // Update the UI based on the loaded cart from local storage
+    cart.forEach(item => {
+        let subtotal = 0;
+        const fullCombinations = Math.floor(item.quantity / item.combination_size);
+        const remainingUnits = item.quantity % item.combination_size;
+        
+        subtotal += fullCombinations * item.combination_price;
+        const individualRemainderPrice = remainingUnits * item.selling_price;
+        
+        if (remainingUnits > 0) {
+            subtotal += Math.min(individualRemainderPrice, item.combination_price);
+        }
+        
+        total += subtotal;
+
+        $('#cart-items').append(`
+            <div class="cart-item d-flex justify-content-between align-items-center p-2 border-bottom">
+                <span>${item.name} - Ksh ${item.selling_price.toFixed(2)} x ${item.quantity}</span>
+                <span class="fw-bold text-primary">= Ksh ${subtotal.toFixed(2)}</span>
+                <button class="btn btn-danger btn-sm remove-from-cart" data-id="${item.id}">&times;</button>
+            </div>
+        `);
+    });
+
+    $('#total-amount').text(total.toFixed(2));
+
+    if (cart.length === 0) {
+        $('#cart-items').append('<p class="text-muted text-center">Your cart is empty.</p>');
+    }
+
+    saveCartToLocalStorage();
+}
+
+// Load cart from localStorage when the page loads
+$(document).ready(function () {
+    loadCartFromLocalStorage();
+    updateCart();
 });
 
+// Function to show errors (replace alert with a better UI modal/toast)
 function showError(message) {
-    // Customize this function to display the error in your desired format
-    alert(message); // Example: using alert; replace with modal or toast notification if needed
+    alert(message); // Can be replaced with a Bootstrap toast or modal
 }
 
 
+
+$(document).ready(function() {
+    updateCart(); // Ensure cart UI is updated on page load
+    $('#error-message').hide(); // Hide error message initially
+});
 
 // Handle payment method change
 $('#payment-method').change(function () {
@@ -198,26 +316,35 @@ $('#payment-method').change(function () {
     const customerNameContainer = $('#customer-name-container');
 
     if (selectedMethod === 'credit') {
-        customerNameContainer.show(); // Show customer name input
+        customerNameContainer.slideDown(200); // Smoothly show input
     } else {
-        customerNameContainer.hide(); // Hide customer name input
-        $('#customer-name').val(''); // Clear the input if not needed
+        customerNameContainer.slideUp(200); // Smoothly hide input
+        $('#customer-name').val(''); // Clear input if not needed
     }
 });
 
-// Function to show error messages
+// Function to show error messages with animation
 function showError(message) {
-    // Assuming there's a specific element for displaying error messages
-    $('#error-message').text(message).show();
+    const errorBox = $('#error-message');
+    
+    errorBox.text(message).fadeIn(300);
+    
+    setTimeout(() => {
+        errorBox.fadeOut(300);
+    }, 3000); // Auto-hide after 3 seconds
 }
 
 // Function to reset checkout form
 function resetCheckoutForm() {
-    $('#payment-method').val(''); // Reset payment method
-    $('#customer-name').val(''); // Clear customer name
-    $('#customer-name-container').hide(); // Hide customer name input
-    $('#error-message').hide(); // Hide error message if visible
+    $('#payment-method').val('').trigger('change'); // Reset and trigger change event
+    $('#customer-name').val('');
+    $('#error-message').fadeOut(300); // Hide error message
 }
+
+
+
+
+
 
 // Handle checkout
 $('#checkout-btn').click(function () {

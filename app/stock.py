@@ -120,7 +120,7 @@ def products():
         return render_template('cashier_products_view.html', products=products, search_query=search_query)
     else:
         flash('Unauthorized access.', 'danger')
-        return redirect(url_for('home.index'))  # Redirect to a safe place if the user role is not recognized
+        return redirect(url_for('home.index'))  
 
 @stock_bp.route('/products/new', methods=['GET', 'POST'])
 @login_required

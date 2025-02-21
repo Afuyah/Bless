@@ -94,30 +94,148 @@ body {
     padding-right: 5px; /* Avoid scrollbar overlap */
 }
 
-
-/* Product Display */
+/* Product Container */
 .product-container {
     max-height: 83vh;
     overflow-y: auto;
     padding: 10px;
+    scroll-behavior: smooth;
 }
+
+/* Custom Scrollbar for a Sleek Look */
+.product-container::-webkit-scrollbar {
+    width: 6px;
+}
+.product-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+.product-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Product Grid Layout */
 .product-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 20px;
-    padding: 20px;
-}
-.product-card {
-    background: rgba(255, 255, 255, 0.1);
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Balanced size */
+    gap: 15px;
     padding: 15px;
-    border-radius: 10px;
-    transition: all 0.3s;
+}
+
+/* Product Card Styling */
+.product-card {
+    background: rgba(255, 255, 255, 0.15); /* Enhanced glass effect */
+    padding: 15px;
+    border-radius: 12px;
+    transition: all 0.3s ease-in-out;
     text-align: center;
     font-weight: bold;
+    color: #fff;
+    backdrop-filter: blur(12px) saturate(180%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover & Click Effects */
+.product-card:hover {
+    transform: translateY(-6px) scale(1.08);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Click Ripple Effect */
+.product-card:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease-in-out;
+}
+
+/* Optional: Add a slight pulsating glow */
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.3); }
+    50% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
+    100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.3); }
 }
 .product-card:hover {
-    transform: translateY(-5px) scale(1.05);
-    background: rgba(255, 255, 255, 0.15);
+    animation: glowPulse 1.5s infinite alternate;
+}
+
+/* Product Name */
+.product-card h5 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+/* Price & Stock Info */
+.product-price {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffeb3b; /* Highlighted yellow */
+}
+.product-stock {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Low Stock Indicator */
+.low-stock {
+    color: #ff4d4d;
+    font-weight: bold;
+}
+
+/* Disabled Product (Out of Stock) */
+.disabled-card {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Category Toggler */
+.category-container {
+    position: sticky;
+    top: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    padding: 10px;
+}
+
+/* Floating Category Filter */
+.category-item {
+    padding: 8px 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+.category-item:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+.category-item.active {
+    background: #ffeb3b;
+    color: #333;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .product-list {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+    }
+    .product-card {
+        padding: 12px;
+    }
+}
+
+.highlight {
+    background-color: yellow;
+    font-weight: bold;
+    color: black;
 }
 
 /* Floating Cart */
