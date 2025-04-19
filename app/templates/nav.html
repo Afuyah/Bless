@@ -1,0 +1,80 @@
+
+<nav class="navbar navbar-expand-lg sticky-top glass-navbar">
+    <a class="navbar-brand brand-logo" href="{{ url_for('home.index') }}">BhaPos</a>
+  
+    <button
+      class="navbar-toggler text-white"
+      type="button"
+      data-toggle="collapse"
+      data-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <i class="fas fa-bars"></i>
+    </button>
+  
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        {% if current_user.is_authenticated %}
+  
+          <!-- POS SCREEN -->
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'sales.sales_screen' %}active disabled-link{% endif %}"
+               href="{{ url_for('sales.sales_screen') }}"
+               {% if request.endpoint == 'sales.sales_screen' %}aria-current="page"{% endif %}>
+               POS SCREEN
+            </a>
+          </li>
+  
+          <!-- ADD EXPENSES -->
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'expense.expenses_page' %}active disabled-link{% endif %}"
+               href="{{ url_for('expense.expenses_page') }}"
+               {% if request.endpoint == 'expense.expenses_page' %}aria-current="page"{% endif %}>
+               ADD EXPENSES
+            </a>
+          </li>
+  
+          <!-- MY ACCOUNT -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {% if request.endpoint in ['auth.change_password'] %}active disabled-link{% endif %}"
+               href="#"
+               id="navbarDropdown"
+               role="button"
+               data-toggle="dropdown"
+               aria-haspopup="true"
+               aria-expanded="false"
+               {% if request.endpoint in ['auth.change_password'] %}aria-current="page"{% endif %}>
+               MY ACCOUNT
+            </a>
+            <div class="dropdown-menu dropdown-animated" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item {% if request.endpoint == 'auth.change_password' %}active disabled-link{% endif %}"
+                 href="{{ url_for('auth.change_password') }}"
+                 {% if request.endpoint == 'auth.change_password' %}aria-current="page"{% endif %}>
+                 Settings
+              </a>
+              <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
+            </div>
+          </li>
+  
+        {% else %}
+          <!-- If on login page, show HOME instead -->
+          {% if request.endpoint == 'auth.login' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('home.index') }}">
+              HOME
+            </a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link btn btn-primary btn-login" href="{{ url_for('auth.login') }}">
+              SIGN IN
+            </a>
+          </li>
+          {% endif %}
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+

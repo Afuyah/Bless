@@ -1,0 +1,263 @@
+{% extends 'base_layout.html' %}
+
+{% block title %}POS{% endblock %}
+
+{% block content %}
+  <!-- POS styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pos.css') }}">
+
+  <!-- Inline overlay & blur styles -->
+  <style>
+    /* Blur the POS while overlay is active */
+    .blur-background {
+      filter: blur(4px);
+      pointer-events: none;
+    }
+    /* Fullscreen overlay */
+    .activation-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    /* Modal box */
+    .activation-modal {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      max-width: 360px;
+      width: 90%;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .activation-modal h4 { color: #fff; margin-bottom: 1rem; }
+    .activation-modal p { color: #ccc; margin-bottom: 1.5rem; }
+    .activation-modal .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+    .activation-modal .btn-success { background: #27ae60; color: #fff; }
+    .activation-modal .btn-success:hover { background: #219150; }
+    .activation-modal .btn-danger  { background: #c0392b; color: #fff; }
+    .activation-modal .btn-danger:hover  { background: #a83224; }
+  </style>
+
+  <!-- POS UI (loads in bg, blurred until activation) -->
+  <div id="pos-container" class="pos-container blur-background">
+    <div class="container-fluid cashier-ui">
+      <!-- Toggle Button (mobile) -->
+      <button id="catToggleBtn" class="btn btn-secondary d-block d-md-none category-toggle-btn">
+        <i class="fas fa-th-large"></i> Categories
+      </button>
+      <!-- Category Panel -->
+      <div id="categoryPanel" class="category-panel glassmorphism">
+        <div class="panel-header">
+          <span>Select Category</span>
+          <button id="catCloseBtn" class="btn-close"></button>
+        </div>
+        <div class="panel-list" id="panelCategoryList">
+          {% for category in categories %}
+            <div class="panel-item" data-category="{{ category.id }}">
+              {{ category.name }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="row">
+        <!-- Sidebar (desktop) -->
+        <div class="col-md-2 category-sidebar glassmorphism p-3 d-none d-md-flex">
+          <h5 class="text-center text-light">Categories</h5>
+          <input type="text" id="search" class="form-control search-box" placeholder="Search products...">
+          <div class="category-list mt-3" id="category-list">
+            {% for category in categories %}
+              <div class="category-item py-2 px-3 text-light" data-category="{{ category.id }}">
+                {{ category.name }}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+         <!-- Product Display -->
+      <div class="col-md-10 product-container">
+        <div class="product-list scrollable" id="product-list"></div>
+        <p id="no-products" class="alert alert-warning text-center d-none">No products found.</p>
+      </div>
+  
+      <!-- ... your floating cart etc ... -->
+    </div>
+  </div>
+      <!-- Floating Cart -->
+      <div class="col-md-3 floating-cart glassmorphism p-4 d-none">
+        <h5 class="text-center text-light">Cart Summary</h5>
+        <div id="cart-items" class="cart-items scrollable"></div>
+        <div class="cart-footer">
+          <div class="d-flex justify-content-between text-light mt-3 fw-bold">
+            <span>Total:</span>
+            <span id="total-amount" class="text-warning">Ksh 0.00</span>
+          </div>
+          <button id="checkout-btn" class="btn btn-success w-100 mt-3">Checkout</button>
+          <button id="clear-cart" class="btn btn-danger w-100 mt-2">Clear Cart</button>
+        </div>
+      </div>
+    </div>
+    <!-- Mobile cart toggle -->
+    <button id="toggle-cart-btn" class="btn btn-warning d-md-none position-fixed">Cart</button>
+    <!-- Bottom nav -->
+    <nav class="bottom-nav glassmorphism">
+      <a href="#" class="nav-link"><i class="fas fa-cash-register"></i><span>Sales</span></a>
+      <a href="#" class="nav-link"><i class="fas fa-undo"></i><span>Returns</span></a>
+      <a href="#" class="nav-link"><i class="fas fa-history"></i><span>Recent</span></a>
+      <a href="#" class="nav-link"><i class="fas fa-chart-line"></i><span>Reports</span></a>
+      <a href="#" class="nav-link" id="fullscreen-toggle-btn">
+        <i class="fas fa-expand" id="fullscreen-icon"></i>
+        <span id="fullscreen-text">Fullscreen</span>
+      </a>
+    </nav>
+    <!-- Success & Checkout Modals -->
+    {% include 'sales/success_modal.html' %}
+    {% include 'sales/checkout_modal.html' %}
+  </div> <!-- /#pos-container -->
+
+ <!-- Activation Overlay -->
+<div id="activation-overlay" class="activation-overlay">
+  <div class="activation-modal text-center">
+    <h4>POS Activation</h4>
+    <p>Hardware checks passed.</p>
+    <p class="text-muted small">Please activate within <span id="countdown-timer" class="font-weight-bold">45</span> seconds</p>
+    <div class="d-flex justify-content-center gap-3">
+      <button id="btnActivate" class="btn btn-success m-2">
+        <i class="fas fa-play"></i> Activate
+      </button>
+      <button id="btnCancel" class="btn btn-danger m-2">
+        <i class="fas fa-times"></i> Home
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<style>
+  #countdown-timer {
+    animation: pulse 1s infinite;
+    font-size: 1.5rem;
+    color: #ff4444;
+    text-shadow: 0 0 8px rgba(255, 68, 68, 0.8);
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+</style>
+
+<!-- Countdown Beep Sound -->
+<audio id="beep-sound" src="{{ url_for('static', filename='audio/beep.mp3') }}"></audio>
+<audio id="timeout-sound" src="{{ url_for('static', filename='audio/timeout.mp3') }}"></audio>
+
+
+<!-- Core POS JS -->
+<script src="{{ url_for('static', filename='js/pos.js') }}"></script>
+
+<!-- Activation & Fullscreen Lock Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const posCont        = document.getElementById('pos-container');
+    const overlay        = document.getElementById('activation-overlay');
+    const btnActivate    = document.getElementById('btnActivate');
+    const btnCancel      = document.getElementById('btnCancel');
+    const countdownEl    = document.getElementById('countdown-timer');
+    const beepSound      = document.getElementById('beep-sound');
+    const timeoutSound   = document.getElementById('timeout-sound');
+
+    let countdown        = 45;
+    let countdownInterval;
+
+    function enterFullscreen() {
+      const el = document.documentElement;
+      if      (el.requestFullscreen)        return el.requestFullscreen();
+      else if (el.webkitRequestFullscreen)  return el.webkitRequestFullscreen();
+      else if (el.msRequestFullscreen)      return el.msRequestFullscreen();
+      else                                   return Promise.resolve();
+    }
+
+    function logout() {
+      window.location.href = '/';
+    }
+
+    function lockAndMonitor() {
+      document.addEventListener('keydown', e => {
+        if (['Escape','F11','F10'].includes(e.key)) {
+          e.preventDefault();
+          document.exitFullscreen?.();
+          enterFullscreen();
+        }
+      });
+      document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) logout();
+      });
+      setInterval(() => {
+        if (!document.fullscreenElement) logout();
+      }, 3000);
+    }
+
+    function startCountdown() {
+      countdownInterval = setInterval(() => {
+        countdown--;
+        countdownEl.textContent = countdown;
+
+        // Play beep every second
+        if (beepSound) {
+          beepSound.currentTime = 0;
+          beepSound.play().catch(() => {});
+        }
+
+        // If time runs out
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+
+          // Play final warning beep
+          if (timeoutSound) {
+            timeoutSound.play().catch(() => {});
+          }
+
+          setTimeout(() => {
+            overlay.style.display = 'none';
+            logout();
+          }, 1000);
+        }
+      }, 1000);
+    }
+
+    btnActivate.addEventListener('click', () => {
+      enterFullscreen()
+        .then(() => {
+          clearInterval(countdownInterval);
+          overlay.style.display = 'none';
+          posCont.classList.remove('blur-background');
+          lockAndMonitor();
+        })
+        .catch(() => logout());
+    });
+
+    btnCancel.addEventListener('click', () => {
+      clearInterval(countdownInterval);
+      logout();
+    });
+
+    // Start countdown with beeps and pulse
+    startCountdown();
+  });
+</script>
+
+
+{% endblock %}

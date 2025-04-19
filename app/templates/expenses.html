@@ -1,0 +1,279 @@
+{% extends 'base_layout.html' %}
+
+{% block title %}Expenses – Nawiri Enterprise{% endblock %}
+
+{% block content %}
+<div class="expenses-screen">
+  <!-- Glass panel for controls -->
+  <div class="glass-panel controls-panel">
+    <div class="filter-group">
+      <label for="filter-date">View by Date</label>
+      <input type="date" id="filter-date" onchange="fetchExpenses()" />
+    </div>
+    <button id="btnAdd" class="btn btn-add" aria-label="Add Expense">
+      <i class="fas fa-plus"></i> Add Expense
+    </button>
+  </div>
+
+  <!-- Glass panel for the table -->
+  <div class="glass-panel table-panel">
+    <table class="expenses-table">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Amount (Ksh)</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody id="expenses-body">
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Expense Modal -->
+<div class="modal fade" id="addExpenseModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-panel modal-glass">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Expense</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="msgError" class="alert alert-danger d-none"></div>
+        <div id="msgSuccess" class="alert alert-success d-none"></div>
+        <form id="addExpenseForm">
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="expenseDescription" placeholder="Description" required>
+            <label for="expenseDescription">Description</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="number" class="form-control" id="expenseAmount" placeholder="Amount" min="0" step="0.01" required>
+            <label for="expenseAmount">Amount (Ksh)</label>
+          </div>
+          <button type="submit" class="btn btn-submit w-100">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  :root {
+    --bg-gradient-1: #0f172a;
+    --bg-gradient-2: #1e293b;
+    --accent: #6366f1;
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --text-light: #edf2f7;
+    --transition: 0.3s ease;
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2));
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-light);
+  }
+
+  .expenses-screen {
+    max-width: 960px;
+    margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 0 1rem;
+  }
+
+  /* Glass panel base */
+  .glass-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+    transition: transform var(--transition), box-shadow var(--transition);
+  }
+  .glass-panel:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Controls panel */
+  .controls-panel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1 1 200px;
+  }
+  .filter-group label {
+    font-size: 0.9rem;
+  }
+  .filter-group input[type="date"] {
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid rgba(237, 242, 247, 0.2);
+    background: rgba(237, 242, 247, 0.05);
+    color: var(--text-light);
+    transition: border-color var(--transition);
+  }
+  .filter-group input[type="date"]:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .btn-add {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform var(--transition), box-shadow var(--transition);
+  }
+  .btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  }
+
+  /* Table panel */
+  .table-panel {
+    overflow-x: auto;
+  }
+  .expenses-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .expenses-table thead th {
+    background: var(--accent);
+    color: #fff;
+    padding: 0.75rem 1rem;
+    text-align: left;
+  }
+  .expenses-table tbody tr {
+    transition: background var(--transition), transform var(--transition);
+  }
+  .expenses-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+  }
+  .expenses-table td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid rgba(237, 242, 247, 0.1);
+  }
+
+  /* Modal glass styling */
+  .modal-glass {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  .btn-submit {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem;
+    font-weight: 500;
+    transition: transform var(--transition), box-shadow var(--transition);
+  }
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  }
+
+  /* Utility messages */
+  .alert {
+    border-radius: 6px;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const filterDate = document.getElementById('filter-date');
+    const tbBody     = document.getElementById('expenses-body');
+    const modalEl    = document.getElementById('addExpenseModal');
+    const addModal   = new bootstrap.Modal(modalEl);
+    const form       = document.getElementById('addExpenseForm');
+    const errMsg     = document.getElementById('msgError');
+    const okMsg      = document.getElementById('msgSuccess');
+
+    // Fetch & render
+    window.fetchExpenses = () => {
+      const date = filterDate.value;
+      fetch(`/expense/api/expenses?date=${date}`)
+        .then(r => r.json())
+        .then(data => {
+          tbBody.innerHTML = '';
+          data.forEach(e => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${e.description}</td>
+              <td>Ksh ${parseFloat(e.amount).toFixed(2)}</td>
+              <td>${e.category||'Daily'}</td>
+            `;
+            tbBody.appendChild(tr);
+          });
+        })
+        .catch(() => alert('Failed to load expenses'));
+    };
+
+    // Show modal
+    document.getElementById('btnAdd').addEventListener('click', () => {
+      errMsg.classList.add('d-none');
+      okMsg .classList.add('d-none');
+      form.reset();
+      addModal.show();
+    });
+
+    // Submit new expense
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const desc = form.expenseDescription.value.trim();
+      const amt  = parseFloat(form.expenseAmount.value);
+      if (!desc || isNaN(amt) || amt <= 0) {
+        errMsg.textContent = 'Please enter valid values.';
+        errMsg.classList.remove('d-none');
+        return;
+      }
+
+      fetch('/expense/api/add_daily_expense', {
+        method: 'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({description: desc, amount: amt})
+      })
+      .then(r => {
+        if (!r.ok) throw r;
+        return r.json();
+      })
+      .then(res => {
+        okMsg.textContent = res.message;
+        okMsg.classList.remove('d-none');
+        setTimeout(() => addModal.hide(), 1000);
+        fetchExpenses();
+      })
+      .catch(async err => {
+        const errJson = await err.json().catch(()=>({error:'Server error'}));
+        errMsg.textContent = errJson.error || 'Could not save.';
+        errMsg.classList.remove('d-none');
+      });
+    });
+
+    // initial load
+    fetchExpenses();
+  });
+</script>
+{% endblock %}
