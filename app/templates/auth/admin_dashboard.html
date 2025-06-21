@@ -1,0 +1,15 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Admin Dashboard - Bhapos{% endblock %}
+
+{% block content %}
+  {% include 'admin/partials/sidebar.html' %}
+  <div id="main-content" class="flex-1 overflow-auto">
+    {% block main_content %}
+      {% include fragment_template %}
+    {% endblock %}
+  </div>
+
+  
+{% endblock %}
+

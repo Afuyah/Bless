@@ -1,0 +1,42 @@
+<!-- Sales Chart / Fragment Container -->
+<div
+  id="sales-fragment"
+  class="lg:col-span-2 bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden"
+  hx-target="this"
+  hx-swap="innerHTML"
+  hx-get="{{ url_for('reports_bp.weekly_sales_fragment') }}"
+  hx-trigger="load"
+>
+  <!-- initial loading skeleton or default chart markup -->
+  <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Sales Performance</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Last 7 days sales overview</p>
+      </div>
+      <div class="flex space-x-2">
+        <button
+          hx-get="{{ url_for('reports_bp.weekly_sales_fragment') }}"
+          hx-target="#sales-fragment"
+          class="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700"
+        >
+          Week
+        </button>
+        <button
+          hx-get="{{ url_for('reports_bp.monthly_sales_fragment') }}"
+          hx-target="#sales-fragment"
+          class="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700"
+        >
+          Month
+        </button>
+        <button
+          hx-get="{{ url_for('reports_bp.yearly_sales_fragment') }}"
+          hx-target="#sales-fragment"
+          class="text-xs px-2 py-1 rounded bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400"
+        >
+          Year
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,110 @@
+<!-- Header -->
+
+
+<h2 class="text-2xl font-bold text-center text-primary-600 dark:text-primary-400 mb-6">
+  Sales Report for {{ sales[0].date.strftime('%B %Y') if sales else 'N/A' }}
+</h2>
+
+<!-- Month Filter -->
+<form method="GET"
+      hx-get="{{ url_for('sales.monthly_sales_report') }}"
+      hx-target="#report-container"
+      hx-push-url="true"
+      class="mb-6 max-w-xl mx-auto">
+  <label for="month" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Month:</label>
+  <div class="flex space-x-3">
+    <input type="month"
+           name="month"
+           id="month"
+           value="{{ request.args.get('month', datetime.today().strftime('%Y-%m')) }}"
+           required
+           class="flex-1 px-4 py-2 rounded-md border border-primary-500 focus:ring-primary-500 focus:border-primary-600 dark:bg-gray-800 dark:text-white dark:border-gray-600">
+    <button type="submit"
+            class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md shadow">
+      Generate Report
+    </button>
+  </div>
+</form>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+  <div class="bg-green-600 text-white rounded-xl p-6 shadow text-center">
+    <h4 class="text-lg font-semibold mb-2">Total Sales</h4>
+    <p class="text-3xl font-bold">Ksh {{ total_sales }}</p>
+  </div>
+  <div class="bg-blue-600 text-white rounded-xl p-6 shadow text-center">
+    <h4 class="text-lg font-semibold mb-2">Total Transactions</h4>
+    <p class="text-3xl font-bold">{{ total_transactions }}</p>
+  </div>
+  <div class="bg-yellow-500 text-white rounded-xl p-6 shadow text-center">
+    <h4 class="text-lg font-semibold mb-2">Total Profit</h4>
+    <p class="text-3xl font-bold">Ksh {{ total_profit }}</p>
+  </div>
+</div>
+
+<!-- Sales Table -->
+{% if sales %}
+<div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-lg">
+  <table id="salesTable" class="min-w-full table-auto divide-y divide-gray-200 dark:divide-gray-700">
+    <thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm uppercase">
+      <tr>
+        <th class="px-6 py-3 text-left">Transaction ID</th>
+        <th class="px-6 py-3 text-left">Date</th>
+        <th class="px-6 py-3 text-left">Total</th>
+        <th class="px-6 py-3 text-left">Profit</th>
+        <th class="px-6 py-3 text-left">Items Sold</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+      {% for sale in sales %}
+      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+        <td class="px-6 py-4 text-gray-800 dark:text-gray-100">{{ sale.id }}</td>
+        <td class="px-6 py-4 text-gray-600 dark:text-gray-300">{{ sale.date.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td class="px-6 py-4 font-semibold text-green-700 dark:text-green-400">Ksh {{ sale.total | round(2) }}</td>
+        <td class="px-6 py-4 font-semibold text-yellow-700 dark:text-yellow-400">Ksh {{ sale.profit | round(2) }}</td>
+        <td class="px-6 py-4">
+          <ul class="list-disc list-inside text-gray-700 dark:text-gray-200 text-sm">
+            {% for item in sale.cart_items %}
+              <li>{{ item.product.name }} ({{ item.quantity }})</li>
+            {% endfor %}
+          </ul>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-center text-red-600 dark:text-red-400 font-semibold mt-6">
+  No sales data available for the selected month.
+</p>
+{% endif %}
+
+<!-- Navigation Buttons -->
+<div class="mt-8 flex flex-wrap justify-center gap-4">
+  <a href="{{ url_for('sales.daily_sales_report') }}"
+     class="inline-block px-5 py-2 border border-gray-300 text-gray-700 dark:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+    View Daily Report
+  </a>
+  <a href="{{ url_for('sales.filter_sales_report') }}"
+     class="inline-block px-5 py-2 border border-gray-300 text-gray-700 dark:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+    Filter Sales Report
+  </a>
+</div>
+
+<!-- DataTables Script -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#salesTable').DataTable({
+      ordering: true,
+      paging: true,
+      searching: true,
+      info: true,
+      language: {
+        search: "Filter records:",
+        lengthMenu: "Display _MENU_ records per page"
+      }
+    });
+  });
+</script>

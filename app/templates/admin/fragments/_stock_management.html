@@ -1,0 +1,302 @@
+<!-- templates/fragments/_stock_management.html -->
+<div class="bg-white rounded-lg shadow-md p-6">
+    <!-- Header Section -->
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Stock Management</h2>
+        <p class="text-gray-600">Manage product inventory and pricing</p>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="flex items-center justify-between mb-6">
+        <div class="relative flex-grow max-w-md">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <input id="productSearch" type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Search products...">
+        </div>
+        <button id="resetSearch" class="ml-2 px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            Reset
+        </button>
+    </div>
+
+    <!-- Products Table -->
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <table id="productTable" class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost Price</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Selling Price</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for product in products %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ product.name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ product.stock }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Ksh {{ product.cost_price }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Ksh {{ product.selling_price }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div class="flex space-x-2">
+                            <button class="update-cost-price-button px-3 py-1 bg-red-100 text-red-700 rounded-md text-sm hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500" 
+                                    data-id="{{ product.id }}" 
+                                    data-price="{{ product.cost_price }}" 
+                                    data-name="{{ product.name }}">
+                                Cost Price
+                            </button>
+                            <button class="update-selling-price-button px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    data-id="{{ product.id }}" 
+                                    data-price="{{ product.selling_price }}" 
+                                    data-name="{{ product.name }}">
+                                Selling Price
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Selling Price Update Modal -->
+<div id="updateSellingPriceModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-yellow-500 px-4 py-3 sm:px-6">
+                <h3 class="text-lg leading-6 font-medium text-white">Update Selling Price</h3>
+            </div>
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <form id="updateSellingPriceForm">
+                    <div class="mb-4">
+                        <label for="sellingProductName" class="block text-sm font-medium text-gray-700 mb-1">Product</label>
+                        <input type="text" id="sellingProductName" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-gray-100" readonly>
+                    </div>
+                    <div class="mb-4">
+                        <label for="newSellingPrice" class="block text-sm font-medium text-gray-700 mb-1">New Selling Price (Ksh)</label>
+                        <input type="number" id="newSellingPrice" name="newSellingPrice" min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="combinationSize" class="block text-sm font-medium text-gray-700 mb-1">Combination Size</label>
+                            <input type="number" id="combinationSize" name="combinationSize" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="combinationPrice" class="block text-sm font-medium text-gray-700 mb-1">Combination Price</label>
+                            <input type="number" id="combinationPrice" name="combinationPrice" min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                    <input type="hidden" id="sellingProductId" name="sellingProductId">
+                    <div class="mt-5 sm:mt-6">
+                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-yellow-500 text-base font-medium text-white hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:text-sm">
+                            <span id="sellingPriceLoader" class="hidden animate-spin -ml-1 mr-3 h-5 w-5 text-white"></span>
+                            Update Selling Price
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cost Price Update Modal -->
+<div id="updateCostPriceModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-red-500 px-4 py-3 sm:px-6">
+                <h3 class="text-lg leading-6 font-medium text-white">Update Cost Price</h3>
+            </div>
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <form id="updateCostPriceForm">
+                    <div class="mb-4">
+                        <label for="costProductName" class="block text-sm font-medium text-gray-700 mb-1">Product</label>
+                        <input type="text" id="costProductName" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-gray-100" readonly>
+                    </div>
+                    <div class="mb-4">
+                        <label for="newCostPrice" class="block text-sm font-medium text-gray-700 mb-1">New Cost Price (Ksh)</label>
+                        <input type="number" id="newCostPrice" name="newCostPrice" min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <input type="hidden" id="costProductId" name="costProductId">
+                    <div class="mt-5 sm:mt-6">
+                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-500 text-base font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
+                            <span id="costPriceLoader" class="hidden animate-spin -ml-1 mr-3 h-5 w-5 text-white"></span>
+                            Update Cost Price
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DataTable
+    const productTable = new simpleDatatables.DataTable("#productTable", {
+        searchable: true,
+        fixedHeight: true,
+        perPage: 10,
+        labels: {
+            placeholder: "Search...",
+            perPage: "{select} entries per page",
+            noRows: "No products found",
+            info: "Showing {start} to {end} of {rows} entries"
+        }
+    });
+
+    // Modal toggle functions
+    function showModal(modalId) {
+        document.getElementById(modalId).classList.remove('hidden');
+    }
+
+    function hideModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+
+    // Selling Price Modal
+    document.querySelectorAll('.update-selling-price-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.id;
+            const productName = this.dataset.name;
+            const sellingPrice = this.dataset.price;
+
+            document.getElementById('sellingProductId').value = productId;
+            document.getElementById('sellingProductName').value = productName;
+            document.getElementById('newSellingPrice').value = sellingPrice;
+            document.getElementById('combinationSize').value = '';
+            document.getElementById('combinationPrice').value = '';
+            
+            showModal('updateSellingPriceModal');
+        });
+    });
+
+    // Cost Price Modal
+    document.querySelectorAll('.update-cost-price-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.id;
+            const productName = this.dataset.name;
+            const costPrice = this.dataset.price;
+
+            document.getElementById('costProductId').value = productId;
+            document.getElementById('costProductName').value = productName;
+            document.getElementById('newCostPrice').value = costPrice;
+            
+            showModal('updateCostPriceModal');
+        });
+    });
+
+    // Close modals when clicking outside
+    document.querySelectorAll('[id$="Modal"]').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideModal(this.id);
+            }
+        });
+    });
+
+    // Form submissions
+    document.getElementById('updateSellingPriceForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const productId = formData.get('sellingProductId');
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const loader = document.getElementById('sellingPriceLoader');
+
+        submitBtn.disabled = true;
+        loader.classList.remove('hidden');
+        submitBtn.innerHTML = 'Updating...';
+
+        fetch(`/stock/products/${productId}/update_selling_price`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.message);
+            } else {
+                // Refresh table or update specific row
+                productTable.refresh();
+                alert('Price updated successfully');
+                hideModal('updateSellingPriceModal');
+                this.reset();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            loader.classList.add('hidden');
+            submitBtn.innerHTML = 'Update Selling Price';
+        });
+    });
+
+    document.getElementById('updateCostPriceForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const productId = formData.get('costProductId');
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const loader = document.getElementById('costPriceLoader');
+
+        submitBtn.disabled = true;
+        loader.classList.remove('hidden');
+        submitBtn.innerHTML = 'Updating...';
+
+        fetch(`/stock/products/${productId}/update_cost_price`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.message);
+            } else {
+                // Refresh table or update specific row
+                productTable.refresh();
+                alert('Price updated successfully');
+                hideModal('updateCostPriceModal');
+                this.reset();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            loader.classList.add('hidden');
+            submitBtn.innerHTML = 'Update Cost Price';
+        });
+    });
+
+    // Search functionality
+    document.getElementById('productSearch').addEventListener('input', function() {
+        productTable.search(this.value);
+    });
+
+    document.getElementById('resetSearch').addEventListener('click', function() {
+        document.getElementById('productSearch').value = '';
+        productTable.search('');
+    });
+});
+</script>

@@ -1,0 +1,90 @@
+<div class="overflow-x-auto" id="stock-history-container">
+    {% if error_message %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {{ error_message }}
+        </div>
+    {% endif %}
+
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-800">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">User</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Previous</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">New</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Reason</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            {% for log in stock_history %}
+            <tr>
+                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">{{ log.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">{{ log.user.username if log.user else 'System' }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">{{ log.previous_stock }}</td>
+                <td class="px-6 py-4 text-sm {{ 'text-green-600' if log.new_stock > log.previous_stock else 'text-red-600' }} whitespace-nowrap">{{ log.new_stock }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">{{ log.adjustment_type.value }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">{{ log.change_reason or 'N/A' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                    No stock history records found
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if pagination.pages > 1 %}
+    <div class="flex items-center justify-between mt-4">
+        <div>
+            <p class="text-sm text-gray-700 dark:text-gray-300">
+                Showing <span class="font-medium">{{ pagination.first }}</span> to 
+                <span class="font-medium">{{ pagination.last }}</span> of 
+                <span class="font-medium">{{ pagination.total }}</span> records
+            </p>
+        </div>
+
+        <div class="flex space-x-2">
+            {# Previous Page Link #}
+            <a href="{{ url_for('reports.product_stock_history', product_id=product_id, page=pagination.prev_num) }}"
+               hx-get="{{ url_for('reports.product_stock_history', product_id=product_id, page=pagination.prev_num) }}"
+               hx-target="#stock-history-container"
+               hx-swap="innerHTML"
+               class="px-3 py-1 border rounded text-sm transition 
+                      {{ 'bg-gray-100 text-gray-400 cursor-not-allowed' if not pagination.has_prev else 'hover:bg-gray-50 dark:hover:bg-gray-700' }}"
+               {% if not pagination.has_prev %}disabled{% endif %}>
+                Previous
+            </a>
+
+            {# Page Numbers #}
+            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    <a href="{{ url_for('reports.product_stock_history', product_id=product_id, page=page_num) }}"
+                       hx-get="{{ url_for('reports.product_stock_history', product_id=product_id, page=page_num) }}"
+                       hx-target="#stock-history-container"
+                       hx-swap="innerHTML"
+                       class="px-3 py-1 border rounded text-sm transition 
+                              {{ 'bg-blue-500 text-white' if page_num == pagination.page else 'hover:bg-gray-50 dark:hover:bg-gray-700' }}">
+                        {{ page_num }}
+                    </a>
+                {% else %}
+                    <span class="px-3 py-1 text-gray-500">...</span>
+                {% endif %}
+            {% endfor %}
+
+            {# Next Page Link #}
+            <a href="{{ url_for('reports.product_stock_history', product_id=product_id, page=pagination.next_num) }}"
+               hx-get="{{ url_for('reports.product_stock_history', product_id=product_id, page=pagination.next_num) }}"
+               hx-target="#stock-history-container"
+               hx-swap="innerHTML"
+               class="px-3 py-1 border rounded text-sm transition 
+                      {{ 'bg-gray-100 text-gray-400 cursor-not-allowed' if not pagination.has_next else 'hover:bg-gray-50 dark:hover:bg-gray-700' }}"
+               {% if not pagination.has_next %}disabled{% endif %}>
+                Next
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>

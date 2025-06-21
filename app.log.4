@@ -1,0 +1,104 @@
+2025-06-17 09:50:44,700 - WARNING - 404 Error: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again., attempted URL: http://127.0.0.1:5000/favicon.ico
+2025-06-17 11:04:54,545 - ERROR - Exception on /auth/admin_dashboard [GET]
+Traceback (most recent call last):
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 2077, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 1525, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 1523, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 1509, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask_login/utils.py", line 277, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/app/auth.py", line 121, in admin_dashboard
+    return render_template(
+           ^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/templating.py", line 148, in render_template
+    return _render(
+           ^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/templating.py", line 128, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/jinja2/environment.py", line 1304, in render
+    self.environment.handle_exception()
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/jinja2/environment.py", line 939, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/bha/Desktop/Flask/mini-_super/app/templates/auth/admin_dashboard.html", line 1, in top-level template code
+    {% extends 'admin_base.html' %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/app/templates/admin_base.html", line 121, in top-level template code
+    {% block content %}
+  File "/home/bha/Desktop/Flask/mini-_super/app/templates/auth/admin_dashboard.html", line 7, in block 'content'
+    {% include 'admin/partials/sidebar.html'%}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/app/templates/admin/partials/sidebar.html", line 59, in top-level template code
+    hx-get="{{ url_for('stock.update_stock_fragment') }}"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/helpers.py", line 336, in url_for
+    return appctx.app.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/helpers.py", line 323, in url_for
+    rv = url_adapter.build(
+         ^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/werkzeug/routing.py", line 2315, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.BuildError: Could not build url for endpoint 'stock.update_stock_fragment'. Did you mean 'stock.update_stock_form_fragment' instead?
+2025-06-17 11:04:54,668 - ERROR - Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
+2025-06-17 11:04:59,145 - WARNING - 404 Error: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again., attempted URL: http://127.0.0.1:5000/favicon.ico
+2025-06-17 11:05:02,283 - ERROR - Exception on /auth/admin_dashboard [GET]
+Traceback (most recent call last):
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 2077, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 1525, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 1523, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 1509, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask_login/utils.py", line 277, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/app/auth.py", line 121, in admin_dashboard
+    return render_template(
+           ^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/templating.py", line 148, in render_template
+    return _render(
+           ^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/templating.py", line 128, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/jinja2/environment.py", line 1304, in render
+    self.environment.handle_exception()
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/jinja2/environment.py", line 939, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/bha/Desktop/Flask/mini-_super/app/templates/auth/admin_dashboard.html", line 1, in top-level template code
+    {% extends 'admin_base.html' %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/app/templates/admin_base.html", line 121, in top-level template code
+    {% block content %}
+  File "/home/bha/Desktop/Flask/mini-_super/app/templates/auth/admin_dashboard.html", line 7, in block 'content'
+    {% include 'admin/partials/sidebar.html'%}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/app/templates/admin/partials/sidebar.html", line 59, in top-level template code
+    hx-get="{{ url_for('stock.update_stock_fragment') }}"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/helpers.py", line 336, in url_for
+    return appctx.app.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/helpers.py", line 323, in url_for
+    rv = url_adapter.build(
+         ^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/werkzeug/routing.py", line 2315, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.BuildError: Could not build url for endpoint 'stock.update_stock_fragment'. Did you mean 'stock.update_stock_form_fragment' instead?
+2025-06-17 11:05:02,296 - ERROR - Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.

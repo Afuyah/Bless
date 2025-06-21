@@ -1,0 +1,253 @@
+{% extends 'base_layout.html' %}
+
+{% block title %}Login – Login Bhapos{% endblock %}
+
+{% block content %}
+<div class="login-screen">
+  <!-- Shifting gradient backdrop -->
+  <div class="gradient-bg"></div>
+
+  <!-- Glass‑morphic login card with tilt -->
+  <div class="login-card" id="tilt-card">
+    <div class="card-header">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo">
+      <h2>Secure Login</h2>
+      <p>Access your POS dashboard</p>
+    </div>
+
+   <form id="loginForm" class="card-form" method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+      <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+
+      <div class="field-group">
+        <input type="text" id="username" name="username" required placeholder=" " autocomplete="username">
+        <label for="username">Username</label>
+      </div>
+
+      <div class="field-group password-group">
+        <input type="password" id="password" name="password" required placeholder=" " autocomplete="current-password">
+        <label for="password">Password</label>
+        <button type="button" class="toggle-pwd" aria-label="Show/Hide Password">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+
+      <button type="submit" class="btn-submit">
+        <span class="btn-text">Log In</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </form>
+
+
+    <!-- Two‑Factor Overlay -->
+    <div class="twofactor-overlay">
+      <div class="twofactor-dialog">
+        <h3>Two‑Factor Authentication</h3>
+        <p>Enter the 6‑digit code</p>
+        <div class="otp-container">
+          {% for _ in range(6) %}
+          <input type="text" maxlength="1" pattern="\d*" inputmode="numeric">
+          {% endfor %}
+        </div>
+        <button class="btn-verify">Verify</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  :root {
+    --bg1: #1b263b;
+    --bg2: #0f172a;
+    --accent: #7c3aed;
+    --glass: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.2);
+    --text-light: #edf2f7;
+    --transition: 0.3s ease;
+  }
+
+  /* Fullscreen container */
+  .login-screen {
+    position: relative;
+    width: 100%; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; font-family: 'Poppins', sans-serif;
+  }
+
+  /* Animated background */
+  .gradient-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(45deg, var(--bg1), var(--bg2));
+    background-size: 300% 300%;
+    animation: bgAnimation 10s linear infinite;
+    z-index: 1;
+  }
+  @keyframes bgAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Glass card */
+  .login-card {
+    position: relative; z-index: 2;
+    width: 100%; max-width: 360px; padding: 2rem;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    border-radius: 16px; backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    text-align: center; transition: transform var(--transition), box-shadow var(--transition);
+  }
+  .login-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+  }
+
+  .card-header .logo {
+    width: 60px; margin-bottom: 1rem;
+  }
+  .card-header h2 {
+    color: var(--text-light); margin-bottom: 0.25rem;
+  }
+  .card-header p {
+    color: rgba(237,242,247,0.8); margin-bottom: 1.5rem;
+  }
+
+  /* Floating label fields */
+  .field-group {
+    position: relative; margin-bottom: 1.5rem;
+  }
+  .field-group input {
+    width: 100%; padding: 0.9rem 1rem;
+    background: rgba(237,242,247,0.05); border: 1px solid rgba(237,242,247,0.2);
+    border-radius: 8px; color: var(--text-light); font-size: 1rem;
+    transition: border-color var(--transition);
+  }
+  .field-group input:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .field-group label {
+    position: absolute; left: 1rem; top: 50%;
+    transform: translateY(-50%); color: rgba(237,242,247,0.6);
+    pointer-events: none; background: transparent;
+    transition: all var(--transition);
+  }
+  .field-group input:focus + label,
+  .field-group input:not(:placeholder-shown) + label {
+    top: -0.6rem; left: 0.75rem;
+    font-size: 0.75rem; background: var(--glass);
+    padding: 0 0.25rem; color: var(--accent);
+  }
+
+  /* Password toggle */
+  .password-group { display: flex; align-items: center; }
+  .toggle-pwd {
+    position: absolute; right: 0.75rem; top: 50%;
+    transform: translateY(-50%); background: none; border: none;
+    color: rgba(237,242,247,0.6); cursor: pointer; font-size: 1.1rem;
+  }
+
+  /* Submit button */
+  .btn-submit {
+    position: relative; width: 100%; padding: 0.9rem;
+    background: var(--accent); border: none; border-radius: 8px;
+    color: #fff; font-weight: 600; cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition);
+  }
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124,58,237,0.4);
+  }
+  .btn-text { position: relative; z-index: 2; }
+  .btn-spinner {
+    position: absolute; inset: 0; margin: auto;
+    width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin 1s linear infinite; display: none;
+  }
+  .loading .btn-text { opacity: 0; }
+  .loading .btn-spinner { display: block; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* 2FA overlay */
+  .twofactor-overlay {
+    position: absolute; inset: 0; display: none;
+    background: rgba(15,23,42,0.95); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; z-index: 3;
+  }
+  .twofactor-dialog {
+    background: var(--glass); border: 1px solid var(--glass-border);
+    padding: 1.5rem; border-radius: 12px; width: 90%; max-width: 320px;
+    text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .otp-container {
+    display: flex; gap: 0.5rem; justify-content: center; margin: 1rem 0;
+  }
+  .otp-container input {
+    width: 2.5rem; height: 2.5rem; text-align: center;
+    border: 1px solid rgba(237,242,247,0.2); border-radius: 8px;
+    background: rgba(237,242,247,0.05); color: var(--text-light);
+    font-size: 1.2rem;
+  }
+  .btn-verify {
+    padding: 0.7rem 1.2rem; background: var(--accent);
+    border: none; border-radius: 8px; color: #fff;
+    cursor: pointer; transition: background var(--transition);
+  }
+  .btn-verify:hover { background: #5b21b6; }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const card = document.getElementById('tilt-card');
+    const form = document.getElementById('loginForm');
+    const pwdInput = form.password;
+    const toggle = document.querySelector('.toggle-pwd');
+
+    // 3D tilt
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width/2;
+      const y = e.clientY - r.top  - r.height/2;
+      card.style.transform = `perspective(600px) rotateX(${ -y/20 }deg) rotateY(${ x/20 }deg)`;
+    });
+    card.addEventListener('mouseleave', () => card.style.transform = '');
+
+    // Show/hide password
+    toggle.addEventListener('click', () => {
+      const isPwd = pwdInput.type === 'password';
+      pwdInput.type = isPwd ? 'text' : 'password';
+      toggle.innerHTML = isPwd
+        ? '<i class="fas fa-eye-slash"></i>'
+        : '<i class="fas fa-eye"></i>';
+    });
+
+    // Submit handler with loader + 2FA
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      form.querySelector('.btn-submit').classList.add('loading');
+      try {
+        const res = await fetch('{{ url_for("auth.login") }}', {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify({
+            username: form.username.value,
+            password: form.password.value
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (data.twofactor_required) {
+            document.querySelector('.twofactor-overlay').style.display = 'flex';
+          } else {
+            window.location = data.redirect_url;
+          }
+        } else throw new Error(data.message);
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        form.querySelector('.btn-submit').classList.remove('loading');
+      }
+    });
+  });
+</script>
+{% endblock %}

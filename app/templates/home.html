@@ -1,0 +1,157 @@
+{% extends 'base_layout.html' %}
+
+{% block title %}Home – Bhapos{% endblock %}
+
+{% block content %}
+<div class="home-wrapper">
+  <!-- Animated background blobs -->
+  <div class="background-shapes">
+    <div class="shape shape1"></div>
+    <div class="shape shape2"></div>
+    <div class="shape shape3"></div>
+    <div class="shape shape4"></div>
+  </div>
+
+  <!-- Glass card with tilt effect -->
+  <div class="glass-card" id="tilt-card">
+    <h1 class="title">
+        Pos <span class="brand-highlight"> Demo</span>
+    </h1>
+    <p class="subtitle"> POS System</p>
+    <div class="buttons">
+      <!--<a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-login">
+        ENTER
+      </a>-->
+     
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Full‑screen flex container */
+  .home-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #0e1a2b, #142d4c);
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* Floating background blobs */
+  .background-shapes .shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.4;
+    filter: blur(60px);
+    animation: float 8s ease-in-out infinite;
+  }
+  .shape1 {
+    width: 300px; height: 300px;
+    background: #3b82f6;
+    top: -100px; left: -100px;
+    animation-duration: 7s;
+  }
+  .shape2 {
+    width: 200px; height: 200px;
+    background: #9333ea;
+    bottom: -80px; right: -80px;
+    animation-duration: 9s;
+  }
+  .shape3 {
+    width: 250px; height: 250px;
+    background: #10b981;
+    top: 20%; right: -120px;
+    animation-duration: 8.5s;
+  }
+  .shape4 {
+    width: 180px; height: 180px;
+    background: #f59e0b;
+    bottom: 15%; left: -100px;
+    animation-duration: 7.5s;
+  }
+
+  @keyframes float {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50%    { transform: translate(30px, -40px) scale(1.1); }
+  }
+
+  /* Glass‑morphism card */
+  .glass-card {
+    position: relative;
+    z-index: 10;
+    max-width: 380px;
+    padding: 3rem 2rem;
+    background: rgba(255,255,255,0.08);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    text-align: center;
+    transition: transform 0.2s ease;
+  }
+
+  /* Gradient text for brand */
+  .title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+  .brand-highlight {
+    background: linear-gradient(90deg, #3b82f6, #9333ea);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 2rem;
+  }
+
+  /* Buttons */
+  .buttons .btn {
+    min-width: 120px;
+    padding: 0.6rem 1.4rem;
+    font-weight: 500;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    margin: 0 0.5rem;
+  }
+  .btn-login {
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    border: none;
+  }
+  .btn-login:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 15px rgba(59,130,246,0.4);
+  }
+  .btn-register {
+    color: #fff;
+    border: 2px solid rgba(255,255,255,0.7);
+    background: transparent;
+  }
+  .btn-register:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-2px);
+  }
+
+</style>
+
+<script>
+  // Simple 3D tilt for the card
+  const card = document.getElementById('tilt-card');
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width/2;
+    const y = e.clientY - rect.top - rect.height/2;
+    card.style.transform = `perspective(600px) rotateX(${-y/20}deg) rotateY(${x/20}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(600px) rotateX(0) rotateY(0)';
+  });
+</script>
+{% endblock %}

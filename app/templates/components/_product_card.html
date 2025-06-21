@@ -1,0 +1,20 @@
+<div class="col">
+    <div class="product-card shadow-sm {{ 'low-stock' if product.stock < 5 else '' }}" 
+         data-product-id="{{ product.id }}" 
+         data-product-name="{{ product.name | lower }}">
+         
+      <div class="product-details position-relative p-3 rounded-3 bg-glass text-white h-100">
+        <h6 class="product-name mb-1 text-truncate" title="{{ product.name }}">{{ product.name }}</h6>
+        <p class="product-price mb-2 text-muted small">Ksh {{ "%.2f"|format(product.selling_price) }}</p>
+  
+        {% if product.stock < 5 %}
+          <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2"
+                data-bs-toggle="tooltip"
+                title="Low Stock: Only {{ product.stock }} left">
+            Low Stock
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  

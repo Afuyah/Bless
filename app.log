@@ -1,0 +1,76 @@
+2025-06-17 13:14:32,317 - ERROR - Exception on /stock/admin_update_stock [GET]
+Traceback (most recent call last):
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 2077, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 1525, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 1523, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 1509, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask_login/utils.py", line 277, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/app/stock.py", line 398, in update_stock_page
+    return render_template('update_stock.html', products=products)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/templating.py", line 148, in render_template
+    return _render(
+           ^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/templating.py", line 128, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/jinja2/environment.py", line 1304, in render
+    self.environment.handle_exception()
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/jinja2/environment.py", line 939, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/bha/Desktop/Flask/mini-_super/app/templates/update_stock.html", line 1, in top-level template code
+    <tr id="product-row-{{ product.id }}" class="hover:bg-gray-50 transition-colors duration-150">
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/jinja2/environment.py", line 487, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'product' is undefined
+2025-06-17 13:14:32,533 - ERROR - Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
+2025-06-17 13:14:33,538 - ERROR - Exception on /stock/admin_update_stock [GET]
+Traceback (most recent call last):
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 2077, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 1525, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 1523, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/app.py", line 1509, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask_login/utils.py", line 277, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/app/stock.py", line 398, in update_stock_page
+    return render_template('update_stock.html', products=products)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/templating.py", line 148, in render_template
+    return _render(
+           ^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/flask/templating.py", line 128, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/jinja2/environment.py", line 1304, in render
+    self.environment.handle_exception()
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/jinja2/environment.py", line 939, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/bha/Desktop/Flask/mini-_super/app/templates/update_stock.html", line 1, in top-level template code
+    <tr id="product-row-{{ product.id }}" class="hover:bg-gray-50 transition-colors duration-150">
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/nawiri/lib/python3.11/site-packages/jinja2/environment.py", line 487, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'product' is undefined
+2025-06-17 13:14:33,540 - ERROR - Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
