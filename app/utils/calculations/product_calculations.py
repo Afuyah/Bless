@@ -266,9 +266,11 @@ def get_repeat_purchase_rate(product_id, time_period='year'):
     return round(safe_divide(repeaters, total_customers, 0) * 100, 1)
 
 
+from sqlalchemy import func, text, desc
 
 def get_analytics_months(product_id, limit=12):
-    month_label = func.strftime('%Y-%m', Sale.date).label('month')  # for SQLite
+    """Return the most recent N months where sales exist for a product."""
+    month_label = func.to_char(Sale.date, 'YYYY-MM').label('month')  # PostgreSQL compatible
 
     return [
         row[0]
@@ -276,33 +278,32 @@ def get_analytics_months(product_id, limit=12):
         .join(CartItem)
         .filter(CartItem.product_id == product_id)
         .group_by(month_label)
-        .order_by(text('month DESC'))  # <-- fix here
+        .order_by(desc('month'))
         .limit(limit)
         .all()
     ]
 
 def get_units_sold_by_month(product_id, months=None):
-    """Get total units sold for a product per month"""
+    """Get total units sold for a product per month."""
     if months is None:
         months = get_analytics_months(product_id)
 
     results = []
-    for month_tuple in months:
-        month = month_tuple[0]
+    for month in months:
         total = db.session.query(
             func.sum(CartItem.quantity)
         ).join(Sale).filter(
             CartItem.product_id == product_id,
-            func.strftime('%Y-%m', Sale.date) == month
+            func.to_char(Sale.date, 'YYYY-MM') == month
         ).scalar() or 0
         results.append(total)
-    
+
     return results
 
 def get_revenue_by_month(product_id):
-    """Monthly revenue for charts (SQLite-compatible)"""
+    """Get total revenue (quantity * unit price) per month for a product."""
     months = get_analytics_months(product_id)
-    
+
     return [
         float(
             db.session.query(
@@ -311,7 +312,7 @@ def get_revenue_by_month(product_id):
             .join(Sale)
             .filter(
                 CartItem.product_id == product_id,
-                func.strftime('%Y-%m', Sale.date) == month[0]
+                func.to_char(Sale.date, 'YYYY-MM') == month
             )
             .scalar() or 0
         )
@@ -319,28 +320,33 @@ def get_revenue_by_month(product_id):
     ]
 
 def get_price_history(product_id):
-    """Returns historical prices for a product"""
+    """Returns historical selling prices for a product."""
     rows = db.session.query(PriceChange.new_price).filter_by(
         product_id=product_id
     ).order_by(PriceChange.changed_at).all()
-    
-    return [float(row[0]) for row in rows]  # Extract price from (price,) tuple
+
+    return [float(row[0]) for row in rows]
 
 def get_price_change_dates(product_id, limit=12):
-    """Get price change dates for chart"""
+    """Get price change dates for a product."""
     try:
         changes = PriceChange.query.filter_by(
             product_id=product_id,
             change_type='selling_price_update'
         ).order_by(PriceChange.changed_at.desc()).limit(limit).all()
 
-        return [c.changed_at.strftime('%Y-%m-%d') for c in reversed(changes)] if changes else []
+        return [
+            c.changed_at.strftime('%Y-%m-%d')
+            for c in reversed(changes)
+        ] if changes else []
 
     except Exception as e:
-        db.session.rollback()  # Rollback in case session is in a failed state
-        logger.error(f"Error getting price change dates for product {product_id}: {e}", exc_info=True)
+        db.session.rollback()
+        logger.error(
+            f"Error getting price change dates for product {product_id}: {e}",
+            exc_info=True
+        )
         return []
-
 
 def get_sales_by_day_of_week(product_id, time_period='month'):
     """Sales distribution by weekday"""
