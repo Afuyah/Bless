@@ -147,9 +147,7 @@ class Business(BaseModel):
     state = db.Column(db.String(100), nullable=True)
     country = db.Column(db.String(100), default="Kenya")
     postal_code = db.Column(db.String(20), nullable=True)
-    timezone = db.Column(db.String(50), default="Africa/Nairobi")
-    latitude = db.Column(db.Float, nullable=True)
-    longitude = db.Column(db.Float, nullable=True)
+  
     
     # Legal Information
     registration_number = db.Column(db.String(50), nullable=True, unique=True)
@@ -169,7 +167,7 @@ class Business(BaseModel):
     approval_notes = db.Column(db.Text, nullable=True)
     # Media
     logo_url = db.Column(db.String(255), nullable=True)
-    banner_url = db.Column(db.String(255), nullable=True)
+   
     
     # Relationships
     approved_by = db.relationship('User', foreign_keys=[approved_by_id])
@@ -793,7 +791,10 @@ class Product(BaseModel, ShopScopedMixin):
 
     @hybrid_property
     def is_low_stock(self):
+        if self.stock is None or self.low_stock_threshold is None:
+            return False
         return self.stock < self.low_stock_threshold
+
 
     @hybrid_property
     def display_price(self):
