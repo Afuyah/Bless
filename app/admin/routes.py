@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, session, current_app, abort
 from flask_login import login_user, logout_user, current_user, login_required
 from sqlalchemy import func
-from app.models import User, db, Role, Sale, Product, Category, StockLog, CartItem
+from app.models import User, db, Role, Sale, Product, Category, StockLog, CartItem, Shop
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date, timedelta, datetime
 from sqlalchemy.exc import SQLAlchemyError
