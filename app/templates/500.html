@@ -85,7 +85,8 @@
           <div class="opacity-0 transition-opacity duration-300">
             <p><span class="text-red-300">Error:</span> Internal Server Error (500)</p>
             <p><span class="text-red-300">Path:</span> {{ request.path }}</p>
-            <p><span class="text-red-300">Time:</span> {{ now.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+           <p><span class="text-red-300">Time:</span> {{ now.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+
             {% if error %}
               <p><span class="text-red-300">Details:</span> {{ error }}</p>
             {% endif %}

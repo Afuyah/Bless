@@ -167,9 +167,13 @@ def create_app(config_class=Config):
                     # Invalid or missing shop ID in URL
                     pass
 
+  
+
     @app.context_processor
     def inject_now():
-        return {'now': datetime.now}
+        tz = pytz.timezone(app.config.get('TIME_ZONE', 'Africa/Nairobi'))
+        return {'now': datetime.now(tz)}
+
 
     # -----------------------
     # Template Filter
