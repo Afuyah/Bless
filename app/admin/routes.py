@@ -134,14 +134,23 @@ def prepare_dashboard_data(shop_id):
 
     # --- PRODUCT DATA ---
     dashboard_data['products']['top_selling'] = db.session.query(
-        Product,
-        func.sum(CartItem.quantity),
-        func.sum(CartItem.quantity * Product.selling_price)
-    ).join(CartItem).join(Sale).filter(
+        Product.id,
+        Product.name,
+        Product.image_url,
+        Product.selling_price,
+        func.sum(CartItem.quantity).label('total_quantity'),
+        func.sum(CartItem.quantity * Product.selling_price).label('total_sales')
+    ).join(
+        CartItem, Product.id == CartItem.product_id
+    ).join(
+        Sale, Sale.id == CartItem.sale_id
+    ).filter(
         Sale.shop_id == shop_id,
         Product.shop_id == shop_id,
         func.date(Sale.date) >= month_ago
-    ).group_by(Product, Shop, Business).order_by(
+    ).group_by(
+        Product.id, Product.name, Product.image_url, Product.selling_price
+    ).order_by(
         func.sum(CartItem.quantity).desc()
     ).limit(5).all()
 
