@@ -141,7 +141,7 @@ def prepare_dashboard_data(shop_id):
         Sale.shop_id == shop_id,
         Product.shop_id == shop_id,
         func.date(Sale.date) >= month_ago
-    ).group_by(Product).order_by(
+    ).group_by(Product, Shop, Business).order_by(
         func.sum(CartItem.quantity).desc()
     ).limit(5).all()
 
