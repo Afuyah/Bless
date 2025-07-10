@@ -1,0 +1,362 @@
+<!-- Monthly Sales Analytics Fragment -->
+<div id="monthly-sales-fragment" class="space-y-6 p-4 sm:p-6">
+  
+    <!-- Header with Date Picker -->
+  <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-t-lg">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div class="space-y-1">
+        <div class="flex items-center gap-3">
+          <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{ report_date.display }} Sales Analytics</h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Comprehensive performance overview</p>
+          {% if comparisons.mom_change is defined %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-400' if comparisons.mom_change >= 0 else 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-400' }}">
+            {{ "%+.1f"|format(comparisons.mom_change) }}% MoM
+          </span>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="flex flex-col sm:flex-row items-end sm:items-center gap-3 w-full sm:w-auto">
+        <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-full">
+          <button onclick="navigateMonth('{{ report_date.prev_month }}')" 
+                  class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+            <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+          
+          <form hx-get="{{ url_for('reports.monthly_sales_analytics', shop_id=current_shop.id) }}"
+                hx-target="#monthly-sales-fragment"
+                hx-swap="outerHTML"
+                class="flex items-center gap-2">
+            <input type="month" name="month" 
+                   class="rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 px-3 py-1 text-sm"
+                   value="{{ report_date.month }}"
+                   onchange="this.form.requestSubmit()">
+          </form>
+          
+          <button onclick="navigateMonth('{{ report_date.next_month }}')"
+                  class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  {% if report_date.month == report_date.current_month %}disabled{% endif %}>
+            <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <button onclick="navigateMonth('{{ report_date.current_month }}')"
+                class="px-3 py-1.5 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700 transition-colors shadow-sm flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          This Month
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Metrics Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Total Sales -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Sales</p>
+          <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+            Ksh {{ "%.2f"|format(metrics.total_sales) }}
+          </p>
+        </div>
+        <div class="p-3 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+      </div>
+      <div class="mt-4 flex items-center justify-between text-sm">
+        <span class="text-gray-500 dark:text-gray-400">MoM Change</span>
+        <span class="{{ 'text-green-600' if comparisons.mom_change >= 0 else 'text-red-600' }} font-medium">
+          {{ "%+.1f"|format(comparisons.mom_change) }}%
+        </span>
+      </div>
+    </div>
+
+    <!-- Total Profit -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Profit</p>
+          <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+            Ksh {{ "%.2f"|format(metrics.total_profit) }}
+          </p>
+        </div>
+        <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+          </svg>
+        </div>
+      </div>
+      <div class="mt-4 flex items-center justify-between text-sm">
+        <span class="text-gray-500 dark:text-gray-400">Margin</span>
+        <span class="text-blue-600 dark:text-blue-400 font-medium">
+          {{ "%.1f"|format(metrics.avg_profit_margin) }}%
+        </span>
+      </div>
+    </div>
+
+    <!-- Transactions -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Transactions</p>
+          <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+            {{ metrics.total_transactions }}
+          </p>
+        </div>
+        <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+      </div>
+      <div class="mt-4 flex items-center justify-between text-sm">
+        <span class="text-gray-500 dark:text-gray-400">Avg. Sale</span>
+        <span class="text-purple-600 dark:text-purple-400 font-medium">
+          Ksh {{ "%.2f"|format(metrics.avg_sale) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Products Sold -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Products Sold</p>
+          <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+            {{ metrics.products_sold }}
+          </p>
+        </div>
+        <div class="p-3 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+        </div>
+      </div>
+      <div class="mt-4 flex items-center justify-between text-sm">
+        <span class="text-gray-500 dark:text-gray-400">Refund Rate</span>
+        <span class="{{ 'text-green-600' if metrics.refund_rate < 5 else 'text-red-600' }} font-medium">
+          {{ "%.1f"|format(metrics.refund_rate) }}%
+        </span>
+      </div>
+    </div>
+  </div>
+
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- Daily Sales Trend Card -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700 flex flex-col">
+    <!-- Card Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+      <div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Daily Sales Trend</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          Last {{ time_analytics.daily|length }} days
+        </p>
+      </div>
+      <div class="flex gap-2" role="group" aria-label="Chart view options">
+        <button 
+          class="chart-toggle px-3 py-1 text-xs rounded-md bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 font-medium transition-colors"
+          data-chart="dailySalesChart" 
+          data-dataset="Sales"
+          aria-pressed="true"
+        >
+          Sales
+        </button>
+        <button 
+          class="chart-toggle px-3 py-1 text-xs rounded-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium transition-colors"
+          data-chart="dailySalesChart" 
+          data-dataset="Transactions"
+          aria-pressed="false"
+        >
+          Transactions
+        </button>
+        <button 
+          class="chart-toggle px-3 py-1 text-xs rounded-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium transition-colors"
+          data-chart="dailySalesChart" 
+          data-dataset="Average"
+          aria-pressed="false"
+        >
+          Avg. Sale
+        </button>
+      </div>
+    </div>
+    
+    <!-- Chart Container -->
+    <div class="flex-1 min-h-[300px] relative">
+      <canvas 
+        id="dailySalesChart" 
+        aria-label="Daily sales trend chart showing sales and transactions data"
+        role="img"
+        class="w-full h-full"
+      ></canvas>
+      <div id="dailySalesChart-empty" class="absolute inset-0 flex items-center justify-center hidden">
+        <p class="text-gray-500 dark:text-gray-400">No daily data available</p>
+      </div>
+    </div>
+    
+    <!-- Summary Stats -->
+    <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+      <div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Today</p>
+        <p class="text-lg font-semibold text-gray-900 dark:text-white">
+          Ksh {{ "%.0f"|format(time_analytics.daily[-1].sales) if time_analytics.daily else '0' }}
+        </p>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+  <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Avg. Daily</p>
+  <p class="text-lg font-semibold text-gray-900 dark:text-white">
+    Ksh {{ "%.0f"|format((time_analytics.daily|sum(attribute='sales')/(time_analytics.daily|length)) if time_analytics.daily else 0) }}
+  </p>
+</div>
+      <div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+  <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Change</p>
+  <p class="text-lg font-semibold {% if time_analytics.daily|length >= 2 and (time_analytics.daily[-1].sales - time_analytics.daily[-2].sales) > 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+    {% if time_analytics.daily|length >= 2 %}
+      {% set diff = time_analytics.daily[-1].sales - time_analytics.daily[-2].sales %}
+      {% set pct_change = (diff / time_analytics.daily[-2].sales * 100) if time_analytics.daily[-2].sales != 0 else 0 %}
+      {{ "%.1f"|format(pct_change) }}%
+      {% if diff > 0 %}↑{% else %}↓{% endif %}
+    {% else %}
+      0.0%
+    {% endif %}
+  </p>
+</div>
+    </div>
+  </div>
+
+  <!-- Weekly Performance Card -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700 flex flex-col">
+    <!-- Card Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+      <div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Weekly Performance</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {{ time_analytics.weekly.keys()|list|first }} to {{ time_analytics.weekly.keys()|list|last }}
+        </p>
+      </div>
+      <p class="text-sm font-medium text-gray-900 dark:text-white">
+        {{ (time_analytics.weekly.values()|sum(attribute='sales')) }} total
+      </p>
+    </div>
+    
+    <!-- Chart Container -->
+    <div class="flex-1 min-h-[300px] relative">
+      <canvas 
+        id="weeklyChart" 
+        aria-label="Weekly performance chart showing sales data"
+        role="img"
+        class="w-full h-full"
+      ></canvas>
+      <div id="weeklyChart-empty" class="absolute inset-0 flex items-center justify-center hidden">
+        <p class="text-gray-500 dark:text-gray-400">No weekly data available</p>
+      </div>
+    </div>
+    
+    <!-- Week Breakdown -->
+    <div class="mt-4 grid grid-cols-2 sm:grid-cols-5 gap-2">
+  {% for week, data in time_analytics.weekly.items() %}
+    {% set weekly_values = time_analytics.weekly.values()|list %}
+    <div class="text-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-100 dark:border-gray-700">
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ week }}</p>
+      <p class="text-lg font-semibold text-gray-900 dark:text-white">
+        Ksh {{ "%.0f"|format(data.sales) }}
+      </p>
+      <p class="text-xs text-gray-500 dark:text-gray-400">
+        {{ data.transactions }} {{ 'trans' if data.transactions != 1 else 'tran' }}
+      </p>
+      <p class="text-xs mt-1 
+          {% if loop.index0 > 0 and weekly_values[loop.index0-1] is defined and data.sales > weekly_values[loop.index0-1].sales %}
+              text-green-600 dark:text-green-400
+          {% else %}
+              text-red-600 dark:text-red-400
+          {% endif %}">
+        {% if loop.index0 > 0 and weekly_values[loop.index0-1] is defined %}
+          {% set prev_sales = weekly_values[loop.index0-1].sales %}
+          {% if prev_sales != 0 %}
+            {{ "%.1f"|format((data.sales - prev_sales) / prev_sales * 100) }}%
+          {% else %}
+            &mdash;
+          {% endif %}
+        {% endif %}
+      </p>
+    </div>
+  {% endfor %}
+</div>
+  </div>
+</div>
+
+
+  <!-- Top Products Section -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Top Performing Products</h3>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Product</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Revenue</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Profit</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Margin</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantity</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Transactions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+          {% for product in product_analytics.top_products %}
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ product.name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">Ksh {{ "%.2f"|format(product.revenue) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">Ksh {{ "%.2f"|format(product.profit) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ 'bg-green-100 text-green-800' if product.margin >= 30 else 'bg-yellow-100 text-yellow-800' }}">
+                {{ "%.1f"|format(product.margin) }}%
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ product.quantity }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ product.transactions }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+
+  <!-- Customer Types -->
+  {% if customer_analytics %}
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Customer Segments</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {% for c_type, data in customer_analytics.items() %}
+      <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium text-gray-900 dark:text-white capitalize">{{ c_type }}</span>
+          <span class="text-xs px-2 py-1 rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200">
+            {{ "%.1f"|format(data.total / metrics.total_sales * 100 if metrics.total_sales > 0 else 0) }}%
+          </span>
+        </div>
+        <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">Ksh {{ "%.2f"|format(data.total) }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">{{ data.count }} transactions</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Avg: Ksh {{ "%.2f"|format(data.avg_amount) }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+

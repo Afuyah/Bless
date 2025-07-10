@@ -1,0 +1,104 @@
+<div id="user-management-fragment" class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden m-5">
+  <!-- Header and Add User Button -->
+{% set shop = g.current_shop %}
+
+  <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50 dark:bg-gray-800/50">
+  <div>
+   <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+      User Management - Bhapos
+    </h2>
+     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Add and Manage users</p>
+  </div>
+    <a href="{{ url_for('auth.add_user', shop_id=shop.id) }}"
+       hx-get="{{ url_for('auth.add_user', shop_id=shop.id) }}"
+       hx-target="#main-content"
+       hx-swap="innerHTML"
+       class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+      </svg>
+      Add User
+    </a>
+
+  </div>
+
+  <!-- User Table -->
+  <div class="overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-800">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Username
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Role
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+          {% for user in users %}
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                  {{ user.username }}
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                {% if user.role.name == 'Admin' %}bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400
+                {% else %}bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400{% endif %}">
+                {{ user.role.name }}
+              </span>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="2" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+              <div class="flex flex-col items-center justify-center py-8">
+                <svg class="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <p class="mt-2 text-gray-600 dark:text-gray-300">No users found</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+</div>
+
+<!-- DataTables Initialization -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $('#userTable').DataTable({
+        responsive: true,
+        searching: true,
+        paging: true,
+        ordering: true,
+        lengthMenu: [5, 10, 25, 50],
+        language: {
+            search: "Search users:",
+            lengthMenu: "Show _MENU_ users",
+            emptyTable: "No users available",
+            info: "Showing _START_ to _END_ of _TOTAL_ users",
+            infoEmpty: "Showing 0 to 0 of 0 users",
+            paginate: {
+                first: "First",
+                last: "Last",
+                next: "Next",
+                previous: "Previous"
+            }
+        },
+        initComplete: function() {
+            // Add dark mode class to DataTables elements
+            $('.dataTables_length select').addClass('dark:bg-gray-700 dark:border-gray-600 dark:text-white');
+            $('.dataTables_filter input').addClass('dark:bg-gray-700 dark:border-gray-600 dark:text-white');
+        }
+    });
+});
+</script>

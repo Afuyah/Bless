@@ -1,0 +1,300 @@
+<div id="product-inventory" class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden m-5">
+  <!-- Header Section -->
+  <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50 dark:bg-gray-800/50">
+    {% for shop in shops %}
+ <div class="flex items-center space-x-4">
+      <div class="p-3 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Product Inventory</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage your product stock levels</p>
+      </div>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+      <!-- Add Product Button -->
+      <button hx-get="{{ url_for('inventory.new_product_form_fragment',shop_id=shop.id) }}"
+              hx-target="#main-content"
+              hx-swap="innerHTML"
+              class="flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        Add Product
+      </button>
+      
+      <!-- Stock Filter -->
+      <div class="relative min-w-[180px]">
+        <label for="stockFilter" class="sr-only">Filter by Stock</label>
+        <select id="stockFilter" 
+                class="w-full pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none shadow-sm">
+          <option value="all">All Products</option>
+          <option value="critical">Critical (<5)</option>
+          <option value="low">Low Stock (5-10)</option>
+          <option value="medium">Medium Stock (11-49)</option>
+          <option value="high">High Stock (50+)</option>
+          <option value="out">Out of Stock</option>
+        </select>
+        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+          <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventory Table -->
+ <div class="overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-800">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Product
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Stock Status
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Cost
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Price
+          </th>
+          <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+        {% for product in products %}
+        <tr class="{% if product.stock == 0 %}bg-red-50/30 dark:bg-red-900/10{% elif product.stock < 5 %}bg-amber-50/30 dark:bg-amber-900/10{% endif %} hover:bg-gray-50 dark:hover:bg-gray-700/50">
+          <!-- Product Column -->
+          <td class="px-6 py-4">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-10 w-10 rounded-md bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                {% if product.image_url %}
+                <img class="h-10 w-10 rounded-md object-cover" src="{{ product.image_url }}" alt="{{ product.name }}">
+                {% else %}
+                <svg class="h-6 w-6 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                {% endif %}
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ product.name }}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">{{ product.category or 'Uncategorized' }}</div>
+                
+              </div>
+            </div>
+          </td>
+          
+          <!-- Stock Status Column -->
+          <td class="px-6 py-4">
+            <div class="flex items-center">
+              <div class="w-24 mr-3">
+                <div class="relative pt-1">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <span class="text-xs font-semibold inline-block {% if product.stock == 0 %}text-red-600 dark:text-red-400{% elif product.stock < 5 %}text-amber-600 dark:text-amber-400{% else %}text-green-600 dark:text-green-400{% endif %}">
+                        {{ product.stock }} in stock
+                      </span>
+                    </div>
+                  </div>
+                  <div class="overflow-hidden h-2 mt-1 text-xs flex rounded bg-gray-200 dark:bg-gray-700">
+                    <div style="width: {% if product.stock == 0 %}0%{% elif product.stock < 5 %}20%{% elif product.stock < 10 %}40%{% elif product.stock < 25 %}60%{% elif product.stock < 50 %}80%{% else %}100%{% endif %}" 
+                         class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center {% if product.stock == 0 %}bg-red-500{% elif product.stock < 5 %}bg-amber-500{% else %}bg-green-500{% endif %}"></div>
+                  </div>
+                </div>
+              </div>
+              {% if product.stock == 0 %}
+              <span class="px-2 py-1 text-xs rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200">
+                Out of stock
+              </span>
+              {% elif product.stock < 5 %}
+              <span class="px-2 py-1 text-xs rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200">
+                Critical
+              </span>
+              {% endif %}
+            </div>
+          </td>
+          
+          <!-- Cost Column -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900 dark:text-white">Ksh {{ "%.2f"|format(product.cost_price) }}</div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">per unit</div>
+          </td>
+          
+          <!-- Price Column -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-gray-900 dark:text-white">Ksh {{ "%.2f"|format(product.selling_price) }}</div>
+           <div class="text-xs text-gray-500 dark:text-gray-400">
+              {% if product.cost_price > 0 %}
+                Margin: {{ ((product.selling_price - product.cost_price) / product.cost_price * 100) | round(1) }}%
+              {% else %}
+                Margin: N/A
+              {% endif %}
+            </div>
+
+          </td>
+          
+          <!-- Actions Column -->
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <div class="flex justify-end space-x-2">
+              <!-- Update Stock Button -->
+              <button hx-get="{{ url_for('inventory.update_stock_form_fragment', product_id=product.id, shop_id=shop.id) }}"
+                      hx-target="#main-content"
+                      hx-swap="innerHTML"
+                      class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Stock
+              </button>
+              
+              <!-- View Details Button -->
+                
+              <button  hx-get="{{ url_for('reports.product_report', product_id=product.id, shop_id=shop.id) }}"
+                     hx-target="#main-content"
+                     hx-swap="innerHTML"
+                     class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md shadow-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                View
+              </button>
+
+
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+
+{% if pagination.pages > 1 %}
+  <div class="mt-4 flex justify-between items-center text-sm text-gray-600 dark:text-gray-300">
+    <div>Page {{ pagination.page }} of {{ pagination.pages }}</div>
+    <div class="flex space-x-2">
+      {% if pagination.has_prev %}
+        <a hx-get="{{ url_for('inventory.products_fragment', page=pagination.prev_num, search=search_query, shop_id=shop.id) }}"
+           hx-target="#main-content"
+           hx-swap="innerHTML"
+           class="px-3 py-1 border rounded bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+          Previous
+        </a>
+      {% endif %}
+      {% if pagination.has_next %}
+        <a hx-get="{{ url_for('inventory.products_fragment', page=pagination.next_num, search=search_query, shop_id=shop.id) }}"
+           hx-target="#main-content"
+           hx-swap="innerHTML"
+           class="px-3 py-1 border rounded bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+          Next
+        </a>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+
+    
+  </div>
+
+  <!-- Empty State -->
+  {% if not products %}
+  <div class="text-center py-12">
+    <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    </svg>
+    <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-white">No products found</h3>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by adding a new product.</p>
+    <div class="mt-6">
+      <button hx-get="{{ url_for('inventory.new_product_form_fragment', shop_id=shop.id) }}"
+              hx-target="#main-content"
+              hx-swap="innerHTML"
+              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        Add Product
+      </button>
+    </div>
+  </div>
+  {% endif %}
+{% endfor %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize DataTables
+  const inventoryTable = new simpleDatatables.DataTable("#inventoryTable", {
+    searchable: true,
+    fixedHeight: false,
+    perPage: 10,
+    perPageSelect: [10, 25, 50, 100],
+    labels: {
+      placeholder: "Search products...",
+      searchTitle: "Search within table",
+      perPage: "products per page",
+      noRows: "No matching products found",
+      info: "Showing {start} to {end} of {rows} products"
+    },
+    classes: {
+      active: "bg-primary-50 dark:bg-primary-900/20",
+      disabled: "opacity-50 cursor-not-allowed",
+      paginationList: "flex flex-wrap gap-1",
+      paginationListItem: "rounded-md border border-gray-300 dark:border-gray-600",
+      paginationListItemLink: "px-3 py-1 block hover:bg-gray-50 dark:hover:bg-gray-700"
+    }
+  });
+
+  // Stock filter functionality
+  document.getElementById('stockFilter').addEventListener('change', function() {
+    const filterValue = this.value;
+    const rows = document.querySelectorAll('#inventoryTable tbody tr');
+    
+    rows.forEach(row => {
+      const stockText = row.querySelector('.text-xs.font-semibold')?.textContent;
+      const stockValue = parseInt(stockText?.match(/\d+/)?.[0]) || 0;
+      
+      let shouldShow = false;
+      
+      switch(filterValue) {
+        case 'critical':
+          shouldShow = stockValue < 5;
+          break;
+        case 'low':
+          shouldShow = stockValue >= 5 && stockValue <= 10;
+          break;
+        case 'medium':
+          shouldShow = stockValue > 10 && stockValue <= 49;
+          break;
+        case 'high':
+          shouldShow = stockValue >= 50;
+          break;
+        case 'out':
+          shouldShow = stockValue === 0;
+          break;
+        default: // 'all'
+          shouldShow = true;
+      }
+      
+      row.style.display = shouldShow ? '' : 'none';
+    });
+    
+    // Update DataTables count
+    inventoryTable.update();
+  });
+});
+
+function showProductDetails(productId) {
+  // Implement with your preferred modal solution
+  console.log('Show details for product:', productId);
+  // Example: htmx.ajax('GET', `/products/${productId}/details`, { target: '#modal-content', swap: 'innerHTML' });
+  // Then show the modal
+}
+</script>

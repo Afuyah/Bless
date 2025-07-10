@@ -1,0 +1,593 @@
+
+<div class="container mx-auto px-4 py-6">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Product Performance Analytics</h1>
+            <h2 class="text-xl font-semibold text-blue-600 dark:text-blue-400">{{ product.name }}</h2>
+            <div class="flex items-center mt-2 space-x-2">
+                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    SKU: {{ product.id }}
+                </span>
+                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                    {{ "Ksh{:,.2f}".format(product.selling_price) }}
+                </span>
+                <span class="px-2 py-1 text-xs rounded-full {{ 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' if product.stock < 10 else 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' }}">
+                    Stock: {{ product.stock }}
+                </span>
+            </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <select id="timePeriod" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    hx-get="{{ url_for('reports.product_report', shop_id=current_shop.id, product_id=product.id) }}"
+                    hx-target="#analytics-content"
+                    hx-include="[name='time_period']">
+                <option value="today" {% if time_period == 'today' %}selected{% endif %}>Today</option>
+                <option value="week" {% if time_period == 'week' %}selected{% endif %}>This Week</option>
+                <option value="month" {% if time_period == 'month' %}selected{% endif %}>This Month</option>
+                <option value="year" {% if time_period == 'year' %}selected{% endif %}>This Year</option>
+                <option value="all" {% if time_period == 'all' %}selected{% endif %}>All Time</option>
+            </select>
+            
+            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                    onclick="exportProductReport()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Key Metrics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Revenue Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg">
+            <div class="p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</p>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                            {{ "Ksh{:,.2f}".format(analytics.total_revenue) }}
+                        </h3>
+                    </div>
+                    <div class="p-3 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center {{ 'text-green-600 dark:text-green-400' if analytics.revenue_trend > 0 else 'text-red-600 dark:text-red-400' }}">
+                    <span class="font-medium">{{ analytics.revenue_trend|abs }}%</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M{{ '12 7a1 1 0 01-1.414 0L5 1.414 6.414 0 12 5.586 17.586 0 19 1.414l-5.586 5.586A1 1 0 0112 7z' if analytics.revenue_trend > 0 else '12 13a1 1 0 01-1.414 0L5 7.414 6.414 6 12 11.586 17.586 6 19 7.414l-5.586 5.586A1 1 0 0112 13z' }}" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-sm ml-1">vs previous period</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Units Sold Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg">
+            <div class="p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Units Sold</p>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                            {{ analytics.total_units_sold }}
+                        </h3>
+                    </div>
+                    <div class="p-3 rounded-lg bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center {{ 'text-green-600 dark:text-green-400' if analytics.sales_trend > 0 else 'text-red-600 dark:text-red-400' }}">
+                    <span class="font-medium">{{ analytics.sales_trend|abs }}%</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M{{ '12 7a1 1 0 01-1.414 0L5 1.414 6.414 0 12 5.586 17.586 0 19 1.414l-5.586 5.586A1 1 0 0112 7z' if analytics.sales_trend > 0 else '12 13a1 1 0 01-1.414 0L5 7.414 6.414 6 12 11.586 17.586 6 19 7.414l-5.586 5.586A1 1 0 0112 13z' }}" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-sm ml-1">vs previous period</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profit Margin Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg">
+            <div class="p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Avg. Profit Margin</p>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                            {{ "{:.1f}%".format(analytics.avg_profit_margin) }}
+                        </h3>
+                    </div>
+                    <div class="p-3 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center {{ 'text-green-600 dark:text-green-400' if analytics.margin_trend > 0 else 'text-red-600 dark:text-red-400' }}">
+                    <span class="font-medium">{{ analytics.margin_trend|abs }}%</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M{{ '12 7a1 1 0 01-1.414 0L5 1.414 6.414 0 12 5.586 17.586 0 19 1.414l-5.586 5.586A1 1 0 0112 7z' if analytics.margin_trend > 0 else '12 13a1 1 0 01-1.414 0L5 7.414 6.414 6 12 11.586 17.586 6 19 7.414l-5.586 5.586A1 1 0 0112 13z' }}" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-sm ml-1">vs previous period</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Health Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg">
+            <div class="p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Stock Health</p>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                            {{ "{:.1f}".format(analytics.stock_cover_days) }} days
+                        </h3>
+                    </div>
+                    <div class="p-3 rounded-lg bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-1">
+                        <span>Current: {{ product.stock }}</span>
+                        <span>Avg Monthly: {{ "{:.1f}".format(analytics.avg_monthly_usage) }}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ (product.stock / analytics.max_stock_observed * 100) if analytics.max_stock_observed else 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <!-- Add this at the top of your template for debugging -->
+<div id="debug-info" class="hidden">
+    <div>Months: {{ analytics.months|tojson }}</div>
+    <div>Units Sold: {{ analytics.units_sold_by_month|tojson }}</div>
+    <div>Revenue: {{ analytics.revenue_by_month|tojson }}</div>
+    <div>Price Dates: {{ analytics.price_change_dates|tojson }}</div>
+    <div>Price History: {{ analytics.price_history|tojson }}</div>
+    <div>Sales by Day: {{ analytics.sales_by_day_of_week|tojson }}</div>
+</div>
+
+<!-- Charts Section -->
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Sales Trend Chart -->
+        <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div class="p-5 border-b border-gray-100 dark:border-gray-700">
+                <h3 class="font-semibold text-lg text-gray-800 dark:text-white">Sales & Revenue Trend</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Last 12 months performance</p>
+            </div>
+            <div class="p-4 h-80">
+                <canvas id="salesTrendChart" style="border: 1px solid red; width:100%; height:400px;"></canvas>
+            </div>
+            <div class="p-4 border-t border-gray-100 dark:border-gray-700 grid grid-cols-3 gap-4 text-center">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Best Month</p>
+                    <p class="font-medium">{{ analytics.best_selling_month }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Revenue Growth</p>
+                    <p class="font-medium {{ 'text-green-600 dark:text-green-400' if analytics.revenue_growth > 0 else 'text-red-600 dark:text-red-400' }}">
+                        {{ "{:.1f}%".format(analytics.revenue_growth) }}
+                    </p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Sales Growth</p>
+                    <p class="font-medium {{ 'text-green-600 dark:text-green-400' if analytics.sales_growth > 0 else 'text-red-600 dark:text-red-400' }}">
+                        {{ "{:.1f}%".format(analytics.sales_growth) }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Frequency Chart -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div class="p-5 border-b border-gray-100 dark:border-gray-700">
+                <h3 class="font-semibold text-lg text-gray-800 dark:text-white">Sales Frequency</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Weekly sales patterns</p>
+            </div>
+            <div class="p-4 h-64">
+                <canvas id="salesFrequencyChart"></canvas>
+            </div>
+            <div class="p-4 border-t border-gray-100 dark:border-gray-700 grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Peak Sales Day</p>
+                    <p class="font-medium">{{ analytics.peak_sales_day }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Avg Days Between Sales</p>
+                    <p class="font-medium">{{ "{:.1f}".format(analytics.avg_days_between_sales) }} days</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bottom Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Price History Chart -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div class="p-5 border-b border-gray-100 dark:border-gray-700">
+                <h3 class="font-semibold text-lg text-gray-800 dark:text-white">Price History</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Price changes over time</p>
+            </div>
+            <div class="p-4 h-64">
+                <canvas id="priceHistoryChart"></canvas>
+            </div>
+            <div class="p-4 border-t border-gray-100 dark:border-gray-700 grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Current Price</p>
+                    <p class="font-medium">{{ "Ksh{:,.2f}".format(product.selling_price) }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Optimal Price</p>
+                    <p class="font-medium text-green-600 dark:text-green-400">
+                        {{ "Ksh{:,.2f}".format(analytics.suggested_price) }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Behavior -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div class="p-5 border-b border-gray-100 dark:border-gray-700">
+                <h3 class="font-semibold text-lg text-gray-800 dark:text-white">Customer Behavior</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Purchase patterns</p>
+            </div>
+            <div class="p-4 space-y-4">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Avg. Quantity per Order</p>
+                    <p class="font-medium">{{ "{:.1f}".format(analytics.avg_quantity_per_order) }}</p>
+                    <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700 mt-1">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ (analytics.avg_quantity_per_order / 10 * 100) if analytics.avg_quantity_per_order else 0 }}%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Repeat Purchase Rate</p>
+                    <p class="font-medium">{{ "{:.1f}%".format(analytics.repeat_purchase_rate) }}</p>
+                    <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700 mt-1">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: {{ analytics.repeat_purchase_rate }}%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Frequently Bought With</p>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        {% for product in analytics.frequently_bought_with[:3] %}
+                        <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                            {{ product }}
+                        </span>
+                        {% endfor %}
+                        {% if analytics.frequently_bought_with|length > 3 %}
+                        <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                            +{{ analytics.frequently_bought_with|length - 3 }} more
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Insights -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700">
+            <div class="p-5 border-b border-gray-100 dark:border-gray-700">
+                <h3 class="font-semibold text-lg text-gray-800 dark:text-white">Inventory Insights</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Stock management metrics</p>
+            </div>
+            <div class="p-4 space-y-4">
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Stock Level</span>
+                        <span class="text-sm font-medium {{ 'text-red-600 dark:text-red-400' if product.stock < 10 else 'text-gray-500 dark:text-gray-400' }}">
+                            {{ product.stock }} units
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ (product.stock / analytics.max_stock_observed * 100) if analytics.max_stock_observed else 0 }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Stockouts</p>
+                        <p class="font-medium text-red-600 dark:text-red-400">{{ analytics.stockout_count }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Avg Monthly</p>
+                        <p class="font-medium">{{ "{:.1f}".format(analytics.avg_monthly_usage) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Reorder Point</p>
+                        <p class="font-medium"></p>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Tables Section -->
+    <div class="mb-8">
+        <div class="flex overflow-x-auto border-b border-gray-200 dark:border-gray-700">
+            <button class="px-6 py-3 font-medium text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400 whitespace-nowrap"
+                    hx-get="{{ url_for('reports.product_sales_table', shop_id=current_shop.id, product_id=product_id, page=page+1, time_period=time_period) }}"
+
+
+                    hx-target="#analytics-tables"
+                    hx-trigger="click"
+                    hx-swap="innerHTML">
+                Sales Records
+            </button>
+            <button class="px-6 py-3 font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap"
+                    hx-get="{{ url_for('reports.product_price_history', shop_id=current_shop.id, product_id=product.id) }}"
+
+                    hx-target="#analytics-tables"
+                    hx-trigger="click"
+                    hx-swap="innerHTML">
+                Price History
+            </button>
+            <button class="px-6 py-3 font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap"
+                    hx-get="{{ url_for('reports.product_stock_history', shop_id=current_shop.id, product_id=product.id) }}"
+                    hx-target="#analytics-tables"
+                    hx-trigger="click"
+                    hx-swap="innerHTML">
+                Stock History
+            </button>
+            
+        </div>
+        <div id="analytics-tables" class="bg-white dark:bg-gray-800 rounded-b-xl shadow-md border border-gray-100 dark:border-gray-700 border-t-0">
+            <!-- Tables will be loaded here dynamically -->
+            <div class="p-8 text-center text-gray-400 dark:text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p class="text-lg">Select a data view above</p>
+                <p class="text-sm mt-1">Choose between sales records, price history, stock movements or customer data</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Chart instance references
+let salesTrendChart = null;
+let salesFrequencyChart = null;
+let priceHistoryChart = null;
+
+function initializeSalesTrendChart() {
+    const salesTrendCtx = document.getElementById('salesTrendChart')?.getContext('2d');
+    if (!salesTrendCtx) return;
+
+    // Get the data from your template
+    const months = {{ analytics.months|tojson }};
+    const unitsData = {{ analytics.units_sold_by_month|tojson }};
+    const revenueData = {{ analytics.revenue_by_month|tojson }};
+
+    // Create the chart
+    salesTrendChart = new Chart(salesTrendCtx, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Units Sold',
+                    data: unitsData,
+                    borderColor: 'rgb(59, 130, 246)', // blue-500
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.3,
+                    yAxisID: 'y',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Revenue (Ksh)',
+                    data: revenueData,
+                    borderColor: 'rgb(16, 185, 129)', // green-500
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.3,
+                    yAxisID: 'y1',
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                                if (context.datasetIndex === 1) { // Revenue
+                                    label += 'Ksh' + context.parsed.y.toLocaleString();
+                                } else { // Units
+                                    label += context.parsed.y;
+                                }
+                            }
+                            return label;
+                        }
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Units Sold'
+                    },
+                    grid: {
+                        drawOnChartArea: true
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Revenue (Ksh)'
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return 'Ksh' + value.toLocaleString();
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeCharts() {
+    // Destroy existing chart instances if they exist
+    if (salesTrendChart) {
+        salesTrendChart.destroy();
+        salesTrendChart = null;
+    }
+    if (salesFrequencyChart) {
+        salesFrequencyChart.destroy();
+        salesFrequencyChart = null;
+    }
+    if (priceHistoryChart) {
+        priceHistoryChart.destroy();
+        priceHistoryChart = null;
+    }
+
+    // Initialize all charts
+    initializeSalesTrendChart();
+    
+    // Sales Frequency Chart (Weekdays)
+    const salesFrequencyCtx = document.getElementById('salesFrequencyChart')?.getContext('2d');
+    if (salesFrequencyCtx) {
+        salesFrequencyChart = new Chart(salesFrequencyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Units Sold',
+                    data: {{ analytics.sales_by_day_of_week|tojson }},
+                    backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Sales: ${context.parsed.y}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Units Sold' }
+                    }
+                }
+            }
+        });
+    }
+
+    // Price History Chart
+    const priceHistoryCtx = document.getElementById('priceHistoryChart')?.getContext('2d');
+    if (priceHistoryCtx) {
+        priceHistoryChart = new Chart(priceHistoryCtx, {
+            type: 'line',
+            data: {
+                labels: {{ analytics.price_change_dates|tojson }},
+                datasets: [{
+                    label: 'Price (Ksh)',
+                    data: {{ analytics.price_history|tojson }},
+                    borderColor: 'rgb(220, 38, 38)',
+                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Price: Ksh' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: { display: true, text: 'Price (Ksh)' },
+                        ticks: {
+                            callback: function(value) {
+                                return 'Ksh' + value.toFixed(2);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Initialize on first load
+document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to ensure all elements are loaded
+    setTimeout(initializeCharts, 100);
+});
+
+// Reinitialize after HTMX swaps
+document.body.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id === 'analytics-content') {
+        setTimeout(initializeCharts, 100);
+    }
+});
+
+// Also handle when HTMX content is added to the DOM
+document.body.addEventListener('htmx:afterSettle', function() {
+    if (document.getElementById('salesTrendChart')) {
+        setTimeout(initializeCharts, 100);
+    }
+});
+</script>

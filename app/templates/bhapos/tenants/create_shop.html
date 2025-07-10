@@ -1,0 +1,38 @@
+{% extends 'bhapos/base.html' %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-8">
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+    <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Create Shop for <span class="text-green-600 dark:text-green-400">{{ business.name }}</span></h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Fill in the shop details below.</p>
+    </div>
+
+    <form method="POST" class="px-6 py-5 space-y-5">
+      {{ form.hidden_tag() }}
+
+      <div>
+        {{ form.name.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+        {{ form.name(class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm") }}
+        {% if form.name.errors %}
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.name.errors[0] }}</p>
+        {% endif %}
+      </div>
+
+      <div>
+        {{ form.location.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+        {{ form.location(class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm") }}
+        {% if form.location.errors %}
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.location.errors[0] }}</p>
+        {% endif %}
+      </div>
+
+      <div class="pt-3">
+        <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md shadow-sm transition">
+          <i class="fas fa-save mr-2"></i> {{ form.submit.label.text or 'Save' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

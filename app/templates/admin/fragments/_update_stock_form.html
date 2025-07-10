@@ -1,0 +1,148 @@
+<!-- fragments/adjust_stock_fragment.html -->
+<div class="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 mt-5">
+  <!-- Header Section -->
+  <div class="mb-6 text-center">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center justify-center">
+      <i class="fas fa-boxes text-primary-500 mr-3"></i>
+      Adjust Stock
+    </h2>
+    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+      Update inventory for <span class="font-semibold text-primary-600 dark:text-primary-400">{{ product.name }}</span>
+    </p>
+    <div class="mt-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+      Current Stock: <span class="font-bold {% if product.stock < 10 %}text-red-500{% elif product.stock < 50 %}text-yellow-500{% else %}text-green-500{% endif %}">
+        {{ product.stock }}
+      </span>
+    </div>
+  </div>
+{% for shop in shops %}
+  <!-- Form Section -->
+  <form method="POST" 
+        action="{{ url_for('inventory.adjust_stock', product_id=product.id, shop_id=shop.id) }}"
+        hx-post="{{ url_for('inventory.adjust_stock', product_id=product.id, shop_id=shop.id) }}"
+        hx-target="#main-content"
+        hx-swap="innerHTML"
+        class="space-y-5">
+    
+    <!-- Quantity Input -->
+    <div>
+      <label for="adjustment_quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        Adjustment Quantity
+      </label>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <i class="fas fa-hashtag text-gray-400"></i>
+        </div>
+        <input type="number" 
+               id="adjustment_quantity" 
+               name="adjustment_quantity" 
+               min="1" 
+               required
+               class="pl-10 w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+               placeholder="Enter quantity">
+      </div>
+      <p id="quantityFeedback" class="mt-1 text-sm text-red-600 dark:text-red-400 hidden">
+        Quantity must be greater than zero
+      </p>
+    </div>
+    
+    <!-- Adjustment Type -->
+    <div>
+      <label for="adjustment_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        Adjustment Type
+      </label>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <i class="fas fa-exchange-alt text-gray-400"></i>
+        </div>
+        <select id="adjustment_type" 
+                name="adjustment_type" 
+                required
+                class="pl-10 w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
+          {% for type in allowed_types %}
+            <option value="{{ type }}" {% if type == 'add' %}selected{% endif %}>
+              {{ type|capitalize }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    
+    <!-- Notes Field (Optional) -->
+    <div>
+      <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        Notes (Optional)
+      </label>
+      <textarea id="notes" 
+                name="notes"
+                rows="2"
+                class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                placeholder="Reason for adjustment"></textarea>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end space-x-3 pt-2">
+      <button type="button"
+              hx-get="{{ url_for('inventory.products_fragment', shop_id=shop.id) }}"
+              hx-target="#main-content"
+              hx-swap="innerHTML"
+              class="btn-secondary">
+        <i class="fas fa-times mr-2"></i>
+        Cancel
+      </button>
+      <button type="submit" 
+              class="btn-primary">
+        <i class="fas fa-save mr-2"></i>
+        Update Stock
+      </button>
+    </div>
+  </form>
+  {% endfor %}
+</div>
+
+<!-- Styles -->
+<style>
+  .btn-primary {
+    @apply inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all;
+  }
+</style>
+
+<!-- Scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const quantityInput = document.getElementById('adjustment_quantity');
+  const quantityFeedback = document.getElementById('quantityFeedback');
+  const form = document.querySelector('form');
+
+  // Real-time validation
+  quantityInput.addEventListener('input', function() {
+    if (this.value < 1) {
+      quantityFeedback.classList.remove('hidden');
+      this.classList.add('border-red-500', 'ring-1', 'ring-red-500');
+    } else {
+      quantityFeedback.classList.add('hidden');
+      this.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
+    }
+  });
+
+  // Form submission handling
+  form.addEventListener('submit', function(e) {
+    if (quantityInput.value < 1) {
+      e.preventDefault();
+      quantityFeedback.classList.remove('hidden');
+      quantityInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
+      quantityInput.focus();
+    }
+  });
+
+  // Show loading state during submission
+  form.addEventListener('htmx:beforeRequest', function() {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+    submitBtn.disabled = true;
+  });
+});
+</script>

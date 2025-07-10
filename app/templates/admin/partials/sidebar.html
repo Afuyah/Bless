@@ -1,0 +1,248 @@
+<!-- Modern POS Sidebar -->
+<div id="sidebar" class="fixed md:relative z-40 bg-white dark:bg-gray-900 w-72 h-full border-r border-gray-100 dark:border-gray-800 flex flex-col flex-shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl">
+    <!-- Sidebar Header -->
+    <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-800">
+        <!-- Logo/Brand -->
+        <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 rounded-lg ">
+              
+            </div>
+            
+        </div>
+        
+        <!-- Collapse Button -->
+        <button id="sidebar-collapse" class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+            <svg class="h-5 w-5 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </button>
+    </div>
+   
+   <!-- Store Status -->
+        <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-primary-50/10 to-blue-50/10 dark:from-gray-800/50 dark:to-gray-800/50">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-lg font-bold text-primary-600 dark:text-primary-400">{{ business.name }}</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-300">Enterprise POS</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Online</span>
+                </div>
+            </div>
+            <div class="mt-2 flex items-center text-xs text-gray-500 dark:text-gray-400">
+                <i class="fas fa-store mr-1"></i>
+                <span>{{ current_shop.name }} • Today: {{ now().strftime('%b %d') }}</span>
+            </div>
+        </div>
+    
+    <!-- Navigation -->
+    <nav class="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+        <!-- Dashboard -->
+        <a href="{{ url_for('admin.admin_dashboard', shop_id=current_shop.id) }}"
+           hx-get="{{ url_for('admin.admin_dashboard', shop_id=current_shop.id) }}"
+           hx-target="#main-content"
+           hx-swap="innerHTML"
+           hx-push-url="true"
+           hx-indicator="#global-loader"
+           class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+            <div class="relative mr-3">
+                <i class="fas fa-tachometer-alt text-gray-500 dark:text-gray-400 group-hover:text-primary-500 transition-colors duration-200"></i>
+                <div class="absolute -top-1 -right-1 w-2 h-2 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            </div>
+            <span>Dashboard</span>
+        </a>
+
+        <!-- Sales & Inventory Section -->
+        <div class="px-4 py-2 mt-6 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center">
+            <i class="fas fa-cash-register mr-2"></i>
+            <span>Sales & Inventory</span>
+        </div>
+        
+        <!-- Product Management -->
+        <a href="{{ url_for('inventory.products', shop_id=current_shop.id) }}"
+           hx-get="{{ url_for('inventory.products', shop_id=current_shop.id ) }}" 
+           hx-target="#main-content" 
+           hx-swap="innerHTML"
+           hx-push-url="true"
+           hx-indicator="#global-loader"
+           class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+            <div class="relative mr-3">
+                <i class="fas fa-box text-gray-500 dark:text-gray-400 group-hover:text-primary-500 transition-colors duration-200"></i>
+                <div class="absolute -top-1 -right-1 w-2 h-2 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            </div>
+            <span>Products</span>
+        </a>
+
+        <!-- Categories -->
+        <a href="{{ url_for('inventory.categories', shop_id=current_shop.id) }}" 
+           hx-get="{{ url_for('inventory.categories', shop_id=current_shop.id) }}" 
+           hx-target="#main-content" 
+           hx-swap="innerHTML"
+           hx-push-url="true"
+           hx-indicator="#global-loader"
+           class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+            <div class="relative mr-3">
+                <i class="fas fa-tags text-gray-500 dark:text-gray-400 group-hover:text-primary-500 transition-colors duration-200"></i>
+                <div class="absolute -top-1 -right-1 w-2 h-2 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            </div>
+            <span>Categories</span>
+        </a>
+
+        <!-- Price Updates -->
+        <a href="{{ url_for('price.price_fragment', shop_id=current_shop.id) }}"
+           hx-get="{{ url_for('price.price_fragment', shop_id=current_shop.id) }}"
+           hx-target="#main-content"
+           hx-swap="innerHTML"
+           hx-push-url="true"
+           hx-indicator="#global-loader"
+           class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+            <div class="relative mr-3">
+                <i class="fas fa-tag text-gray-500 dark:text-gray-400 group-hover:text-primary-500 transition-colors duration-200"></i>
+                <div class="absolute -top-1 -right-1 w-2 h-2 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            </div>
+            <span>Pricing</span>
+        </a>
+
+        <!-- Reports Section -->
+        <div class="px-4 py-2 mt-6 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center">
+            <i class="fas fa-chart-bar mr-2"></i>
+            <span>Reports & Analytics</span>
+        </div>
+        
+        <!-- Daily Reports -->
+        <a href="{{ url_for('reports.daily_sales_report', shop_id=current_shop.id ) }}"
+           hx-get="{{ url_for('reports.daily_sales_report', shop_id=current_shop.id) }}"
+           hx-target="#main-content"
+           hx-push-url="true"
+           hx-indicator="#global-loader"
+           class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+            <div class="relative mr-3">
+                <i class="fas fa-chart-line text-gray-500 dark:text-gray-400 group-hover:text-primary-500 transition-colors duration-200"></i>
+                <div class="absolute -top-1 -right-1 w-2 h-2 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            </div>
+            <span>Daily Sales</span>
+        </a>
+
+        <!-- Weekly Reports -->
+        <a href="{{ url_for('reports.weekly_sales_report', shop_id=current_shop.id  ) }}"
+           hx-get="{{ url_for('reports.weekly_sales_report', shop_id=current_shop.id ) }}"
+           hx-target="#main-content"
+           hx-swap="innerHTML"
+           hx-push-url="true"
+           hx-indicator="#global-loader"
+           class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+            <div class="relative mr-3">
+                <i class="fas fa-calendar-week text-gray-500 dark:text-gray-400 group-hover:text-primary-500 transition-colors duration-200"></i>
+                <div class="absolute -top-1 -right-1 w-2 h-2 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            </div>
+            <span>Weekly Reports</span>
+        </a>
+
+        <!-- Monthly Reports -->
+        <a href="{{ url_for('reports.monthly_sales_analytics', shop_id=current_shop.id) }}"
+           hx-get="{{ url_for('reports.monthly_sales_analytics', shop_id=current_shop.id ) }}"
+           hx-target="#main-content"
+           hx-swap="innerHTML"
+           hx-push-url="true"
+           hx-indicator="#global-loader"
+           class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+            <div class="relative mr-3">
+                <i class="fas fa-chart-pie text-gray-500 dark:text-gray-400 group-hover:text-primary-500 transition-colors duration-200"></i>
+                <div class="absolute -top-1 -right-1 w-2 h-2 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            </div>
+            <span>Monthly Analytics</span>
+        </a>
+
+        <!-- Stock Logs -->
+        <a href="{{ url_for('inventory.stock_logs', shop_id=current_shop.id) }}"
+           hx-get="{{ url_for('inventory.stock_logs', shop_id=current_shop.id) }}"
+           hx-target="#main-content"
+           hx-swap="innerHTML"
+           hx-push-url="true"
+           hx-indicator="#global-loader"
+           class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+            <div class="relative mr-3">
+                <i class="fas fa-clipboard-list text-gray-500 dark:text-gray-400 group-hover:text-primary-500 transition-colors duration-200"></i>
+                <div class="absolute -top-1 -right-1 w-2 h-2 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            </div>
+            <span>Stock Logs</span>
+        </a>
+
+        <!-- System Section -->
+        <div class="px-4 py-2 mt-6 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center">
+            <i class="fas fa-cog mr-2"></i>
+            <span>System</span>
+        </div>
+        
+          <a href="{{ url_for('auth.user_management', shop_id=current_shop.id) }}"
+             hx-get="{{ url_for('auth.user_management', shop_id=current_shop.id) }}"
+             hx-target="#main-content"
+             hx-swap="innerHTML"
+             hx-push-url="true"
+             hx-indicator="#global-loader"
+             class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                    text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                    hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+              <div class="relative mr-3">
+                  <i class="fas fa-users-cog text-gray-500 dark:text-gray-400 group-hover:text-primary-500 transition-colors duration-200"></i>
+                  <div class="absolute -top-1 -right-1 w-2 h-2 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+              </div>
+              <span>User Management </span>
+          </a>
+        
+
+    </nav>
+    
+    <!-- User Profile -->
+    <div class="p-4 border-t border-gray-100 dark:border-gray-800">
+        <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold shadow-sm">
+                {{ current_user.username[0]|upper }}
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ current_user.username }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ current_user.role.name }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Menu Button -->
+<button id="mobile-menu-button" class="md:hidden fixed bottom-4 right-4 z-30 h-14 w-14 rounded-full bg-primary-500 text-white shadow-lg flex items-center justify-center transition-transform hover:scale-105">
+    <i class="fas fa-bars text-xl"></i>
+</button>
+
+<!-- Mobile Sidebar Overlay -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"></div>
+
+<!-- Modern POS Loader -->
+<div id="global-loader" class="fixed inset-0 bg-black/30 dark:bg-black/50 z-50 flex items-center justify-center transition-opacity duration-300 opacity-0 pointer-events-none">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-64 text-center transform transition-all duration-300 scale-95">
+        <div class="flex justify-center mb-4">
+            <div class="h-12 w-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-1">Processing</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Please wait...</p>
+    </div>
+</div>
+

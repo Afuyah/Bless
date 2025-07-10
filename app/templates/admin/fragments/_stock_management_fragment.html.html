@@ -1,0 +1,424 @@
+<!-- fragments/stock_management_fragment.html -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
+  <!-- Header Section -->
+  <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
+          <i class="fas fa-boxes text-primary-500 mr-3"></i>
+          Stock Management
+        </h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Update product inventory and pricing
+        </p>
+      </div>
+      
+      <div class="relative w-full sm:w-64">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <i class="fas fa-search text-gray-400"></i>
+        </div>
+        <input type="text" id="productSearch" 
+               class="pl-10 w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" 
+               placeholder="Search products...">
+        <button id="resetSearch" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700" id="productTable">
+      <thead class="bg-gray-50 dark:bg-gray-700">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+            Product
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+            Stock
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+            Cost Price
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+            Selling Price
+          </th>
+          <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+        {% for product in products %}
+        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+          <!-- Product Name -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-10 w-10 bg-gray-200 dark:bg-gray-600 rounded-md flex items-center justify-center">
+                <i class="fas fa-box text-gray-500 dark:text-gray-300"></i>
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ product.name }}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">SKU: {{ product.sku or 'N/A' }}</div>
+              </div>
+            </div>
+          </td>
+          
+          <!-- Stock Level -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 py-1 text-xs font-semibold rounded-full 
+              {% if product.stock < 10 %}bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400
+              {% elif product.stock < 50 %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400
+              {% else %}bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400{% endif %}">
+              {{ product.stock }} in stock
+            </span>
+          </td>
+          
+          <!-- Cost Price -->
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+            <div class="flex items-center">
+              <span class="font-mono">Ksh {{ "%.2f"|format(product.cost_price) }}</span>
+              <button @click="openCostPriceModal({{ product.id }}, '{{ product.name }}', {{ product.cost_price }})"
+                      class="ml-2 p-1 text-gray-400 hover:text-primary-500 dark:hover:text-primary-400">
+                <i class="fas fa-pencil-alt text-xs"></i>
+              </button>
+            </div>
+          </td>
+          
+          <!-- Selling Price -->
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+            <div class="flex items-center">
+              <span class="font-mono">Ksh {{ "%.2f"|format(product.selling_price) }}</span>
+              <button @click="openSellingPriceModal({{ product.id }}, '{{ product.name }}', {{ product.selling_price }})"
+                      class="ml-2 p-1 text-gray-400 hover:text-primary-500 dark:hover:text-primary-400">
+                <i class="fas fa-pencil-alt text-xs"></i>
+              </button>
+            </div>
+          </td>
+          
+          <!-- Actions -->
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <div class="flex justify-end space-x-2">
+              <button hx-get="{{ url_for('inventory.adjust_stock_fragment', product_id=product.id, shop_id=shop.id) }}"
+                      hx-target="#modals"
+                      class="btn-action-secondary">
+                <i class="fas fa-edit mr-1"></i> Stock
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  {% if not products %}
+  <div class="p-8 text-center border-t border-gray-200 dark:border-gray-700">
+    <div class="mx-auto max-w-md">
+      <i class="fas fa-boxes text-gray-300 dark:text-gray-600 text-5xl mb-4"></i>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">No products found</h3>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        Add products to your inventory to get started.
+      </p>
+      <div class="mt-6">
+        <button hx-get="{{ url_for('inventory.new_product_fragment', shop_id=shop.id) }}"
+                hx-target="#modals"
+                class="btn-primary inline-flex items-center">
+          <i class="fas fa-plus mr-2"></i>
+          Add Product
+        </button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Cost Price Modal -->
+<div id="costPriceModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+  <div class="flex items-end sm:items-center justify-center min-h-full p-4 text-center">
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true" @click="closeCostPriceModal">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+    
+    <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
+      <div class="px-4 py-3 bg-red-500 dark:bg-red-600">
+        <h3 class="text-lg font-medium text-white">
+          Update Cost Price
+        </h3>
+      </div>
+      
+      <div class="px-6 py-4">
+        <form id="updateCostPriceForm" @submit.prevent="submitCostPriceForm">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Product
+            </label>
+            <input type="text" x-model="costPriceModal.productName" 
+                   class="w-full bg-gray-100 dark:bg-gray-700 rounded-md border-gray-300 dark:border-gray-600 shadow-sm" readonly>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              New Cost Price (Ksh)
+            </label>
+            <input type="number" x-model="costPriceModal.newPrice" min="0" step="0.01" required
+                   class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:text-white">
+          </div>
+          
+          <input type="hidden" x-model="costPriceModal.productId">
+          
+          <div class="flex justify-end space-x-3 pt-2">
+            <button type="button" @click="closeCostPriceModal"
+                    class="btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" class="btn-danger">
+              <span x-show="costPriceModal.loading" class="animate-spin mr-2">↻</span>
+              Update Price
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Selling Price Modal -->
+<div id="sellingPriceModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+  <div class="flex items-end sm:items-center justify-center min-h-full p-4 text-center">
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true" @click="closeSellingPriceModal">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+    
+    <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
+      <div class="px-4 py-3 bg-primary-500 dark:bg-primary-600">
+        <h3 class="text-lg font-medium text-white">
+          Update Selling Price
+        </h3>
+      </div>
+      
+      <div class="px-6 py-4">
+        <form id="updateSellingPriceForm" @submit.prevent="submitSellingPriceForm">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Product
+            </label>
+            <input type="text" x-model="sellingPriceModal.productName" 
+                   class="w-full bg-gray-100 dark:bg-gray-700 rounded-md border-gray-300 dark:border-gray-600 shadow-sm" readonly>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              New Selling Price (Ksh)
+            </label>
+            <input type="number" x-model="sellingPriceModal.newPrice" min="0" step="0.01" required
+                   class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Bundle Size (optional)
+              </label>
+              <input type="number" x-model="sellingPriceModal.combinationSize" min="1"
+                     class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm dark:bg-gray-700 dark:text-white">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Bundle Price (optional)
+              </label>
+              <input type="number" x-model="sellingPriceModal.combinationPrice" min="0" step="0.01"
+                     class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm dark:bg-gray-700 dark:text-white">
+            </div>
+          </div>
+          
+          <input type="hidden" x-model="sellingPriceModal.productId">
+          
+          <div class="flex justify-end space-x-3 pt-2">
+            <button type="button" @click="closeSellingPriceModal"
+                    class="btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" class="btn-primary">
+              <span x-show="sellingPriceModal.loading" class="animate-spin mr-2">↻</span>
+              Update Price
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles -->
+<style>
+  .btn-primary {
+    @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all;
+  }
+  .btn-danger {
+    @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all;
+  }
+  .btn-action-secondary {
+    @apply inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all;
+  }
+</style>
+
+<!-- Alpine.js Component -->
+<script>
+document.addEventListener('alpine:init', () => {
+  Alpine.data('stockManagement', () => ({
+    costPriceModal: {
+      open: false,
+      productId: null,
+      productName: '',
+      newPrice: 0,
+      loading: false
+    },
+    sellingPriceModal: {
+      open: false,
+      productId: null,
+      productName: '',
+      newPrice: 0,
+      combinationSize: null,
+      combinationPrice: null,
+      loading: false
+    },
+    
+    openCostPriceModal(id, name, price) {
+      this.costPriceModal = {
+        open: true,
+        productId: id,
+        productName: name,
+        newPrice: price,
+        loading: false
+      };
+      document.body.classList.add('overflow-hidden');
+      document.getElementById('costPriceModal').classList.remove('hidden');
+    },
+    
+    closeCostPriceModal() {
+      this.costPriceModal.open = false;
+      document.body.classList.remove('overflow-hidden');
+      document.getElementById('costPriceModal').classList.add('hidden');
+    },
+    
+    openSellingPriceModal(id, name, price) {
+      this.sellingPriceModal = {
+        open: true,
+        productId: id,
+        productName: name,
+        newPrice: price,
+        combinationSize: null,
+        combinationPrice: null,
+        loading: false
+      };
+      document.body.classList.add('overflow-hidden');
+      document.getElementById('sellingPriceModal').classList.remove('hidden');
+    },
+    
+    closeSellingPriceModal() {
+      this.sellingPriceModal.open = false;
+      document.body.classList.remove('overflow-hidden');
+      document.getElementById('sellingPriceModal').classList.add('hidden');
+    },
+    
+    async submitCostPriceForm() {
+      this.costPriceModal.loading = true;
+      
+      try {
+        const response = await axios.patch(`/api/products/${this.costPriceModal.productId}/cost_price`, {
+          cost_price: this.costPriceModal.newPrice
+        });
+        
+        // Update the table row
+        const row = document.querySelector(`tr[data-product-id="${this.costPriceModal.productId}"]`);
+        if (row) {
+          row.querySelector('.cost-price').textContent = `Ksh ${this.costPriceModal.newPrice.toFixed(2)}`;
+        }
+        
+        this.closeCostPriceModal();
+        showToast('Cost price updated successfully', 'success');
+      } catch (error) {
+        showToast(error.response?.data?.message || 'Failed to update cost price', 'error');
+      } finally {
+        this.costPriceModal.loading = false;
+      }
+    },
+    
+    async submitSellingPriceForm() {
+      this.sellingPriceModal.loading = true;
+      
+      try {
+        const response = await axios.patch(`/api/products/${this.sellingPriceModal.productId}/selling_price`, {
+          selling_price: this.sellingPriceModal.newPrice,
+          combination_size: this.sellingPriceModal.combinationSize,
+          combination_price: this.sellingPriceModal.combinationPrice
+        });
+        
+        // Update the table row
+        const row = document.querySelector(`tr[data-product-id="${this.sellingPriceModal.productId}"]`);
+        if (row) {
+          row.querySelector('.selling-price').textContent = `Ksh ${this.sellingPriceModal.newPrice.toFixed(2)}`;
+        }
+        
+        this.closeSellingPriceModal();
+        showToast('Selling price updated successfully', 'success');
+      } catch (error) {
+        showToast(error.response?.data?.message || 'Failed to update selling price', 'error');
+      } finally {
+        this.sellingPriceModal.loading = false;
+      }
+    }
+  }));
+});
+
+// Initialize DataTable
+document.addEventListener('DOMContentLoaded', function() {
+  const productTable = new simpleDatatables.DataTable("#productTable", {
+    searchable: true,
+    perPage: 10,
+    perPageSelect: [10, 25, 50],
+    labels: {
+      placeholder: "Search products...",
+      perPage: "{select} per page",
+      noRows: "No matching products found",
+      info: "Showing {start} to {end} of {rows} products"
+    }
+  });
+
+  // Search functionality
+  document.getElementById('productSearch').addEventListener('input', function() {
+    productTable.search(this.value);
+  });
+
+  document.getElementById('resetSearch').addEventListener('click', function() {
+    document.getElementById('productSearch').value = '';
+    productTable.search('');
+  });
+});
+
+// Toast notification function
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `fixed bottom-4 right-4 z-50 px-4 py-2 rounded-md shadow-lg text-white ${
+    type === 'error' ? 'bg-red-500' : 
+    type === 'success' ? 'bg-green-500' : 'bg-blue-500'
+  }`;
+  toast.innerHTML = `
+    <div class="flex items-center">
+      <i class="fas ${
+        type === 'error' ? 'fa-exclamation-circle' : 
+        type === 'success' ? 'fa-check-circle' : 'fa-info-circle'
+      } mr-2"></i>
+      <span>${message}</span>
+    </div>
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 5000);
+}
+</script>

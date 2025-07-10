@@ -1,0 +1,129 @@
+{% extends 'bhapos/base.html' %}
+
+{% block title %}Business Management{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Business Management</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Manage all registered businesses and their tenants
+        </p>
+      </div>
+      <div class="mt-4 md:mt-0">
+        <a href="{{ url_for('bhapos.create_business') }}" 
+           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
+          <i class="fas fa-plus-circle mr-2"></i> New Business
+        </a>
+      </div>
+    </div>
+
+    <!-- Business Table -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-xl overflow-hidden">
+      <!-- Table Header -->
+      <div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+        <div class="col-span-5 md:col-span-3 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase">Business</div>
+        <div class="col-span-3 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase">Tenants</div>
+        <div class="hidden md:block md:col-span-3 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase">Created</div>
+        <div class="col-span-4 md:col-span-3 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase text-right">Actions</div>
+      </div>
+
+      <!-- Business List -->
+      {% if businesses.items %}
+        {% for business in businesses.items %}
+        <div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+          <!-- Business Info -->
+          <div class="col-span-5 md:col-span-3 flex items-center">
+            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-3">
+              <i class="fas fa-building text-indigo-600 dark:text-indigo-300"></i>
+            </div>
+            <div>
+              <div class="font-medium text-gray-900 dark:text-white">{{ business.name }}</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {% if business.registration_number %}
+                ID: {{ business.registration_number }}
+                {% else %}
+                No registration number
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Tenant Count -->
+          <div class="col-span-3 flex items-center">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+              {% if business.users %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+              {% else %}bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300{% endif %}">
+              <i class="fas fa-users mr-1"></i>
+              {{ business.users|length }} tenant{% if business.users|length != 1 %}s{% endif %}
+            </span>
+          </div>
+
+          <!-- Created Date -->
+          <div class="hidden md:flex md:col-span-3 items-center">
+            <i class="far fa-calendar-alt text-gray-400 mr-2"></i>
+            <span class="text-sm text-gray-700 dark:text-gray-300">
+              {{ business.created_at.strftime('%b %d, %Y') }}
+            </span>
+          </div>
+
+          <!-- Actions -->
+          <div class="col-span-4 md:col-span-3 flex justify-end space-x-2">
+            <a href="{{ url_for('bhapos.view_business', id=business.id) }}" 
+               class="inline-flex items-center p-1.5 border border-transparent rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
+               title="View">
+              <i class="fas fa-eye text-xs"></i>
+            </a>
+            <a href="{{ url_for('bhapos.create_tenant', business_id=business.id) }}" 
+               class="inline-flex items-center p-1.5 border border-transparent rounded-full shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition"
+               title="Add Tenant">
+              <i class="fas fa-user-plus text-xs"></i>
+            </a>
+          
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <!-- Empty State -->
+        <div class="px-6 py-12 text-center">
+          <i class="fas fa-building text-4xl text-gray-300 dark:text-gray-600 mb-4"></i>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">No Businesses Found</h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Get started by registering your first business
+          </p>
+          <div class="mt-6">
+            <a href="{{ url_for('bhapos.create_business') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
+              <i class="fas fa-plus-circle mr-2"></i> Create Business
+            </a>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Pagination -->
+      {% if businesses.pages > 1 %}
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 flex items-center justify-between">
+        <div class="text-sm text-gray-700 dark:text-gray-300">
+          Showing <span class="font-medium">{{ businesses.first }}</span> to <span class="font-medium">{{ businesses.last }}</span> of <span class="font-medium">{{ businesses.total }}</span> businesses
+        </div>
+        <div class="flex space-x-2">
+          {% if businesses.has_prev %}
+          <a href="{{ url_for('bhapos.list_businesses', page=businesses.prev_num) }}" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+            Previous
+          </a>
+          {% endif %}
+          
+          {% if businesses.has_next %}
+          <a href="{{ url_for('bhapos.list_businesses', page=businesses.next_num) }}" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+            Next
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

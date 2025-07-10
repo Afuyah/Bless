@@ -1,0 +1,269 @@
+{% extends 'bhapos/base.html' %}
+
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Manage all system users and their permissions
+        </p>
+      </div>
+      <div class="mt-4 md:mt-0 flex items-center space-x-3">
+        <div class="relative">
+          <select id="roleFilter" onchange="window.location.href='/users?role='+this.value" 
+            class="appearance-none bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 pl-3 pr-8 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+            <option value="">All Roles</option>
+            {% for role_choice in Role %}
+            <option value="{{ role_choice.name }}" {% if role == role_choice.name %}selected{% endif %}>
+              {{ role_choice.value|title }}
+            </option>
+            {% endfor %}
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
+            <i class="fas fa-chevron-down text-xs"></i>
+          </div>
+        </div>
+        <a href="#" 
+           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
+          <i class="fas fa-user-plus mr-2"></i> New User
+        </a>
+      </div>
+    </div>
+
+    <!-- User Table -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-xl overflow-hidden">
+      <!-- Table Header -->
+      <div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+        <div class="col-span-5 md:col-span-3 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase">User</div>
+        <div class="col-span-3 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase">Role</div>
+        <div class="hidden md:block md:col-span-3 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase">Business</div>
+        <div class="col-span-4 md:col-span-3 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase text-right">Actions</div>
+      </div>
+
+      <!-- User List -->
+      {% if users.items %}
+        {% for user in users.items %}
+        <div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+          <!-- User Info -->
+          <div class="col-span-5 md:col-span-3 flex items-center">
+            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-3">
+              <i class="fas fa-user text-indigo-600 dark:text-indigo-300"></i>
+            </div>
+            <div>
+              <div class="font-medium text-gray-900 dark:text-white">{{ user.username }}</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {{ user.email or "No email" }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Role -->
+          <div class="col-span-3 flex items-center">
+            <span class="px-2 py-1 text-xs font-medium rounded-full 
+              {% if user.role == Role.ADMIN %}bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300
+              {% elif user.role == Role.CASHIER %}bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300
+              {% elif user.role == Role.TENANT %}bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300
+              {% else %}bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-300{% endif %}">
+              {{ user.role.value|title }}
+            </span>
+          </div>
+
+          <!-- Business -->
+          <div class="hidden md:flex md:col-span-3 items-center">
+            {% if user.business %}
+            <div class="flex items-center">
+              <i class="fas fa-building text-gray-400 mr-2 text-sm"></i>
+              <span class="text-sm text-gray-700 dark:text-gray-300 truncate">{{ user.business.name }}</span>
+            </div>
+            {% else %}
+            <span class="text-sm text-gray-400 dark:text-gray-500">Not assigned</span>
+            {% endif %}
+          </div>
+
+          <!-- Actions -->
+          <div class="col-span-4 md:col-span-3 flex justify-end space-x-2">
+            
+            {% if not user.is_deleted %}
+            <button onclick="confirmDeactivate({{ user.id }}, '{{ user.username }}')"
+               class="inline-flex items-center p-1.5 border border-transparent rounded-full shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition"
+               title="Deactivate">
+              <i class="fas fa-user-slash text-xs"></i>
+            </button>
+            {% else %}
+            <button onclick="confirmActivate({{ user.id }}, '{{ user.username }}')"
+               class="inline-flex items-center p-1.5 border border-transparent rounded-full shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition"
+               title="Activate">
+              <i class="fas fa-user-check text-xs"></i>
+            </button>
+            {% endif %}
+            <button onclick="confirmDelete({{ user.id }}, '{{ user.username }}')"
+               class="inline-flex items-center p-1.5 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition"
+               title="Delete">
+              <i class="fas fa-trash-alt text-xs"></i>
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <!-- Empty State -->
+        <div class="px-6 py-12 text-center">
+          <i class="fas fa-users text-4xl text-gray-300 dark:text-gray-600 mb-4"></i>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">No Users Found</h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {% if role %}
+              No users with the {{ role }} role were found.
+            {% else %}
+              No users found in the system.
+            {% endif %}
+          </p>
+          <div class="mt-6">
+            <a href="#" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
+              <i class="fas fa-user-plus mr-2"></i> Create New User
+            </a>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Pagination -->
+      {% if users.pages > 1 %}
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 flex items-center justify-between">
+        <div class="text-sm text-gray-700 dark:text-gray-300">
+          Showing <span class="font-medium">{{ users.first }}</span> to <span class="font-medium">{{ users.last }}</span> of <span class="font-medium">{{ users.total }}</span> users
+        </div>
+        <div class="flex space-x-2">
+          {% if users.has_prev %}
+          <a href="{{ url_for('bhapos.list_users', page=users.prev_num, role=role) }}" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+            Previous
+          </a>
+          {% endif %}
+          
+          {% if users.has_next %}
+          <a href="{{ url_for('bhapos.list_users', page=users.next_num, role=role) }}" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+            Next
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modals -->
+<dialog id="confirmModal" class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-0 w-full max-w-md">
+  <div class="relative">
+    <div class="absolute top-4 right-4">
+      <button onclick="confirmModal.close()" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <div class="p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4" id="modalTitle">Confirm Action</h3>
+      <p class="text-gray-600 dark:text-gray-300" id="modalMessage"></p>
+      
+      <div class="mt-6 space-y-4 hidden" id="deactivateFields">
+        <div>
+          <label for="deactivateReason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Reason (Optional)
+          </label>
+          <textarea id="deactivateReason" rows="3" class="block w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Why are you deactivating this user?"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 rounded-b-xl flex justify-end space-x-3">
+      <button onclick="confirmModal.close()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+        Cancel
+      </button>
+      <button id="confirmAction" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
+        Confirm
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+let currentUserId = null;
+let currentAction = null;
+
+function confirmDeactivate(userId, username) {
+  currentUserId = userId;
+  currentAction = 'deactivate';
+  document.getElementById('modalTitle').textContent = 'Deactivate User';
+  document.getElementById('modalMessage').textContent = `Are you sure you want to deactivate ${username}?`;
+  document.getElementById('deactivateFields').classList.remove('hidden');
+  document.getElementById('confirmAction').classList.remove('bg-red-600', 'hover:bg-red-700', 'focus:ring-red-500');
+  document.getElementById('confirmAction').classList.add('bg-yellow-600', 'hover:bg-yellow-700', 'focus:ring-yellow-500');
+  document.getElementById('confirmAction').textContent = 'Deactivate';
+  confirmModal.showModal();
+}
+
+function confirmActivate(userId, username) {
+  currentUserId = userId;
+  currentAction = 'activate';
+  document.getElementById('modalTitle').textContent = 'Activate User';
+  document.getElementById('modalMessage').textContent = `Are you sure you want to activate ${username}?`;
+  document.getElementById('deactivateFields').classList.add('hidden');
+  document.getElementById('confirmAction').classList.remove('bg-yellow-600', 'hover:bg-yellow-700', 'focus:ring-yellow-500');
+  document.getElementById('confirmAction').classList.add('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
+  document.getElementById('confirmAction').textContent = 'Activate';
+  confirmModal.showModal();
+}
+
+function confirmDelete(userId, username) {
+  currentUserId = userId;
+  currentAction = 'delete';
+  document.getElementById('modalTitle').textContent = 'Delete User';
+  document.getElementById('modalMessage').textContent = `Are you sure you want to permanently delete ${username}? This action cannot be undone.`;
+  document.getElementById('deactivateFields').classList.add('hidden');
+  document.getElementById('confirmAction').classList.remove('bg-yellow-600', 'hover:bg-yellow-700', 'focus:ring-yellow-500', 'bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
+  document.getElementById('confirmAction').classList.add('bg-red-600', 'hover:bg-red-700', 'focus:ring-red-500');
+  document.getElementById('confirmAction').textContent = 'Delete';
+  confirmModal.showModal();
+}
+
+document.getElementById('confirmAction').addEventListener('click', async function() {
+  let endpoint = '';
+  let body = {};
+  
+  switch(currentAction) {
+    case 'deactivate':
+      endpoint = `/users/${currentUserId}/deactivate`;
+      body.reason = document.getElementById('deactivateReason').value;
+      break;
+    case 'activate':
+      endpoint = `/users/${currentUserId}/activate`;
+      break;
+    case 'delete':
+      endpoint = `/users/${currentUserId}/delete`;
+      break;
+  }
+  
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token() }}'
+      },
+      body: JSON.stringify(body)
+    });
+    
+    if (response.ok) {
+      window.location.reload();
+    } else {
+      alert('Error performing action');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error performing action');
+  }
+  
+  confirmModal.close();
+});
+</script>
+{% endblock %}

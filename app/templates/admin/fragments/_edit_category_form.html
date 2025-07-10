@@ -1,0 +1,63 @@
+<div id="edit-category-form" class="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden m-4">
+  <!-- Header Section -->
+  <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+    <div class="flex items-center">
+      <div class="p-2 mr-3 rounded-lg bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-gray-800 dark:text-white">Edit Category</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Update category details</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Section -->
+  {% for shop in shops %}
+  <form method="POST" 
+        action="{{ url_for('inventory.update_category', id=category.id, shop_id=shop.id) }}"
+        hx-post="{{ url_for('inventory.update_category', id=category.id, shop_id=shop.id) }}"
+        hx-target="#main-content"
+        hx-swap="innerHTML"
+        class="p-6 space-y-6">
+
+    <!-- Category Name -->
+    <div>
+      <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category Name</label>
+      <div class="mt-1 relative rounded-md shadow-sm">
+        <input type="text" id="name" name="name" value="{{ category.name }}" required
+               class="block w-full pl-4 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+               placeholder="Category name">
+      </div>
+    </div>
+
+    <!-- Description (Optional) -->
+    <div>
+      <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description (Optional)</label>
+      <textarea id="description" name="description" rows="3"
+                class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                placeholder="Brief description of this category">{{ category.description or '' }}</textarea>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end space-x-3 pt-4">
+      <button type="button"
+              hx-get="{{ url_for('inventory.categories', shop_id=shop.id) }}"
+              hx-target="#main-content"
+              hx-swap="innerHTML"
+              class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+        Cancel
+      </button>
+      <button type="submit" 
+              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+        Update Category
+      </button>
+    </div>
+  </form>
+  {% endfor %}
+</div>

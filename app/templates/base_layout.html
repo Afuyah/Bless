@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nawiri Enterprise - Professional POS System">
+    <meta name="theme-color" content="#2563eb"> <!-- Tailwind blue-600 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{% block title %}Nawiri POS{% endblock %}</title>
+
+    <!-- Favicon & PWA Assets -->
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-192x192.png') }}">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+
+    <!-- Tailwind CSS (via CDN for prototyping) -->
+   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!--  <script src="{{ url_for('static', filename='js/tailwind.js') }}"></script>-->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                    
+                        dark: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+
+
+                         primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        success: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        danger: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            200: '#fecaca',
+                            300: '#fca5a5',
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                        },
+                        warning: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        }
+
+
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                        'fade-out': 'fadeIn 0.3s ease-out reverse forwards',
+                        'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-in': 'slideIn 0.3s ease-out forwards',
+                        'slide-out': 'slideOut 0.3s ease-out forwards'
+                   },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(0)' },
+                        },
+                        slideOut: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(100%)' },
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 12px rgba(0, 0, 0, 0.05)',
+                        'soft-md': '0 6px 20px rgba(0, 0, 0, 0.08)',
+                        'soft-lg': '0 10px 25px rgba(0, 0, 0, 0.1)',
+                        'inner-sm': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)'
+                    }
+
+
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Styles -->
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .sidebar-collapsed {
+            width: 5rem;
+        }
+        .sidebar-expanded {
+            width: 16rem;
+        }
+        .pos-transition {
+            transition: all 0.2s ease-in-out;
+        }
+        .receipt-print {
+            display: none;
+        }
+        @media print {
+            .receipt-print {
+                display: block;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+
+  /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-track {
+            background-color: rgba(243, 244, 246, 0.5);
+        }
+        
+        /* Smooth transitions */
+        .transition-all-slow {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Product card hover effect */
+        .product-card {
+            transition: all 0.2s ease, transform 0.1s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+        }
+        .product-card:active {
+            transform: translateY(0);
+        }
+
+
+        /* Light color scheme adjustments */
+.pos-card {
+    background-color: #f9fafb; /* gray-50 */
+    border: 1px solid #e5e7eb; /* gray-200 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+}
+
+.pos-card:hover {
+    border-color: #93c5fd; /* primary-300 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+}
+
+/* Image container */
+.pos-card .relative.aspect-\[1\/1\] {
+    background-color: white;
+    border-bottom: 1px solid #f3f4f6; /* gray-100 */
+}
+        
+        /* Modal backdrop */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Custom barcode font */
+        @font-face {
+            font-family: 'Libre Barcode 39';
+            src: url('https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap');
+        }
+        
+        /* Button press effect */
+        .btn-press:active {
+            transform: scale(0.98);
+        }
+        
+        /* Fade in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Pulse animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Custom checkbox */
+        .custom-checkbox {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #cbd5e1;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .custom-checkbox:checked {
+            background-color: #0ea5e9;
+            border-color: #0ea5e9;
+        }
+        .custom-checkbox:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+        }
+
+
+    </style>
+</head>
+
+<body class="font-sans bg-gray-50 text-gray-800 antialiased">
+    <!-- App Container -->
+    <div class="flex h-full">
+       
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+           
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto bg-gray-50">
+                {% block content %}
+                <!-- Content will be injected here -->
+                {% endblock %}
+            </main>
+
+            </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 space-y-2 z-50 w-80"></div>
+
+    <!-- Scripts -->
+    <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
+                    .then(registration => {
+                        console.log('ServiceWorker registered:', registration.scope);
+                        registration.onupdatefound = () => {
+                            const installingWorker = registration.installing;
+                            installingWorker.onstatechange = () => {
+                                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showToast({
+                                        message: 'New version available. Click to refresh!',
+                                        type: 'info',
+                                        action: () => window.location.reload()
+                                    });
+                                }
+                            };
+                        };
+                    })
+                    .catch(error => console.error('ServiceWorker registration failed:', error));
+            });
+        }
+
+        // Toast Notification System
+        function showToast({message, type = 'info', action = null, duration = 5000}) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            // Type-based styling
+            const typeStyles = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500',
+                info: 'bg-blue-500'
+            };
+            
+            toast.className = `animate-fade-in p-4 rounded-lg shadow-lg text-white flex items-start ${typeStyles[type] || typeStyles.info}`;
+            toast.innerHTML = `
+                <div class="flex-1">
+                    <div class="flex items-center">
+                        <i class="fas ${type === 'success' ? 'fa-check-circle' : 
+                                          type === 'error' ? 'fa-exclamation-circle' : 
+                                          type === 'warning' ? 'fa-exclamation-triangle' : 
+                                          'fa-info-circle'} mr-2"></i>
+                        <span>${message}</span>
+                    </div>
+                </div>
+                <button class="ml-4 text-white opacity-70 hover:opacity-100">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Add click handler if action provided
+            if (action) {
+                toast.style.cursor = 'pointer';
+                toast.addEventListener('click', action);
+            }
+            
+            // Close button
+            toast.querySelector('button').addEventListener('click', (e) => {
+                e.stopPropagation();
+                toast.remove();
+            });
+            
+            // Auto-dismiss
+            if (duration > 0) {
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                    setTimeout(() => toast.remove(), 300);
+                }, duration);
+            }
+            
+            container.appendChild(toast);
+            
+            // Return dismiss function
+            return {
+                dismiss: () => toast.remove()
+            };
+        }
+
+        // Make toast function globally available
+        window.showToast = showToast;
+
+        // Convert Flask flash messages to toasts
+        document.addEventListener('DOMContentLoaded', () => {
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        showToast({
+                            message: "{{ message }}",
+                            type: "{{ category }}"
+                        });
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        });
+
+     
+    </script>
+
+    <!-- Application-specific JS 
+    <script src="{{ url_for('static', filename='js/tailwind.js') }}"></script>-->
+</body>
+</html>

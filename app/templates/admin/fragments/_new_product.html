@@ -1,0 +1,228 @@
+<div id="new-product-form" class="max-w-3xl mx-auto p-6 sm:p-8 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 m-3">
+  <!-- Success Message (will be shown after successful submission) -->
+  <div id="success-message" 
+       class="hidden transition-opacity duration-300 mb-6"
+       _="on load wait 3s then transition opacity to 0 then remove me">
+    <div class="rounded-md bg-green-50 dark:bg-green-900/20 p-4 border border-green-100 dark:border-green-900/30">
+      <div class="flex items-center">
+        <svg class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+        <p class="ml-3 text-sm font-medium text-green-800 dark:text-green-200">
+          Product added successfully! The list will refresh automatically.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header Section -->
+  <div class="text-center mb-8">
+    <div class="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+    </div>
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Add New Product</h2>
+    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Fill in the details to register a new inventory item</p>
+  </div>
+
+  <!-- Error Message -->
+  {% if error %}
+  <div class="mb-6 rounded-md bg-red-50 dark:bg-red-900/20 p-4 border border-red-100 dark:border-red-900/30">
+    <div class="flex items-center">
+      <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+      </svg>
+      <p class="ml-3 text-sm font-medium text-red-800 dark:text-red-200">
+        {{ error }}
+      </p>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Product Form -->
+  <form id="product-form"
+        hx-post="{{ url_for('inventory.new_product', shop_id=current_shop.id) }}"
+        hx-target="#new-product-form"
+        hx-swap="outerHTML"
+        hx-trigger="submit"
+        hx-indicator="#submit-button"
+        class="space-y-6">
+    
+    <!-- Form Fields (unchanged from your original) -->
+    <!-- Product Name -->
+    <div>
+      <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Product Name</label>
+      <div class="relative rounded-md shadow-sm">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+          </svg>
+        </div>
+        <input type="text" id="name" name="name" required
+               class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+               placeholder="e.g. Premium Bread">
+      </div>
+    </div>
+
+    <!-- Pricing Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Cost Price -->
+      <div>
+        <label for="cost_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cost Price (Ksh)</label>
+        <div class="relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Ksh</span>
+          </div>
+          <input type="number" id="cost_price" name="cost_price" step="0.01" min="0" required
+                 class="block w-full pl-14 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                 placeholder="0.00">
+        </div>
+      </div>
+
+      <!-- Selling Price -->
+      <div>
+        <label for="selling_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Selling Price (Ksh)</label>
+        <div class="relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Ksh</span>
+          </div>
+          <input type="number" id="selling_price" name="selling_price" step="0.01" min="0" required
+                 class="block w-full pl-14 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                 placeholder="0.00">
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock & Category Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Stock Level -->
+      <div>
+        <label for="stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Opening Stock</label>
+        <div class="relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          </div>
+          <input type="number" id="stock" name="stock" min="0" required
+                 class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                 placeholder="Quantity">
+        </div>
+      </div>
+
+      <!-- Category -->
+      <div>
+        <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+        <div class="relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </div>
+          <select id="category" name="category" required
+                  class="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white appearance-none bg-none">
+            <option disabled selected value="">Select Category</option>
+            {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+          </select>
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bundle Pricing Section -->
+    <div class="bg-blue-50 dark:bg-blue-900/10 p-4 sm:p-6 rounded-lg border border-blue-100 dark:border-blue-900/30">
+      <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-4 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+        Bundle Pricing (Optional)
+      </h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Bundle Size -->
+        <div>
+          <label for="combination_size" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bundle Size</label>
+          <input type="number" id="combination_size" name="combination_size" min="1"
+                 class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                 placeholder="e.g. 2 units">
+        </div>
+        
+        <!-- Bundle Price -->
+        <div>
+          <label for="combination_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bundle Price (Ksh)</label>
+          <div class="relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Ksh</span>
+            </div>
+            <input type="number" id="combination_price" name="combination_price" step="0.01" min="0"
+                   class="block w-full pl-14 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                   placeholder="0.00">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+      <a href="{{ url_for('inventory.products_fragment', shop_id=current_shop.id) }}"
+         hx-get="{{ url_for('inventory.products_fragment', shop_id=current_shop.id) }}"
+         hx-target="#main-content"
+         hx-swap="innerHTML"
+         class="inline-flex justify-center items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        Cancel
+      </a>
+      <button id="submit-button" 
+        type="submit"
+        class="inline-flex justify-center items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        _="on click 
+            set my.disabled to true
+            then set my.innerHTML to '<svg class=&quot;animate-spin -ml-1 mr-2 h-4 w-4 text-white&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; fill=&quot;none&quot; viewBox=&quot;0 0 24 24&quot;><circle class=&quot;opacity-25&quot; cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;10&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;4&quot;></circle><path class=&quot;opacity-75&quot; fill=&quot;currentColor&quot; d=&quot;M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z&quot;></path></svg>Saving...'">
+  Save Product
+</button>
+
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  htmx.on('#product-form', 'htmx:afterSwap', function(evt) {
+    const successMsg = document.getElementById('success-message');
+    const form = document.getElementById('product-form');
+    const submitBtn = document.getElementById('submit-button');
+
+    // Ensure this was a successful swap to same form (form re-rendered)
+    if (evt.detail.target.id === 'new-product-form' && evt.detail.xhr.responseText.includes("Product added successfully")) {
+      if (successMsg) {
+        successMsg.classList.remove('hidden');
+        setTimeout(() => successMsg.classList.add('hidden'), 3000);
+      }
+
+      if (form) {
+        form.reset();
+        const selects = form.querySelectorAll('select');
+        selects.forEach(select => {
+          select.selectedIndex = 0;
+        });
+      }
+
+      // Restore submit button text
+      if (submitBtn) {
+        submitBtn.innerHTML = 'Save Product';
+      }
+
+      // Trigger product list refresh
+      setTimeout(() => {
+        htmx.trigger('#product-list', 'refresh');
+      }, 500);
+    }
+  });
+});
+</script>

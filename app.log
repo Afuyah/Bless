@@ -1,0 +1,39 @@
+2025-07-06 13:45:33,935 - ERROR - Exception on /auth/login [POST]
+Traceback (most recent call last):
+  File "/home/bha/Desktop/Flask/mini-_super/bhapos/lib/python3.11/site-packages/flask/app.py", line 2077, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/bhapos/lib/python3.11/site-packages/flask/app.py", line 1525, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/bhapos/lib/python3.11/site-packages/flask/app.py", line 1523, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/bhapos/lib/python3.11/site-packages/flask/app.py", line 1509, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/app/auth/routes.py", line 101, in login
+    if not usernames or not passwords:
+           ^^^^^^^^^
+NameError: name 'usernames' is not defined
+2025-07-06 13:45:33,937 - ERROR - 500 Internal Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
+2025-07-06 13:45:34,318 - WARNING - 404 Error at http://127.0.0.1:5000/favicon.ico
+2025-07-06 13:46:37,142 - ERROR - Exception on /auth/login [POST]
+Traceback (most recent call last):
+  File "/home/bha/Desktop/Flask/mini-_super/bhapos/lib/python3.11/site-packages/flask/app.py", line 2077, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/bhapos/lib/python3.11/site-packages/flask/app.py", line 1525, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/bhapos/lib/python3.11/site-packages/flask/app.py", line 1523, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/bhapos/lib/python3.11/site-packages/flask/app.py", line 1509, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/bha/Desktop/Flask/mini-_super/app/auth/routes.py", line 101, in login
+    if not username or not password:
+           ^^^^^^^^^
+NameError: name 'usernames' is not defined
+2025-07-06 13:46:37,144 - ERROR - 500 Internal Server Error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.

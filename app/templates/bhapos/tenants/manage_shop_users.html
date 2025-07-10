@@ -1,0 +1,48 @@
+{% extends 'bhapos/base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Users in <span class="text-green-600 dark:text-green-400">{{ shop.name }}</span></h2>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Manage user roles and activity status.</p>
+  </div>
+
+  {% if users %}
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm">
+      <thead class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm uppercase font-semibold tracking-wider">
+        <tr>
+          <th class="px-6 py-3 text-left">Username</th>
+          <th class="px-6 py-3 text-left">Role</th>
+          <th class="px-6 py-3 text-left">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200 dark:divide-gray-700 text-sm text-gray-700 dark:text-gray-200">
+        {% for user in users %}
+        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+          <td class="px-6 py-4 font-medium">{{ user.username }}</td>
+          <td class="px-6 py-4 capitalize">{{ user.role.name }}</td>
+          <td class="px-6 py-4">
+            {% if user.is_deleted %}
+              <span class="inline-flex px-2 py-1 text-xs font-semibold leading-5 rounded bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                Inactive
+              </span>
+            {% else %}
+              <span class="inline-flex px-2 py-1 text-xs font-semibold leading-5 rounded bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                Active
+              </span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center text-gray-500 dark:text-gray-400 mt-12">
+    <i class="fas fa-user-slash text-3xl mb-2"></i>
+    <p>No users found in this shop.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

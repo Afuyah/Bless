@@ -1,0 +1,241 @@
+{% extends 'bhapos/base.html' %}
+
+{% block title %}Create Tenant for {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full mx-auto">
+    <!-- Header with Business Info -->
+    <div class="text-center mb-8">
+      <div class="mx-auto h-16 w-16 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mb-4">
+        <i class="fas fa-user-tie text-indigo-600 dark:text-indigo-300 text-2xl"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Create Tenant Account</h2>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        For <span class="font-medium text-indigo-600 dark:text-indigo-400">{{ business.name }}</span>
+      </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden">
+      <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Account Details</h3>
+        <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+          New Tenant
+        </span>
+      </div>
+      
+      <form method="POST" class="space-y-6 px-6 py-6">
+        {{ form.hidden_tag() }}
+
+        <!-- Username Field -->
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {{ form.username.label.text }}
+            <span class="text-red-500">*</span>
+          </label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-user text-gray-400"></i>
+            </div>
+            {{ form.username(
+              class="block w-full pl-10 pr-4 py-3 text-sm rounded-md border 
+                     border-gray-300 dark:border-gray-600 
+                     bg-white dark:bg-gray-700 
+                     text-gray-900 dark:text-white 
+                     placeholder-gray-400 dark:placeholder-gray-500 
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                     transition",
+              placeholder="john.doe") }}
+          </div>
+          {% if form.username.errors %}
+            <p class="mt-2 text-sm text-red-600 dark:text-red-400">
+              <i class="fas fa-exclamation-circle mr-1"></i> {{ form.username.errors[0] }}
+            </p>
+          {% else %}
+            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              Usernames can contain letters, numbers and underscores
+            </p>
+          {% endif %}
+        </div>
+
+
+        <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {{ form.email.label.text }}
+          <span class="text-gray-400 text-xs">(Optional)</span>
+        </label>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-envelope text-gray-400"></i>
+          </div>
+          {{ form.email(
+            class="block w-full pl-10 pr-4 py-3 text-sm rounded-md border 
+                   border-gray-300 dark:border-gray-600 
+                   bg-white dark:bg-gray-700 
+                   text-gray-900 dark:text-white 
+                   placeholder-gray-400 dark:placeholder-gray-500 
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                   transition",
+            placeholder="optional@example.com") }}
+        </div>
+        {% if form.email.errors %}
+          <p class="mt-2 text-sm text-red-600 dark:text-red-400">
+            <i class="fas fa-exclamation-circle mr-1"></i> {{ form.email.errors[0] }}
+          </p>
+        {% endif %}
+      </div>
+
+        <!-- Password Field -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {{ form.password.label.text }}
+            <span class="text-red-500">*</span>
+          </label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-lock text-gray-400"></i>
+            </div>
+            {{ form.password(
+              class="block w-full pl-10 pr-4 py-3 text-sm rounded-md border 
+                     border-gray-300 dark:border-gray-600 
+                     bg-white dark:bg-gray-700 
+                     text-gray-900 dark:text-white 
+                     placeholder-gray-400 dark:placeholder-gray-500 
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                     transition",
+              placeholder="••••••••") }}
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <button type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none" onclick="togglePasswordVisibility()">
+                <i class="far fa-eye" id="passwordToggleIcon"></i>
+              </button>
+            </div>
+          </div>
+
+
+
+          {% if form.password.errors %}
+            <p class="mt-2 text-sm text-red-600 dark:text-red-400">
+              <i class="fas fa-exclamation-circle mr-1"></i> {{ form.password.errors[0] }}
+            </p>
+          {% else %}
+            <div class="mt-2">
+              <div class="grid grid-cols-4 gap-2">
+                <div class="h-1 rounded-full bg-gray-200 dark:bg-gray-700" id="pw-strength-1"></div>
+                <div class="h-1 rounded-full bg-gray-200 dark:bg-gray-700" id="pw-strength-2"></div>
+                <div class="h-1 rounded-full bg-gray-200 dark:bg-gray-700" id="pw-strength-3"></div>
+                <div class="h-1 rounded-full bg-gray-200 dark:bg-gray-700" id="pw-strength-4"></div>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Password must be at least 8 characters with uppercase, number and special character
+              </p>
+            </div>
+          {% endif %}
+        </div>
+          <div>
+            <label for="confirm_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {{ form.confirm_password.label.text }}
+              <span class="text-red-500">*</span>
+            </label>
+            <div class="mt-1 relative rounded-md shadow-sm">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-lock text-gray-400"></i>
+              </div>
+              {{ form.confirm_password(
+                class="block w-full pl-10 pr-4 py-3 text-sm rounded-md border 
+                       border-gray-300 dark:border-gray-600 
+                       bg-white dark:bg-gray-700 
+                       text-gray-900 dark:text-white 
+                       placeholder-gray-400 dark:placeholder-gray-500 
+                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                       transition",
+                placeholder="••••••••") }}
+            </div>
+            {% if form.confirm_password.errors %}
+              <p class="mt-2 text-sm text-red-600 dark:text-red-400">
+                <i class="fas fa-exclamation-circle mr-1"></i> {{ form.confirm_password.errors[0] }}
+              </p>
+            {% endif %}
+          </div>
+
+
+        
+
+        <!-- Form Actions -->
+        <div class="flex items-center justify-between pt-4">
+          <a href="{{ url_for('bhapos.view_business', id=business.id) }}" 
+             class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+            <i class="fas fa-arrow-left mr-1"></i> Back to business
+          </a>
+          <button type="submit" 
+                  class="inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
+            <i class="fas fa-user-plus mr-2"></i> Create Tenant
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Additional Help -->
+    <div class="mt-6 text-center">
+      <p class="text-xs text-gray-500 dark:text-gray-400">
+        Tenant accounts have full access to manage {{ business.name }}
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePasswordVisibility() {
+  const passwordField = document.querySelector('input[name="password"]');
+  const icon = document.getElementById('passwordToggleIcon');
+  
+  if (passwordField.type === 'password') {
+    passwordField.type = 'text';
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    passwordField.type = 'password';
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+}
+
+// Password strength indicator
+document.querySelector('input[name="password"]').addEventListener('input', function(e) {
+  const strengthBars = [
+    document.getElementById('pw-strength-1'),
+    document.getElementById('pw-strength-2'),
+    document.getElementById('pw-strength-3'),
+    document.getElementById('pw-strength-4')
+  ];
+  
+  // Reset all bars
+  strengthBars.forEach(bar => {
+    bar.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
+    bar.classList.add('bg-gray-200', 'dark:bg-gray-700');
+  });
+  
+  const password = e.target.value;
+  if (!password) return;
+  
+  // Very basic strength evaluation
+  let strength = 0;
+  if (password.length >= 8) strength += 1;
+  if (/[A-Z]/.test(password)) strength += 1;
+  if (/\d/.test(password)) strength += 1;
+  if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+  
+  // Update bars
+  for (let i = 0; i < strength; i++) {
+    strengthBars[i].classList.remove('bg-gray-200', 'dark:bg-gray-700');
+    if (strength <= 2) {
+      strengthBars[i].classList.add('bg-red-500');
+    } else if (strength === 3) {
+      strengthBars[i].classList.add('bg-yellow-500');
+    } else {
+      strengthBars[i].classList.add('bg-green-500');
+    }
+  }
+});
+</script>
+{% endblock %}

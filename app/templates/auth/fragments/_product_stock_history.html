@@ -1,0 +1,49 @@
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Transaction Type</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantity</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Previous Stock</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">New Stock</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Reference</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            {% for movement in stock_history %}
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    {{ movement.created_at.strftime('%Y-%m-%d %H:%M') }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    <span class="px-2 py-1 rounded-full text-xs 
+                              {% if movement.transaction_type == 'purchase' %}bg-blue-100 text-blue-800
+                              {% elif movement.transaction_type == 'sale' %}bg-green-100 text-green-800
+                              {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ movement.transaction_type|title }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm {{ 'text-red-500' if movement.transaction_type == 'sale' else 'text-green-500' }}">
+                    {{ movement.quantity|abs }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    {{ movement.previous_quantity }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    {{ movement.new_quantity }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 dark:text-blue-400">
+                    {% if movement.reference_link %}
+                    <a href="{{ movement.reference_link }}" class="hover:underline">
+                        {{ movement.reference_number }}
+                    </a>
+                    {% else %}
+                    {{ movement.reference_number or '-' }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

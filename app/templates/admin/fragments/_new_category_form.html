@@ -1,0 +1,69 @@
+<div class="bg-white dark:bg-gray-800 shadow rounded-xl border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-6 p-6">
+  <!-- Header -->
+  <div class="mb-6">
+    <h2 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+      Add New Category
+    </h2>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Define a new product category for your inventory.</p>
+  </div>
+
+  <!-- Form -->
+  {% for shop in shops %}
+  <form 
+    hx-post="{{ url_for('inventory.create_category',shop_id=shop.id) }}" 
+    hx-target="#main-content" 
+    hx-swap="innerHTML"
+    class="space-y-5"
+  >
+    {% if error %}
+    <div class="p-3 text-sm rounded-lg bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">
+      {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Name Field -->
+    <div>
+      <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category Name <span class="text-red-500">*</span></label>
+      <input 
+        type="text" 
+        name="name" 
+        id="name" 
+        required 
+        class="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+        placeholder="e.g. Electronics, Furniture, Clothing"
+      >
+    </div>
+
+    <!-- Optional: Future fields like description can go here -->
+
+    <!-- Actions -->
+    <div class="flex items-center justify-between mt-6">
+      <button 
+        type="button" 
+        hx-get="{{ url_for('inventory.categories', shop_id=shop.id) }}" 
+        hx-target="#main-content" 
+        hx-swap="innerHTML"
+        class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back
+      </button>
+
+      <button 
+        type="submit"
+        class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        Save Category
+      </button>
+    </div>
+  </form>
+  {% endfor %}
+</div>

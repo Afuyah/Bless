@@ -1,0 +1,352 @@
+
+            <main>
+                  
+                <div class="py-6 px-4 sm:px-6 lg:px-8">
+            <!-- Page header -->
+            <div class="flex flex-wrap items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                        Dashboard Overview
+                    </h1>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        {{ date.today().strftime('%A, %B %d, %Y') }} • Last updated: {{ datetime.now().strftime('%I:%M %p') }}
+                    </p>
+                </div>
+                <div class="flex space-x-3 mt-4 sm:mt-0">
+                    <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none">
+                        <i class="fas fa-plus mr-2"></i> New Sale
+                    </button>
+                    <button class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none">
+                        <i class="fas fa-download mr-2"></i> Export Report
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Key Metrics Cards -->
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+                <!-- Today's Sales -->
+                <div class="dashboard-card bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-indigo-100 dark:bg-indigo-900/30 rounded-md p-3">
+                                <i class="fas fa-shopping-cart text-indigo-600 dark:text-indigo-400 text-xl"></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Today's Sales</dt>
+                                    <dd class="flex items-baseline">
+                                        <div class="text-2xl font-semibold text-gray-900 dark:text-white">
+                                            Ksh {{ "{:,.2f}".format(sales_data['today']) }}
+                                        </div>
+                                        <div class="ml-2 flex items-baseline text-sm font-semibold {{ 'text-green-600 dark:text-green-400' if sales_data['change']|default(0) >= 0 else 'text-red-600 dark:text-red-400' }}">
+                                            <i class="fas {{ 'fa-arrow-up' if sales_data['change']|default(0) >= 0 else 'fa-arrow-down' }} text-xs"></i>
+                                            {{ "{:.1f}%".format(sales_data['change']|abs if sales_data['change'] is not none else 0.0) }}
+                                        </div>
+                                    </dd>
+
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Total Revenue -->
+                <div class="dashboard-card bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-green-100 dark:bg-green-900/30 rounded-md p-3">
+                                <i class="fas fa-chart-line text-green-600 dark:text-green-400 text-xl"></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Revenue</dt>
+                                    <dd class="text-2xl font-semibold text-gray-900 dark:text-white">
+                                       Ksh {{ "{:,.2f}".format(sales_data.total_revenue or 0) }}
+
+
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Low Stock Items -->
+                <div class="dashboard-card bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-amber-100 dark:bg-amber-900/30 rounded-md p-3">
+                                <i class="fas fa-exclamation-triangle text-amber-600 dark:text-amber-400 text-xl"></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Low Stock Items</dt>
+                                    <dd class="flex items-baseline">
+                                        <div class="text-2xl font-semibold text-gray-900 dark:text-white">
+                                            {{ inventory_data.low_stock.count }}
+
+                                        </div>
+                                        
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+               
+                                <!-- Monthly Revenue -->
+                <div class="dashboard-card bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 rounded-md p-3">
+                                <i class="fas fa-calendar-alt text-blue-600 dark:text-blue-400 text-xl"></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Monthly Revenue</dt>
+                                    <dd class="text-2xl font-semibold text-gray-900 dark:text-white">
+                                        Ksh {{ "{:,.2f}".format(monthly_revenue) }}
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+
+
+                <!-- Sales Analytics Chart -->
+            <div class="lg:col-span-2 bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+                  <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white"> Monthly Sales Analytics</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">View your performance</p>
+                      </div>
+                      <div class="flex space-x-2" id="chart-range-buttons">
+                        <button hx-get="{{ url_for('admin.sales_chart_data',shop_id=current_shop.id) }}?range=week" hx-target="#sales-chart-container" hx-swap="innerHTML" class="text-xs px-2 py-1 rounded border bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300">Week</button>
+                        <button hx-get="{{ url_for('admin.sales_chart_data', shop_id=current_shop.id) }}?range=month" hx-target="#sales-chart-container" hx-swap="innerHTML" class="text-xs px-2 py-1 rounded bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400">Month</button>
+                        <button hx-get="{{ url_for('admin.sales_chart_data', shop_id=current_shop.id) }}?range=year" hx-target="#sales-chart-container" hx-swap="innerHTML" class="text-xs px-2 py-1 rounded border bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300">Year</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Loader -->
+                  <div id="chart-loader" class="text-center py-6 hidden">
+                    <svg class="animate-spin h-6 w-6 text-primary-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                    </svg>
+                    <p class="text-sm mt-2 text-gray-500 dark:text-gray-400">pease wait...</p>
+                  </div>
+
+                  <div class="chart-container mt-4">
+                  <canvas id="salesChart" 
+                          data-labels='{{ chart_labels|tojson }}'
+                          data-values='{{ chart_values|tojson }}'></canvas>
+                  <div class="chart-error" style="display: none;"></div>
+                </div>
+                </div>
+
+
+                
+                <!-- Recent Transactions -->
+                <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+                    <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Recent Transactions</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Latest sales activities</p>
+                    </div>
+                    <div class="px-4 py-5 sm:p-6">
+                        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                           
+                            {% for sale in transactions.recent %}
+                            <li class="py-3">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white">#TRXN{{ sale.id }}</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ sale.payment_method|title }} • {{ sale.date.strftime('%I:%M %p') }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white">Ksh {{ "{:,.2f}".format(sale.total) }}</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ sale.date.strftime('%b %d') }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <div class="mt-4 text-center">
+                            <a href="{{ url_for('reports.daily_sales_report', shop_id=current_shop.id) }}"
+                               hx-get="{{ url_for('reports.daily_sales_report', shop_id=current_shop.id) }}"
+                               hx-target="#main-content"
+                               hx-swap="innerHTML"
+                               hx-push-url="false"
+                               class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 inline-flex items-center">
+                                View all transactions <i class="fas fa-chevron-right ml-1"></i>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <!-- Top Selling Products -->
+                <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+                    <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Top Selling Products</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">By quantity sold this month</p>
+                            </div>
+                            <a href="#" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">View report</a>
+                        </div>
+                    </div>
+                    <div class="px-4 py-5 sm:p-6">
+                        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                            {% for row in products.top_selling %}
+                              {% set product = row[0] %}
+                              {% set total_quantity = row[1] %}
+                              {% set total_revenue = row[2] %}
+                              <li class="py-3">
+                                <div class="flex items-center justify-between">
+                                  <div class="flex items-center">
+                                    <div class="bg-gray-200 dark:bg-gray-700 rounded-lg w-10 h-10 flex items-center justify-center overflow-hidden">
+                                      {% if product.image_url %}
+                                      <img src="{{ product.image_url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                                      {% else %}
+                                      <i class="fas fa-box text-gray-400"></i>
+                                      {% endif %}
+                                    </div>
+                                    <div class="ml-4">
+                                      <p class="text-sm font-medium text-gray-900 dark:text-white truncate max-w-xs">{{ product.name }}</p>
+                                      <p class="text-xs text-gray-500 dark:text-gray-400">{{ product.category.name if product.category else 'Uncategorized' }}</p>
+                                    </div>
+                                  </div>
+                                  <div class="text-right">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ total_quantity }} sold</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Ksh {{ "{:,.2f}".format(total_revenue) }}</p>
+                                  </div>
+                                </div>
+                              </li>
+                            {% endfor %}
+
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Low Stock Alerts -->
+                <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+                    <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Inventory Alerts</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Items needing attention</p>
+                            </div>
+                            <a href="{{ url_for('inventory.products', shop_id=current_shop.id) }}" 
+                                hx-get="{{ url_for('inventory.products_fragment', shop_id=current_shop.id) }}" 
+                                hx-target="#main-content" 
+                                hx-swap="innerHTML" 
+                                hx-push-url="false" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">Manage stock</a>
+                        </div>
+                    </div>
+                    <div class="px-4 py-5 sm:p-6">
+                        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                            {% for product in inventory_data.low_stock.products %}
+
+                            <li class="py-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="bg-gray-200 dark:bg-gray-700 rounded-lg w-10 h-10 flex items-center justify-center overflow-hidden">
+                                            {% if product.image_url %}
+                                            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                                            {% else %}
+                                            <i class="fas fa-box text-gray-400"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="ml-4">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate max-w-xs">{{ product.name }}</p>
+                                            
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            {% if product.stock <= 2 %}bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400
+                                            {% elif product.stock <= 5 %}bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400
+                                            {% else %}bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400{% endif %}">
+                                            {{ product.stock }} left
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            {% else %}
+                            <li class="py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                All products are sufficiently stocked
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a hx-get="{{ url_for('inventory.new_product_form_fragment', shop_id=current_shop.id) }}"
+                  hx-target="#main-content"
+                  hx-swap="innerHTML"
+               class="quick-action-card bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center">
+                    <div class="bg-blue-100 dark:bg-blue-900/20 rounded-full p-3 mb-2">
+                        <i class="fas fa-plus text-blue-600 dark:text-blue-400 text-lg"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-900 dark:text-white">Add Product</span>
+                </a>
+                
+                <a 
+                    href="{{ url_for('sales.sales_screen', shop_id=current_shop.id) }}" 
+                    onclick="window.location.href=this.href; return false;"
+                    class="quick-action-card bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center">
+                    
+                        <div class="bg-green-100 dark:bg-green-900/20 rounded-full p-3 mb-2">
+                            <i class="fas fa-cash-register text-green-600 dark:text-green-400 text-lg"></i>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">New Sale</span>
+                    </a>
+
+                
+               <a href="{{ url_for('reports.weekly_sales_report', shop_id=current_shop.id) }}"
+                   hx-get="{{ url_for('reports.weekly_sales_report', shop_id=current_shop.id) }}"
+                   hx-target="#main-content"
+                   hx-swap="innerHTML"
+                   hx-push-url="false"
+                   class="quick-action-card bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center">
+                    <div class="bg-purple-100 dark:bg-purple-900/20 rounded-full p-3 mb-2">
+                        <i class="fas fa-calendar-week text-purple-600 dark:text-purple-400 text-lg"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-900 dark:text-white">Generate Report</span>
+                </a>
+
+                
+                <a href="{{ url_for('inventory.products', shop_id=current_shop.id) }}" 
+                   hx-get="{{ url_for('inventory.products_fragment',  shop_id=current_shop.id) }}" 
+                   hx-target="#main-content" 
+                   hx-swap="innerHTML" 
+                   hx-push-url="false"
+                   class="quick-action-card bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center">
+                    <div class="bg-amber-100 dark:bg-amber-900/20 rounded-full p-3 mb-2">
+                        <i class="fas fa-box text-amber-600 dark:text-amber-400 text-lg"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-900 dark:text-white">Inventory</span>
+                </a>
+
+            </div>
+        </div>
+         
+    </main>
+</div>

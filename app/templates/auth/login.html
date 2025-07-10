@@ -1,0 +1,361 @@
+{% extends 'base_layout.html' %}
+
+{% block title %}Login – BhaPOS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 flex items-center justify-center p-4 relative overflow-hidden">
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute -top-20 -left-20 w-72 h-72 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+    <div class="absolute top-1/3 -right-20 w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/4 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+  </div>
+
+  <!-- Floating particles -->
+  <div class="particles-container absolute inset-0 overflow-hidden pointer-events-none">
+    {% for i in range(15) %}
+    <div class="particle absolute rounded-full bg-white/10" style="
+      width: {{ range(2, 6)|random }}px;
+      height: {{ range(2, 6)|random }}px;
+      top: {{ range(0, 100)|random }}%;
+      left: {{ range(0, 100)|random }}%;
+      animation: float {{ range(10, 25)|random }}s linear infinite;
+      animation-delay: -{{ range(0, 15)|random }}s;
+    "></div>
+    {% endfor %}
+  </div>
+
+  <!-- Glass login card -->
+  <div class="relative z-10 w-full max-w-md transform transition-all duration-500 hover:scale-[1.01]">
+    <div class="glass-card bg-white/5 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden border border-white/10">
+      <!-- Animated header -->
+      <div class="p-8 pb-6 bg-gradient-to-r from-blue-900/30 to-indigo-900/30 border-b border-white/10">
+        <div class="flex flex-col items-center">
+          <!-- Logo with shine effect -->
+          <div class="relative mb-4">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="ring-animation w-24 h-24 rounded-full border-2 border-transparent border-t-white/30 border-r-white/30"></div>
+            </div>
+            <div class="flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg z-10 relative overflow-hidden">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+              </svg>
+              <div class="shine-effect absolute inset-0 bg-white/20 rounded-xl pointer-events-none"></div>
+            </div>
+          </div>
+          
+          <!-- Animated title -->
+          <h2 class="text-2xl font-bold text-white text-center mb-1">
+            <span class="title-gradient">
+              <span class="letter-animation" style="animation-delay: 0.1s">P</span>
+              <span class="letter-animation" style="animation-delay: 0.2s">O</span>
+              <span class="letter-animation" style="animation-delay: 0.3s">S</span>
+              <span class="opacity-0"> </span>
+              <span class="letter-animation" style="animation-delay: 0.4s">L</span>
+              <span class="letter-animation" style="animation-delay: 0.5s">o</span>
+              <span class="letter-animation" style="animation-delay: 0.6s">g</span>
+              <span class="letter-animation" style="animation-delay: 0.7s">i</span>
+              <span class="letter-animation" style="animation-delay: 0.8s">n</span>
+            </span>
+          </h2>
+          <p class="text-blue-200 text-center text-sm opacity-0 animate-fade-in" style="animation-delay: 1s">Access your point of sale system</p>
+        </div>
+      </div>
+
+      <!-- Login form -->
+      <div class="p-8 pt-6">
+        <form id="loginForm" class="space-y-6" method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+
+          <!-- Username field with floating label -->
+          <div class="relative group">
+            <input 
+              id="username" 
+              name="username" 
+              type="text" 
+              required 
+              autocomplete="username"
+              class="peer block w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              placeholder=" ">
+            <label for="username" class="absolute left-3 -top-2.5 px-1 bg-blue-900/80 text-blue-100 text-xs transition-all duration-200 peer-placeholder-shown:text-sm peer-placeholder-shown:text-blue-300 peer-placeholder-shown:top-3 peer-placeholder-shown:left-4 peer-placeholder-shown:bg-transparent peer-focus:-top-2.5 peer-focus:left-3 peer-focus:text-xs peer-focus:text-blue-100 peer-focus:bg-blue-900/80">
+              Username
+            </label>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg class="h-5 w-5 text-blue-300 transition-colors group-focus-within:text-blue-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Password field with floating label -->
+          <div class="relative group">
+            <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              required 
+              autocomplete="current-password"
+              class="peer block w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 pr-10"
+              placeholder=" ">
+            <label for="password" class="absolute left-3 -top-2.5 px-1 bg-blue-900/80 text-blue-100 text-xs transition-all duration-200 peer-placeholder-shown:text-sm peer-placeholder-shown:text-blue-300 peer-placeholder-shown:top-3 peer-placeholder-shown:left-4 peer-placeholder-shown:bg-transparent peer-focus:-top-2.5 peer-focus:left-3 peer-focus:text-xs peer-focus:text-blue-100 peer-focus:bg-blue-900/80">
+              Password
+            </label>
+            <button 
+              type="button" 
+              class="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-300 hover:text-blue-200 transition-colors"
+              id="togglePassword">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Remember me & Forgot password -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input 
+                id="remember" 
+                name="remember" 
+                type="checkbox" 
+                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white/10 rounded bg-white/5 transition">
+              <label for="remember" class="ml-2 block text-sm text-blue-200 hover:text-white transition-colors cursor-pointer">Remember me</label>
+            </div>
+            <div class="text-sm">
+              <a href="#" class="font-medium text-blue-300 hover:text-blue-200 transition-colors">Forgot password?</a>
+            </div>
+          </div>
+
+          <!-- Submit button with ripple effect -->
+          <div class="relative overflow-hidden rounded-xl">
+            <button 
+              type="submit" 
+              class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0"
+              id="loginButton">
+              <span id="buttonText">Sign In</span>
+              <svg id="buttonSpinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span class="ripple"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Footer with subtle animation -->
+      <div class="px-8 py-4 bg-white/5 text-center border-t border-white/10">
+        <p class="text-xs text-blue-300 inline-flex items-center">
+          <span class="wave-animation mr-1">👋</span>
+          © {{ now.year }} Bha POS. All rights reserved.
+          <a href="{{ url_for('home.index') }}" class="ml-2 text-blue-400 hover:text-white transition-colors inline-flex items-center">
+            Back Home
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+ 
+</div>
+
+<style>
+  /* Blob background animation */
+  @keyframes blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+  }
+  
+  /* Particle floating animation */
+  @keyframes float {
+    0% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(-20px) translateX(10px); }
+    100% { transform: translateY(0) translateX(0); }
+  }
+  
+  
+  
+  /* Letter animation */
+  @keyframes letterFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  
+  /* Fade in animation */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  /* Wave animation */
+  @keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+  }
+  
+  /* Shine effect */
+  @keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+  }
+  
+  /* Ripple effect */
+  @keyframes ripple {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(4); opacity: 0; }
+  }
+  
+  /* Loader animations */
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  @keyframes loader-line {
+    0% { transform: scaleY(0.1); }
+    50% { transform: scaleY(1); }
+    100% { transform: scaleY(0.1); }
+  }
+
+  /* Applied animations */
+  .animate-blob { animation: blob 7s infinite; }
+  .animation-delay-2000 { animation-delay: 2s; }
+  .animation-delay-4000 { animation-delay: 4s; }
+  .particle { animation: float 15s infinite linear; }
+  .ring-animation { animation: rotate 8s linear infinite; }
+  .letter-animation { 
+    display: inline-block;
+    animation: letterFloat 3s ease-in-out infinite; 
+  }
+  .animate-fade-in { animation: fadeIn 1s ease-out forwards; }
+  .wave-animation { animation: wave 1.5s ease-in-out infinite; }
+  .shine-effect {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to bottom right,
+      rgba(255, 255, 255, 0) 45%,
+      rgba(255, 255, 255, 0.8) 50%,
+      rgba(255, 255, 255, 0) 55%
+    );
+    transform: rotate(45deg);
+    animation: shine 3s ease-in-out infinite;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+  }
+  
+  /* Glass card effect */
+  .glass-card {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  /* Title gradient */
+  .title-gradient {
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
+    background-size: 200% auto;
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    animation: gradient 3s linear infinite;
+  }
+  
+  @keyframes gradient {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+  
+  
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    
+
+    // Password visibility toggle
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    
+    togglePassword.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.innerHTML = type === 'password' 
+        ? '<svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>'
+        : '<svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd" /><path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" /></svg>';
+    });
+
+    // Form submission
+    const loginForm = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+    const buttonText = document.getElementById('buttonText');
+    const buttonSpinner = document.getElementById('buttonSpinner');
+    
+    loginForm.addEventListener('submit', function(e) {
+      // Show loading state
+      buttonText.classList.add('hidden');
+      buttonSpinner.classList.remove('hidden');
+      loginButton.disabled = true;
+    });
+
+    // Ripple effect for buttons
+    loginButton.addEventListener('click', function(e) {
+      // Create ripple
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple');
+      
+      // Position ripple
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.width = ripple.style.height = `${size}px`;
+      ripple.style.left = `${e.clientX - rect.left - size/2}px`;
+      ripple.style.top = `${e.clientY - rect.top - size/2}px`;
+      
+      // Add ripple to button
+      this.appendChild(ripple);
+      
+      // Remove ripple after animation
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+
+    // Mouse parallax effect
+    let timeout;
+    const glassCard = document.querySelector('.glass-card');
+    document.addEventListener('mousemove', (e) => {
+      clearTimeout(timeout);
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      
+      glassCard.style.transform = `
+        perspective(1000px)
+        rotateX(${(y - 0.5) * 5}deg)
+        rotateY(${(x - 0.5) * -5}deg)
+        scale(1.01)
+      `;
+      
+      // Reset after inactivity
+      timeout = setTimeout(() => {
+        glassCard.style.transform = '';
+      }, 1000);
+    });
+  });
+</script>
+{% endblock %}

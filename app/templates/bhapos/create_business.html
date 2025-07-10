@@ -1,0 +1,157 @@
+{% extends 'bhapos/base.html' %}
+
+{% block title %}Create New Business{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full mx-auto">
+    <!-- Logo/Header -->
+    <div class="text-center mb-8">
+      <div class="mx-auto h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mb-4">
+        <i class="fas fa-building text-indigo-600 dark:text-indigo-300 text-xl"></i>
+      </div>
+      <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">Register Business</h2>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        Add a new business to the system
+      </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden">
+      <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Business Information</h3>
+      </div>
+      
+      <form method="POST" novalidate class="space-y-6 px-6 py-6">
+        {{ form.hidden_tag() }}
+
+        <!-- Business Name -->
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {{ form.name.label.text }}
+            <span class="text-red-500">*</span>
+          </label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            {{ form.name(
+              class="block w-full px-4 py-3 text-sm rounded-md border 
+                     border-gray-300 dark:border-gray-600 
+                     bg-white dark:bg-gray-700 
+                     text-gray-900 dark:text-white 
+                     placeholder-gray-400 dark:placeholder-gray-500 
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                     transition",
+              placeholder="Acme Corporation") }}
+          </div>
+          {% if form.name.errors %}
+            <p class="mt-2 text-sm text-red-600 dark:text-red-400">
+              <i class="fas fa-exclamation-circle mr-1"></i> {{ form.name.errors[0] }}
+            </p>
+          {% endif %}
+        </div>
+
+        <!-- Business Email -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {{ form.email.label.text }}
+            <span class="text-gray-400 text-xs">(Optional)</span>
+          </label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-envelope text-gray-400"></i>
+            </div>
+            {{ form.email(
+              class="block w-full pl-10 pr-4 py-3 text-sm rounded-md border 
+                     border-gray-300 dark:border-gray-600 
+                     bg-white dark:bg-gray-700 
+                     text-gray-900 dark:text-white 
+                     placeholder-gray-400 dark:placeholder-gray-500 
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                     transition",
+              placeholder="contact@example.com") }}
+          </div>
+          {% if form.email.errors %}
+            <p class="mt-2 text-sm text-red-600 dark:text-red-400">
+              <i class="fas fa-exclamation-circle mr-1"></i> {{ form.email.errors[0] }}
+            </p>
+          {% endif %}
+        </div>
+
+        <!-- Phone Number -->
+        <div>
+          <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {{ form.phone.label.text }}
+          </label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="text-gray-400">+</span>
+            </div>
+            {{ form.phone(
+              class="block w-full pl-10 pr-4 py-3 text-sm rounded-md border 
+                     border-gray-300 dark:border-gray-600 
+                     bg-white dark:bg-gray-700 
+                     text-gray-900 dark:text-white 
+                     placeholder-gray-400 dark:placeholder-gray-500 
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                     transition",
+              placeholder="254 700 000000") }}
+          </div>
+        </div>
+
+        <!-- Registration Number -->
+        <div>
+          <label for="registration_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {{ form.registration_number.label.text }}
+          </label>
+          {{ form.registration_number(
+            class="block w-full px-4 py-3 text-sm rounded-md border 
+                   border-gray-300 dark:border-gray-600 
+                   bg-white dark:bg-gray-700 
+                   text-gray-900 dark:text-white 
+                   placeholder-gray-400 dark:placeholder-gray-500 
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                   transition",
+            placeholder="e.g. CPR123456") }}
+        </div>
+
+        
+
+        <!-- Address -->
+        <div>
+          <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {{ form.address.label.text }}
+          </label>
+          {{ form.address(
+            class="block w-full px-4 py-3 text-sm rounded-md border 
+                   border-gray-300 dark:border-gray-600 
+                   bg-white dark:bg-gray-700 
+                   text-gray-900 dark:text-white 
+                   placeholder-gray-400 dark:placeholder-gray-500 
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                   transition",
+            placeholder="123 Business Street",
+            rows="2") }}
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex items-center justify-between pt-6">
+          <a href="{{ url_for('bhapos.list_businesses') }}" 
+             class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300">
+            <i class="fas fa-arrow-left mr-1"></i> Back to businesses
+          </a>
+          <button type="submit" 
+                  class="inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
+            <i class="fas fa-save mr-2"></i> Create Business
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Additional Help -->
+    <div class="mt-6 text-center">
+      <p class="text-xs text-gray-500 dark:text-gray-400">
+        Need help? <a href="#" class="text-indigo-600 dark:text-indigo-400 hover:underline">Contact support</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

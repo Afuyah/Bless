@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bhapos - Advanced POS Management System">
+    <meta name="keywords" content="POS, Dashboard, Sales, Inventory, Management">
+    <title>Bhapos Dashboard</title>
+    <script src="{{ url_for ('static', filename='js/tailwind.js')}}"></script>
+    
+    <style id="critical-css">
+        /* Base styles to prevent layout shift */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        /* Modern preloader styles */
+        #page-preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ffffff;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .dark #page-preloader {
+            background: #0f172a;
+        }
+        
+        /* Animated logo */
+        .preloader-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .preloader-logo-inner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: #0ea5e9;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .preloader-logo-inner:nth-child(2) {
+            border-top-color: #38bdf8;
+            animation-delay: 0.2s;
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+        }
+        
+        .preloader-logo-inner:nth-child(3) {
+            border-top-color: #7dd3fc;
+            animation-delay: 0.4s;
+            width: 50%;
+            height: 50%;
+            top: 25%;
+            left: 25%;
+        }
+        
+        /* Loading text */
+        .preloader-text {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            color: #0ea5e9;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            position: relative;
+        }
+        
+        .dark .preloader-text {
+            color: #7dd3fc;
+        }
+        
+        .preloader-text:after {
+            content: '...';
+            position: absolute;
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        
+        /* Animations */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        /* Progress bar */
+        .preloader-progress {
+            width: 200px;
+            height: 4px;
+            background: rgba(14, 165, 233, 0.2);
+            border-radius: 2px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+        
+        .preloader-progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        .dark .preloader-progress {
+            background: rgba(125, 211, 252, 0.2);
+        }
+        
+        .dark .preloader-progress-bar {
+            background: linear-gradient(90deg, #7dd3fc, #bae6fd);
+        }
+    </style>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    
+    <style>
+        .sidebar-transition {
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ef4444;
+        }
+        
+        .nav-item.active {
+            background-color: #e0f2fe;
+            border-left: 4px solid #0ea5e9;
+        }
+        
+        .sidebar-collapsed .sidebar-text {
+            display: none;
+        }
+        
+        .sidebar-collapsed .sidebar-icon {
+            margin-right: 0;
+        }
+        
+        .sidebar-collapsed .sidebar-stats {
+            display: none;
+        }
+        
+        .sidebar-collapsed {
+            width: 5rem;
+        }
+        
+        .chart-container {
+            height: 250px;
+        }
+    </style>
+</head>
+
+<body class="h-full bg-gray-50 dark:bg-gray-900 flex flex-col" hx-boost="true">
+    <!-- Enhanced Page Preloader -->
+    <div id="page-preloader">
+        <div class="preloader-logo">
+            <div class="preloader-logo-inner"></div>
+            <div class="preloader-logo-inner"></div>
+            <div class="preloader-logo-inner"></div>
+        </div>
+        <div class="preloader-text">Loading Bhapos</div>
+        <div class="preloader-progress">
+            <div class="preloader-progress-bar" id="preloader-progress"></div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator (for HTMX requests) -->
+    <div id="loading-indicator" class="hidden fixed top-4 right-4 z-50">
+        <div class="loader"></div> 
+    </div>
+    
+    {% include 'admin/partials/header.html'%}
+    
+    <!-- Main Content Area -->
+    <div class="flex-1 flex overflow-hidden">
+        <!-- Main Content Area -->
+        <div class="flex-1 flex overflow-hidden">
+            {% block content %}
+            <!-- Page-specific content -->
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 w-80 space-y-2"></div>
+
+    {% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jQuery, Bootstrap & DataTables -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+
+    <!-- Toastify -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <!-- Your Admin Dashboard logic -->
+    <script src="{{ url_for('static', filename='js/admindash.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    {% endblock %}
+
+    <script>
+    // Remove critical CSS after page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const criticalCss = document.getElementById('critical-css');
+        if (criticalCss) {
+            criticalCss.remove();
+        }
+    });
+
+    // Simulate progress for the preloader
+    function simulateProgress() {
+        const progressBar = document.getElementById('preloader-progress');
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 10;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(interval);
+            }
+            progressBar.style.width = progress + '%';
+        }, 200);
+    }
+
+    // Hide preloader when everything is loaded
+    window.addEventListener('load', function() {
+        const preloader = document.getElementById('page-preloader');
+        if (preloader) {
+            // Ensure progress bar reaches 100%
+            document.getElementById('preloader-progress').style.width = '100%';
+            
+            // Fade out preloader
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+                document.body.style.overflow = '';
+            }, 500);
+        }
+    });
+
+    // Start progress simulation immediately
+    simulateProgress();
+
+    // Fallback in case load event doesn't fire
+    setTimeout(function() {
+        const preloader = document.getElementById('page-preloader');
+        if (preloader && preloader.style.visibility !== 'hidden') {
+            document.getElementById('preloader-progress').style.width = '100%';
+            preloader.style.opacity = '0';
+            preloader.style.visibility = 'hidden';
+            document.body.style.overflow = '';
+        }
+    }, 5000); // 5 seconds max
+
+    // Rest of your existing JavaScript...
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const sidebarCollapse = document.getElementById('sidebar-collapse');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            const isOpening = sidebar.classList.contains('-translate-x-full');
+            
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.classList.toggle('opacity-0');
+            sidebarOverlay.classList.toggle('pointer-events-none');
+            
+            // Disable scrolling when sidebar is open
+            document.body.style.overflow = isOpening ? 'hidden' : '';
+        }
+        
+        // Mobile menu button
+        if (mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', toggleSidebar);
+        }
+        
+        // Collapse button (desktop)
+        if (sidebarCollapse) {
+            sidebarCollapse.addEventListener('click', function() {
+                sidebar.classList.toggle('w-72');
+                sidebar.classList.toggle('w-20');
+                document.querySelectorAll('.nav-item span').forEach(el => {
+                    el.classList.toggle('hidden');
+                });
+                sidebarCollapse.querySelector('svg').classList.toggle('rotate-180');
+            });
+        }
+        
+        // Close sidebar when clicking on overlay
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', toggleSidebar);
+        }
+        
+        // Close sidebar on mobile when a nav item is clicked
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth < 768) {
+                    toggleSidebar();
+                }
+            });
+        });
+        
+        // Active nav item highlighting
+        function setActiveNav() {
+            const currentPath = window.location.pathname;
+            navItems.forEach(item => {
+                const itemPath = new URL(item.href).pathname;
+                const isActive = currentPath === itemPath || 
+                                 (currentPath.startsWith(itemPath) && itemPath !== '/');
+                
+                item.classList.toggle('bg-gray-100/50', isActive);
+                item.classList.toggle('dark:bg-gray-800/80', isActive);
+                item.classList.toggle('text-primary-600', isActive);
+                item.classList.toggle('dark:text-primary-400', isActive);
+                
+                const icon = item.querySelector('i');
+                if (icon) {
+                    icon.classList.toggle('text-primary-500', isActive);
+                    icon.classList.toggle('text-gray-500', !isActive);
+                    icon.classList.toggle('dark:text-gray-400', !isActive);
+                }
+            });
+        }
+        
+        // Initialize active state
+        setActiveNav();
+        
+        // Update on HTMX navigation
+        document.addEventListener('htmx:afterSwap', setActiveNav);
+        
+        // Global loader for HTMX
+        document.addEventListener('htmx:beforeRequest', function() {
+            const loader = document.getElementById('global-loader');
+            if (loader) {
+                loader.classList.remove('opacity-0', 'pointer-events-none');
+                loader.classList.add('opacity-100');
+                setTimeout(() => {
+                    loader.querySelector('div').classList.remove('scale-95');
+                }, 10);
+            }
+        });
+        
+        document.addEventListener('htmx:afterOnLoad', function() {
+            const loader = document.getElementById('global-loader');
+            if (loader) {
+                loader.querySelector('div').classList.add('scale-95');
+                setTimeout(() => {
+                    loader.classList.remove('opacity-100');
+                    loader.classList.add('opacity-0', 'pointer-events-none');
+                }, 300);
+            }
+        });
+        
+        // Close sidebar when clicking outside (mobile)
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth >= 768) return;
+            if (!sidebar.contains(event.target) && 
+                !mobileMenuButton.contains(event.target) &&
+                sidebarOverlay && !sidebarOverlay.classList.contains('opacity-0')) {
+                toggleSidebar();
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                if (sidebar) sidebar.classList.remove('-translate-x-full');
+                if (sidebarOverlay) sidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
+                document.body.style.overflow = '';
+            }
+        });
+    });
+    </script>
+</body>
+</html>

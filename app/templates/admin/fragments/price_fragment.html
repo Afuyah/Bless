@@ -1,0 +1,95 @@
+<div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden m-5" id="price-management">
+{% for shop in shops %}
+    <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50 dark:bg-gray-800/50">
+
+    <div class="flex items-center space-x-4">
+        <div class="p-3 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
+       
+      </div>
+      <div>
+
+    <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Price Management</h2>
+    
+ <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Update Product prices Here</p>
+      </div>
+
+    <!-- Search and Filter Controls -->
+    <div class="mb-6 flex items-center space-x-4">
+        <div class="relative flex-grow">
+            <input type="text" id="productSearch" placeholder="Search products..." 
+                   class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                   hx-get="{{ url_for('price.search_products', shop_id=shop.id) }}"
+                   hx-trigger="keyup changed delay:300ms"
+                   hx-target="#priceTableBody"
+                   hx-indicator=".search-indicator">
+            <div class="absolute left-3 top-2.5 text-gray-400">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="search-indicator htmx-indicator absolute right-3 top-2.5">
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+        </div>
+        <button id="resetSearch" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors dark:bg-gray-600 dark:hover:bg-gray-500"
+                hx-get="{{ url_for('price.price_rows_fragment', shop_id=shop.id) }}"
+                hx-target="#priceTableBody"
+                hx-indicator=".search-indicator">
+            Reset
+        </button>
+    </div>
+</div>
+</div>
+    <!-- Price Table -->
+    <div class="overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Product</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stock</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cost Price</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Selling Price</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="priceTableBody" class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700"
+                       hx-ext="loading-states">
+                    {% include 'admin/fragments/_price_rows.html' %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Container -->
+<div id="modal-container"></div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed bottom-4 right-4 hidden">
+    <div class="bg-green-500 text-white px-4 py-2 rounded shadow-lg">
+        <span id="toast-message"></span>
+    </div>
+</div>
+</div>
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle modal closing
+    document.body.addEventListener('hideModal', function() {
+        const modals = document.querySelectorAll('[id^="cost-price-modal-"], [id^="selling-price-modal-"]');
+        modals.forEach(modal => {
+            modal.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+            setTimeout(() => modal.remove(), 300);
+        });
+    });
+    
+    // Show toast notifications
+    document.body.addEventListener('showToast', function() {
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in-out';
+        toast.textContent = 'Price updated successfully';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    });
+});
+        
+</script>
+{% endfor %}

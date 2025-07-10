@@ -1,0 +1,42 @@
+{% for product in products %}
+<tr id="product-row-{{ product.id }}" class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+    <td class="px-6 py-4 whitespace-nowrap">
+        <div class="flex items-center">
+            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ product.name }}</div>
+        </div>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                    {% if product.stock < 10 %}bg-red-100 text-red-800
+                    {% elif product.stock < 20 %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-green-100 text-green-800{% endif %}">
+            {{ product.stock }}
+        </span>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+        Ksh {{ "%.2f"|format(product.cost_price) }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+        Ksh {{ "%.2f"|format(product.selling_price) }}
+        {% if product.combination_size %}
+        <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">
+            ({{ product.combination_size }} for Ksh {{ "%.2f"|format(product.combination_price) }})
+        </span>
+        {% endif %}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+        <button class="mr-2 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                hx-get="{{ url_for('price.edit_selling_price_form', product_id=product.id, shop_id=shop.id) }}"
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+            <i class="fas fa-tag mr-1"></i> Selling
+        </button>
+        <button class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                hx-get="{{ url_for('price.edit_cost_price_form', product_id=product.id, shop_id=shop.id) }}"
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+            <i class="fas fa-dollar-sign mr-1"></i> Cost
+        </button>
+    </td>
+</tr>
+{% endfor %}

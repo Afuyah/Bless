@@ -1,0 +1,42 @@
+{% extends 'bhapos/base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Shops under <span class="text-green-600 dark:text-green-400">{{ business.name }}</span></h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Manage all shops belonging to this business.</p>
+    </div>
+    <a href="{{ url_for('bhapos.create_shop', business_id=business.id) }}"
+       class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md shadow-sm transition">
+      <i class="fas fa-plus mr-2"></i> Add Shop
+    </a>
+  </div>
+
+  {% if shops %}
+    <div class="space-y-4">
+      {% for shop in shops %}
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 flex items-center justify-between transition hover:shadow-md">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ shop.name }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Created on {{ shop.created_at.strftime('%b %d, %Y') }}</p>
+          </div>
+          <a href="{{ url_for('bhapos.manage_shop_users', shop_id=shop.id) }}"
+             class="inline-flex items-center px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-sm font-medium text-gray-800 dark:text-white rounded-md transition">
+            <i class="fas fa-users mr-2"></i> Manage Users
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center text-gray-500 dark:text-gray-400 py-12">
+      <i class="fas fa-store text-4xl mb-3"></i>
+      <p>No shops found under this business yet.</p>
+      <a href="{{ url_for('bhapos.create_shop', business_id=business.id) }}"
+         class="mt-4 inline-block px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition">
+        <i class="fas fa-plus-circle mr-2"></i> Add Shop
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

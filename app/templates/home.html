@@ -1,0 +1,353 @@
+{% extends 'base_layout.html' %}
+
+{% block title %} Bha POS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-900 to-indigo-900 overflow-hidden relative">
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute -top-20 -left-20 w-72 h-72 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+    <div class="absolute top-1/3 -right-20 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/4 w-80 h-80 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+  </div>
+
+  <!-- Floating particles -->
+  <div class="particles-container absolute inset-0 overflow-hidden pointer-events-none">
+    {% for i in range(15) %}
+    <div class="particle absolute rounded-full bg-white/10" style="
+      width: {{ range(2, 6)|random }}px;
+      height: {{ range(2, 6)|random }}px;
+      top: {{ range(0, 100)|random }}%;
+      left: {{ range(0, 100)|random }}%;
+      animation: float {{ range(10, 25)|random }}s linear infinite;
+      animation-delay: -{{ range(0, 15)|random }}s;
+    "></div>
+    {% endfor %}
+  </div>
+
+  <!-- Main content -->
+  <div class="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8">
+      <!-- Glass card -->
+      <div class="glass-card bg-white/5 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/10 transition-all duration-500 hover:shadow-2xl transform hover:-translate-y-1 hover:scale-[1.01]">
+        <div class="p-8 text-center">
+          <!-- Logo/Branding with animated ring -->
+          <div class="flex justify-center mb-6 relative">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="ring-animation w-24 h-24 rounded-full border-2 border-transparent border-t-white/30 border-r-white/30"></div>
+            </div>
+            <div class="flex items-center justify-center w-20 h-20 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg z-10">
+              <!-- Dynamic lock icon with shine effect -->
+              <div class="relative">
+                <svg id="authIcon" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white transition-all duration-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path id="lockPath" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <div id="iconShine" class="shine-effect absolute inset-0 bg-white/20 rounded-full pointer-events-none"></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Animated title -->
+          <h1 class="text-4xl font-bold text-white mb-2 transform transition-all duration-700 hover:scale-105 inline-block">
+            <span class="title-gradient bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+              <span class="letter-animation" style="animation-delay: 0.1s">B</span>
+              <span class="letter-animation" style="animation-delay: 0.2s">h</span>
+              <span class="letter-animation" style="animation-delay: 0.3s">a</span>
+              <span class="opacity-0"> </span>
+              <span class="letter-animation" style="animation-delay: 0.4s">P</span>
+              <span class="letter-animation" style="animation-delay: 0.5s">O</span>
+              <span class="letter-animation" style="animation-delay: 0.6s">S</span>
+            </span>
+          </h1>
+          
+          <!-- Auth message with typing animation -->
+          <p id="authMessage" class="text-lg text-blue-100 mb-8 transition-all duration-700 h-6">
+            {% if current_user.is_authenticated %}
+              <span class="typing-animation">Welcome back, {{ current_user.username }}! 👋</span>
+            {% else %}
+              <span class="typing-animation">Professional Point of Sale System</span>
+            {% endif %}
+          </p>
+          
+          <!-- Dynamic Button with ripple effect -->
+          <div class="mt-8 relative overflow-hidden">
+            <a id="authButton" href="
+  {% if current_user.is_authenticated and current_shop %}
+    {{ url_for('sales.sales_screen', shop_id=current_shop.id) }}
+  {% else %}
+    {{ url_for('auth.login') }}
+  {% endif %}"
+               class="relative overflow-hidden group w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                      {% if current_user.is_authenticated %}bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700{% else %}bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700{% endif %}">
+              <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                <svg class="h-5 w-5 {% if current_user.is_authenticated %}text-green-200 group-hover:text-green-100{% else %}text-blue-200 group-hover:text-blue-100{% endif %} transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  {% if current_user.is_authenticated %}
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
+                  {% else %}
+                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                  {% endif %}
+                </svg>
+              </span>
+              <span class="button-text">
+                {% if current_user.is_authenticated %}ENTER POS DASHBOARD{% else %}LOGIN TO POS SYSTEM{% endif %}
+              </span>
+              <span class="ripple"></span>
+            </a>
+          </div>
+          
+          <!-- Additional links with fade-in -->
+          <div class="mt-6 text-center transition-opacity duration-1000 opacity-0" id="secondaryLinks">
+            {% if current_user.is_authenticated %}
+              <a href="{{ url_for('auth.logout') }}" class="text-blue-300 hover:text-white text-sm font-medium transition-colors inline-flex items-center group">
+                <span>Not {{ current_user.username }}?</span>
+                <span class="ml-1 group-hover:underline">Logout</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </a>
+            {% else %}
+              <a href="#" class="text-blue-300 hover:text-white text-sm font-medium transition-colors inline-flex items-center group">
+                <span>Learn about our features</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Footer note with wave animation -->
+      <div class="text-center">
+        <p class="text-blue-200 text-xs inline-flex items-center">
+          <span class="wave-animation mr-1">👋</span>
+          Version 2.4.1 • © {{ now.year }} Bha. All rights reserved.
+          {% if current_user.is_authenticated %}
+            <span class="ml-2 inline-flex items-center">
+              <span class="relative flex h-2 w-2 mr-1">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              Session active
+            </span>
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  
+</div>
+
+<style>
+  /* Blob background animation */
+  @keyframes blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+  }
+  
+  /* Particle floating animation */
+  @keyframes float {
+    0% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(-20px) translateX(10px); }
+    100% { transform: translateY(0) translateX(0); }
+  }
+  
+  /* Ring loading animation */
+  @keyframes rotate {
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Letter animation */
+  @keyframes letterFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  /* Typing animation */
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+  
+  /* Wave animation */
+  @keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+  }
+  
+  /* Shine effect */
+  @keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+  }
+  
+  /* Ripple effect */
+  @keyframes ripple {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(4); opacity: 0; }
+  }
+  
+  /* Loader animations */
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  @keyframes loader-line {
+    0% { transform: scaleY(0.1); }
+    50% { transform: scaleY(1); }
+    100% { transform: scaleY(0.1); }
+  }
+
+  /* Applied animations */
+  .animate-blob { animation: blob 7s infinite; }
+  .animation-delay-2000 { animation-delay: 2s; }
+  .animation-delay-4000 { animation-delay: 4s; }
+  .particle { animation: float 15s infinite linear; }
+  .ring-animation { animation: rotate 8s linear infinite; }
+  .letter-animation { 
+    display: inline-block;
+    animation: letterFloat 3s ease-in-out infinite; 
+  }
+  .typing-animation {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 2s steps(40, end);
+  }
+  .wave-animation { animation: wave 1.5s ease-in-out infinite; }
+  .shine-effect {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to bottom right,
+      rgba(255, 255, 255, 0) 45%,
+      rgba(255, 255, 255, 0.8) 50%,
+      rgba(255, 255, 255, 0) 55%
+    );
+    transform: rotate(45deg);
+    animation: shine 3s ease-in-out infinite;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+  }
+  
+  /* Glass card effect */
+  .glass-card {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  /* Title gradient */
+  .title-gradient {
+    background-size: 200% auto;
+    animation: gradient 3s ease infinite;
+  }
+  
+  @keyframes gradient {
+    0% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+    100% { background-position: 0% center; }
+  }
+  
+
+ 
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Hide preloader when page loads
+   
+
+    // Show secondary links after delay
+    setTimeout(() => {
+      document.getElementById('secondaryLinks').style.opacity = '1';
+    }, 1800);
+
+    // Check authentication state
+    const isAuthenticated = {% if current_user.is_authenticated %}true{% else %}false{% endif %};
+    const authIcon = document.getElementById('authIcon');
+    const lockPath = document.getElementById('lockPath');
+    const iconShine = document.getElementById('iconShine');
+    
+    if (isAuthenticated) {
+      // Change to unlocked icon with animation
+      setTimeout(() => {
+        lockPath.setAttribute('d', 'M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z');
+        iconShine.style.opacity = '1';
+      }, 500);
+      
+      // Add subtle pulse effect to indicate active session
+      setInterval(() => {
+        authIcon.classList.toggle('scale-110');
+      }, 2000);
+    }
+
+    // Mouse parallax effect
+    let timeout;
+    document.addEventListener('mousemove', (e) => {
+      clearTimeout(timeout);
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      
+      document.querySelector('.glass-card').style.transform = `
+        perspective(1000px)
+        rotateX(${(y - 0.5) * 5}deg)
+        rotateY(${(x - 0.5) * -5}deg)
+        scale(1.01)
+      `;
+      
+      // Reset after inactivity
+      timeout = setTimeout(() => {
+        document.querySelector('.glass-card').style.transform = '';
+      }, 1000);
+    });
+
+    // Ripple effect for buttons
+    document.getElementById('authButton').addEventListener('click', function(e) {
+      // Create ripple
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple');
+      
+      // Position ripple
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.width = ripple.style.height = `${size}px`;
+      ripple.style.left = `${e.clientX - rect.left - size/2}px`;
+      ripple.style.top = `${e.clientY - rect.top - size/2}px`;
+      
+      // Add ripple to button
+      this.appendChild(ripple);
+      
+      // Remove ripple after animation
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+
+    // Hover effect for icon shine
+    const iconContainer = document.querySelector('.relative');
+    iconContainer.addEventListener('mouseenter', () => {
+      iconShine.style.opacity = '1';
+    });
+    iconContainer.addEventListener('mouseleave', () => {
+      if (!isAuthenticated) {
+        iconShine.style.opacity = '0';
+      }
+    });
+  });
+</script>
+{% endblock %}

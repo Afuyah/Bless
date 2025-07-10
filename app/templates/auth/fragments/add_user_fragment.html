@@ -1,0 +1,150 @@
+<!-- auth/fragments/add_user_fragment.html -->
+<div class="max-w-md mx-auto p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 transition-colors duration-300 mt-5">
+    <h3 class="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100 mb-6">Add New User</h3>
+
+    {% if error %}
+    <div class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 p-3 rounded-lg mb-4 text-sm flex items-center">
+        <i class="fas fa-exclamation-circle mr-2"></i>
+        {{ error }}
+    </div>
+    {% endif %}
+{% for shop in shops %}
+    <form 
+        method="POST" 
+        hx-post="{{ url_for('auth.add_user', shop_id=shop.id) }}" 
+        hx-target="#main-content" 
+        hx-swap="innerHTML"
+        hx-indicator="#loading-indicator"
+        class="space-y-4"
+    >
+        <div>
+            <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+                required 
+                placeholder="Enter username"
+                autocomplete="username"
+            >
+        </div>
+
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+            <div class="relative">
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+                    required 
+                    placeholder="Create password"
+                    autocomplete="new-password"
+                    aria-describedby="password-strength"
+                >
+                <button type="button" class="absolute right-3 top-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" onclick="togglePasswordVisibility()">
+                    <i class="far fa-eye" id="toggle-icon"></i>
+                </button>
+            </div>
+            <div id="password-strength" class="mt-1 text-xs flex items-center">
+                <span class="inline-block w-3 h-3 rounded-full mr-1" id="strength-dot"></span>
+                <span id="strength-text">Password Strength</span>
+            </div>
+        </div>
+
+        <div>
+            <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User Role</label>
+            <select 
+                id="role" 
+                name="role" 
+                class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 appearance-none"
+                required
+            >
+                <option value="" disabled selected>Select a role</option>
+                <option value="admin" class="bg-white dark:bg-gray-700">Administrator</option>
+                <option value="cashier" class="bg-white dark:bg-gray-700">Cashier</option>
+            </select>
+        </div>
+
+        <button 
+            type="submit" 
+            class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800 text-white font-medium rounded-lg transition-colors duration-200 flex items-center justify-center"
+        >
+            <span id="submit-text">Create User</span>
+            <span id="loading-indicator" class="htmx-indicator ml-2">
+                <i class="fas fa-spinner fa-spin"></i>
+            </span>
+        </button>
+    </form>
+
+    <div class="mt-4 text-center">
+        <a 
+            href="{{ url_for('auth.user_management', shop_id=shop.id) }}" 
+            hx-get="{{ url_for('auth.user_management', shop_id=shop.id) }}"
+            hx-target="#main-content" 
+            hx-swap="innerHTML"
+            class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:underline transition-colors duration-200 inline-flex items-center"
+        >
+            <i class="fas fa-arrow-left mr-1"></i>
+            Back to User Management
+        </a>
+    </div>
+</div>
+{% endfor %}
+<script>
+// Password strength indicator
+document.getElementById('password')?.addEventListener('input', function() {
+    const value = this.value;
+    const strengthDot = document.getElementById('strength-dot');
+    const strengthText = document.getElementById('strength-text');
+    
+    let strength = 0;
+    let color = 'bg-red-500';
+    let text = 'Weak';
+    
+    // Length check
+    if (value.length >= 8) strength++;
+    if (value.length >= 12) strength++;
+    
+    // Complexity checks
+    if (/[A-Z]/.test(value)) strength++;
+    if (/[0-9]/.test(value)) strength++;
+    if (/[^A-Za-z0-9]/.test(value)) strength++;
+    
+    // Determine strength level
+    if (strength > 3) {
+        color = 'bg-green-500';
+        text = 'Strong';
+    } else if (strength > 1) {
+        color = 'bg-yellow-500';
+        text = 'Medium';
+    }
+    
+    strengthDot.className = `inline-block w-3 h-3 rounded-full mr-1 ${color}`;
+    strengthText.textContent = text;
+});
+
+// Password visibility toggle
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggle-icon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
+// Initialize dark mode classes
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.documentElement.classList.contains('dark')) {
+        document.querySelectorAll('select option').forEach(option => {
+            option.classList.add('dark:bg-gray-700');
+        });
+    }
+});
+</script>

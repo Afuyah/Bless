@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Dashboard{% endblock %}</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+  <script src="{{ url_for ('static', filename='js/tailwind.js')}}"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+ <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+<style>
+  /* Fix for DataTables in dark mode */
+  .dark .dataTables_wrapper .dataTables_info,
+  .dark .dataTables_wrapper .dataTables_length,
+  .dark .dataTables_wrapper .dataTables_filter,
+  .dark .dataTables_wrapper .dataTables_paginate,
+  .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #d1d5db !important; /* Light gray text */
+  }
+
+  .dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+  .dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+    color: #6b7280 !important; /* Gray text for disabled buttons */
+  }
+
+  .dark .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+  .dark .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: #3b82f6 !important; /* Blue background for current page */
+    color: white !important;
+    border-color: #3b82f6 !important;
+  }
+
+  .dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #374151 !important; /* Darker gray on hover */
+    color: white !important;
+  }
+
+  .dark .dataTables_wrapper input[type="search"] {
+    background-color: #374151;
+    color: white;
+    border-color: #4b5563;
+  }
+
+  .dark .dataTables_wrapper select {
+    background-color: #374151;
+    color: white;
+    border-color: #4b5563;
+  }
+
+
+  /* Custom scrollbar for sidebar */
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: #cbd5e0;
+  border-radius: 3px;
+}
+
+.dark .sidebar-scroll {
+  scrollbar-color: #4b5563 transparent;
+}
+
+.dark .sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+}
+
+/* Smooth transitions */
+.sidebar-item {
+  transition: all 0.2s ease;
+}
+
+/* Active state */
+.sidebar-item.active {
+  background-color: #ebf4ff;
+  color: #3b82f6;
+}
+
+.dark .sidebar-item.active {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #93c5fd;
+}
+</style>
+  {% block head %}{% endblock %}
+</head>
+
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+
+<!-- Preloader -->
+<div id="preloader" class="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gray-900 transition-opacity duration-500">
+  <div class="relative w-24 h-24">
+    <!-- Animated gradient border -->
+    <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-indigo-500 border-r-purple-500 border-b-pink-500 border-l-blue-500 animate-spin"></div>
+    <!-- Logo center -->
+    <div class="absolute inset-4 flex items-center justify-center">
+      <svg class="w-12 h-12 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+      </svg>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Main Layout Container -->
+  <div class="flex h-full">
+    <!-- Sidebar -->
+    {% include 'bhapos/partials/sidebar.html' %}
+    
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Navbar -->
+      {% include 'bhapos/partials/navbar.html' %}
+
+      <!-- Main Content Area -->
+      <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
+        <!-- Flashed Messages -->
+        <div class="flash-messages mb-4">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="flex items-center p-4 mb-4 text-sm rounded-lg 
+                  {% if category == 'success' %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                  {% elif category == 'danger' %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
+                  {% elif category == 'warning' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+                  {% elif category == 'info' %}bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200{% endif %}" 
+                  role="alert">
+                  <i class="fas 
+                    {% if category == 'success' %}fa-check-circle
+                    {% elif category == 'danger' %}fa-exclamation-circle
+                    {% elif category == 'warning' %}fa-exclamation-triangle
+                    {% elif category == 'info' %}fa-info-circle{% endif %} 
+                    mr-3"></i>
+                  <span class="sr-only">{{ category|title }}</span>
+                  <div>{{ message }}</div>
+                  <button type="button" class="ml-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex items-center justify-center h-8 w-8 
+                    {% if category == 'success' %}bg-green-100 text-green-500 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800
+                    {% elif category == 'danger' %}bg-red-100 text-red-500 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800
+                    {% elif category == 'warning' %}bg-yellow-100 text-yellow-500 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300 dark:hover:bg-yellow-800
+                    {% elif category == 'info' %}bg-blue-100 text-blue-500 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800{% endif %}" 
+                    data-dismiss-target=".flash-messages" aria-label="Close">
+                    <span class="sr-only">Close</span>
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+        </div>
+
+        
+
+        <!-- Main Content Block -->
+        <div class="content-container">
+          {% block content %}{% endblock %}
+        </div>
+      </main>
+
+      <!-- Footer -->
+     <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-6 px-6">
+  <div class="flex flex-col md:flex-row justify-between items-center">
+    <div class="text-sm text-gray-600 dark:text-gray-400 mb-2 md:mb-0">
+      &copy; {{ now.year }} Your Company. All rights reserved.
+    </div>
+    <div class="text-sm text-gray-600 dark:text-gray-400">
+      v1.0.0
+    </div>
+  </div>
+</footer>
+
+    </div>
+  </div>
+
+  <!-- JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Custom JS -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  
+  <script>
+
+  // Hide preloader when page loads
+window.addEventListener('load', function() {
+  const preloader = document.getElementById('preloader');
+  preloader.style.opacity = '0';
+  setTimeout(() => {
+    preloader.style.display = 'none';
+  }, 500);
+});
+
+
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon-path');
+    const html = document.documentElement;
+
+    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+      themeIcon.setAttribute('d', 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z');
+    } else {
+      html.classList.remove('dark');
+    }
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        if (html.classList.contains('dark')) {
+          html.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+          themeIcon.setAttribute('d', 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z');
+        } else {
+          html.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+          themeIcon.setAttribute('d', 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z');
+        }
+      });
+    }
+
+    // Close flash messages
+    document.querySelectorAll('[data-dismiss-target]').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelector(button.getAttribute('data-dismiss-target')).remove();
+      });
+    });
+  </script>
+  
+
+  <!-- Alpine.js for interactivity -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<!-- HTMX (optional for AJAX) -->
+<script src="https://unpkg.com/htmx.org@1.9.2"></script>
+
+<!-- Flowbite for Tailwind components (optional) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
