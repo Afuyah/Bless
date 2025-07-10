@@ -665,8 +665,9 @@ class RegisterService:
             Sale.is_deleted == False
         ).first()
 
+        opening_cash = float(session.opening_cash or 0)
         cash_sales = float(result.cash or 0)
-        expected_cash = round(float(session.opening_cash) + cash_sales, 2)
+        expected_cash = round(opening_cash + cash_sales, 2)
 
         return {
             "session_id": session.id,
@@ -675,7 +676,7 @@ class RegisterService:
                 "id": session.opened_by.id,
                 "username": session.opened_by.username
             } if session.opened_by else None,
-            "opening_cash": float(session.opening_cash),
+            "opening_cash": opening_cash,
             "total_sales": float(result.total_sales or 0),
             "expected_cash": expected_cash,
             "payment_methods": {
