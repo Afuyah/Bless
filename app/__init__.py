@@ -231,32 +231,13 @@ def create_app(config_class=Config):
         shops = []
         business = None
 
-        try:
-            if current_user.is_authenticated:
-                # For tenants: load all active shops under their business
-                if current_user.is_tenant() and current_user.business_id:
-                    business = (
-                        db.session.query(Business)
-                        .options(db.joinedload(Business.shops))
-                        .get(current_user.business_id)
-                    )
-                    if business:
-                        shops = [shop for shop in business.shops if not shop.is_deleted]
-
-                # For admins: only one assigned shop
-                elif current_user.is_admin() and current_user.shop_id:
-                    shop = (
-                        db.session.query(Shop)
-                        .options(db.joinedload(Shop.business))
-                        .get(current_user.shop_id)
-                    )
-                    if shop and not shop.is_deleted:
-                        shops = [shop]
-                        business = shop.business
-
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            logger.error(f"inject_globals error: {e}", exc_info=True)
+        if current_user.is_authenticated:
+            if current_user.is_tenant():
+                shops = Shop.query.filter_by(business_id=current_user.business_id, is_deleted=False).all()
+                business = current_user.business  # assuming FK/relationship exists
+            elif current_user.is_admin() and current_user.shop:
+                shops = [current_user.shop]
+                business = current_user.shop.business  # again, assuming relationship exists
 
         return {
             'shops': shops,
@@ -289,7 +270,7 @@ def create_app(config_class=Config):
         import os
         return send_from_directory(
             os.path.join(app.root_path, 'static'),
-            'favicon.ico',
+            'imagesfavicon.ico',
             mimetype='image/vnd.microsoft.icon'
         )
         
