@@ -545,7 +545,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    // ====================
+      // ====================
     // POS System Constants
     // ====================
     const API_BASE_URL = `/api/shops/${extractShopIdFromPath()}`;
@@ -720,7 +720,6 @@
     // ====================
     // Register Management
     // ====================
-
     async function checkRegisterStatus() {
         try {
             showLoading('Checking register status...');
@@ -1196,7 +1195,7 @@
     function updateCart() {
         // Calculate totals
         const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const tax = subtotal * 0
+        const tax = subtotal * 0;
         const total = subtotal + tax;
 
         // Update UI
@@ -1264,7 +1263,7 @@
                     ` : ''}
                 </div>
             </div>
-            `).join('');
+        `).join('');
 
         // Add event listeners to cart items
         document.querySelectorAll('.decrease-quantity').forEach(button => {
