@@ -638,7 +638,7 @@ def get_top_performing_shops(business_id, shop_ids):
         return []
     
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    
+
     return db.session.query(
         Shop,
         func.sum(Sale.total).label('total_sales'),
@@ -651,7 +651,7 @@ def get_top_performing_shops(business_id, shop_ids):
         Sale.created_at >= thirty_days_ago,
         Sale.is_deleted == False
     ).group_by(
-        Shop.id
+        *Shop.__table__.c
     ).order_by(
         func.sum(Sale.total).desc()
     ).limit(5).all()
@@ -927,9 +927,10 @@ def get_sales_by_shop(business_id, shop_ids):
         return []
     
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    
+
     return db.session.query(
-        Shop,
+        Shop.id,
+        Shop.name,
         func.sum(Sale.total).label('total_sales'),
         func.sum(Sale.profit).label('total_profit'),
         (func.sum(Sale.profit) / func.nullif(func.sum(Sale.total), 0) * 100).label('profit_margin'),
@@ -940,8 +941,10 @@ def get_sales_by_shop(business_id, shop_ids):
         Sale.created_at >= thirty_days_ago,
         Sale.is_deleted == False
     ).group_by(
-        Shop.id
+        Shop.id,
+        Shop.name
     ).all()
+
 
 
 def get_shop_profit_margins(business_id, shop_ids):
