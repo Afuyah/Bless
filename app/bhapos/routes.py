@@ -949,7 +949,12 @@ def get_sales_by_shop(business_id, shop_ids):
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
 
     return db.session.query(
-        Shop,
+        Shop.id.label('id'),
+        Shop.name.label('name'),
+        Shop.location.label('location'),
+        Shop.phone.label('phone'),
+        Shop.currency.label('currency'),
+        Shop.logo_url.label('logo_url'),
         func.sum(Sale.total).label('total_sales'),
         func.sum(Sale.profit).label('total_profit'),
         (func.sum(Sale.profit) / func.nullif(func.sum(Sale.total), 0) * 100).label('profit_margin')
@@ -964,14 +969,10 @@ def get_sales_by_shop(business_id, shop_ids):
     ).group_by(
         Shop.id,
         Shop.name,
-        Shop.logo_url,
         Shop.location,
-        Shop.is_deleted,
         Shop.phone,
         Shop.currency,
-        Shop.business_id,
-        Shop.created_at,
-        Shop.updated_at,
+        Shop.logo_url
     ).all()
 
 
