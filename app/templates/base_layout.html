@@ -9,7 +9,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{% block title %}Nawiri POS{% endblock %}</title>
-    <script src="{{ url_for ('static', filename='js/tailwind.js')}}"></script>
+
+     <!-- Tailwind CSS (via CDN for prototyping) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    
     <!-- Favicon & PWA Assets -->
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
@@ -25,8 +29,7 @@
 
 
 
-    <!-- Tailwind CSS (via CDN for prototyping) -->
-   <script src="https://cdn.tailwindcss.com"></script>
+   
 
  
     <script>

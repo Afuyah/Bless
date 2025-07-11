@@ -787,18 +787,21 @@ def get_products_needing_reorder(business_id):
 
 
 def get_top_performing_staff(business_id, shop_ids):
-    """Get top performing staff members"""
+    """Get top performing staff members by sales performance"""
     if not shop_ids:
         return []
-    
+
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    
+
     return db.session.query(
-        User,
+        User.id.label('user_id'),
+        User.username,
         func.count(Sale.id).label('sale_count'),
         func.sum(Sale.total).label('total_sales'),
         func.sum(Sale.profit).label('total_profit'),
-        (func.sum(Sale.profit) / func.nullif(func.sum(Sale.total), 0) * 100).label('profit_margin'),
+        (
+            func.sum(Sale.profit) / func.nullif(func.sum(Sale.total), 0) * 100
+        ).label('profit_margin')
     ).join(
         Sale, Sale.user_id == User.id
     ).filter(
@@ -815,16 +818,17 @@ def get_top_performing_staff(business_id, shop_ids):
     ).limit(5).all()
 
 def get_sales_by_staff(business_id, shop_ids):
-    """Get sales performance by staff"""
+    """Get summarized sales performance per staff member"""
     if not shop_ids:
         return []
-    
+
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    
+
     return db.session.query(
-        User,
+        User.id.label('user_id'),
+        User.username,
         func.sum(Sale.total).label('total_sales'),
-        func.sum(Sale.profit).label('total_profit'),
+        func.sum(Sale.profit).label('total_profit')
     ).join(
         Sale, Sale.user_id == User.id
     ).filter(
@@ -837,6 +841,7 @@ def get_sales_by_staff(business_id, shop_ids):
         User.id,
         User.username
     ).all()
+
 
 def get_staff_attendance_metrics(business_id):
     """Get staff attendance metrics (simplified placeholder implementation)"""

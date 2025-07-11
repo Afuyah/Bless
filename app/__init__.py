@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, render_template, request, g, abort, session
+from flask import Flask, render_template, request, g, abort, session, current_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from flask_migrate import Migrate
