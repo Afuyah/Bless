@@ -224,17 +224,17 @@
                   <td class="table-cell">
                     <div class="flex items-center">
                       <div class="flex-shrink-0 h-10 w-10">
-                        {% if shop.Shop.logo_url %}
-                        <img class="h-10 w-10 rounded-full" src="{{ shop.Shop.logo_url }}" alt="{{ shop.Shop.name }}">
+                        {% if shop.logo_url %}
+                        <img class="h-10 w-10 rounded-full" src="{{ shop.logo_url }}" alt="{{ shop.name }}">
                         {% else %}
                         <div class="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                          <span class="text-gray-500 dark:text-gray-300">{{ shop.Shop.name|first|upper }}</span>
+                          <span class="text-gray-500 dark:text-gray-300">{{ shop.name|first|upper }}</span>
                         </div>
                         {% endif %}
                       </div>
                       <div class="ml-4">
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ shop.Shop.name }}</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ shop.Shop.location }}</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ shop.name }}</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ shop.location }}</div>
                       </div>
                     </div>
                   </td>
@@ -251,13 +251,13 @@
                   </td>
                   <td class="table-cell">
                     <div class="text-sm text-gray-900 dark:text-white">
-                      {% set shop_transactions = shop_comparison.shop_transactions[shop.Shop.id] if shop_comparison.shop_transactions[shop.Shop.id] else 0 %}
+                      {% set shop_transactions = shop_comparison.shop_transactions[shop.id] if shop_comparison.shop_transactions[shop.id] else 0 %}
                       {{ shop_transactions|number_format }}
                     </div>
                   </td>
                   <td class="table-cell">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' if not shop.Shop.is_deleted else 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' }}">
-                      {{ 'Active' if not shop.Shop.is_deleted else 'Inactive' }}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' if not shop.is_deleted else 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' }}">
+                      {{ 'Active' if not shop.is_deleted else 'Inactive' }}
                     </span>
                   </td>
                 </tr>
