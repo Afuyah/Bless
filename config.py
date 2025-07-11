@@ -7,7 +7,7 @@ load_dotenv(os.path.join(basedir, '.env'))
 class Config:
     # Basic App Configuration
     SECRET_KEY = os.getenv('SECRET_KEY', 'you-will-never-guess')
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:RfYrAshOYiNnaRMliLXRcCCsqyAZzMCf@metro.proxy.rlwy.net:55306/railway"
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Redis Cache Settings
