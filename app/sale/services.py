@@ -6,6 +6,9 @@ from flask import request, session
 from .. import db, socketio
 from .repositories import ProductRepository, CategoryRepository, SaleRepository, RegisterSessionRepository
 from ..models import Shop, Sale, CartItem, Category, Product, RegisterSession
+
+from app.utils.pricing import PricingUtil
+
 from sqlalchemy.orm import joinedload, with_loader_criteria
 from app.utils.time import get_kenya_today_range
 from sqlalchemy import and_, func, case
@@ -58,7 +61,6 @@ class SalesService:
             raise ValueError("Cannot process empty sale")
 
         try:
-            # Validate and prepare items
             validated_items = []
             for item in cart_items:
                 product = ProductRepository.get_for_sale(item['product_id'], shop_id)
@@ -70,21 +72,26 @@ class SalesService:
                         f"Available: {product.stock}, Requested: {item['quantity']}"
                     )
 
+                subtotal = PricingUtil.calculate_combination_price(product, item['quantity'])
+                cost = float(product.cost_price) * item['quantity']
+
                 validated_items.append({
                     'product_id': product.id,
                     'quantity': item['quantity'],
-                    'price': float(product.selling_price),
+                    'price': float(product.selling_price),  # keep for UI/reference
                     'cost_price': float(product.cost_price),
-                    'name': product.name
+                    'name': product.name,
+                    'subtotal': subtotal,
+                    'total_cost': cost
                 })
 
             # Financials
-            subtotal = sum(Decimal(str(item['price'])) * item['quantity'] for item in validated_items)
+            subtotal = sum(Decimal(str(item['subtotal'])) for item in validated_items)
+            total_cost = sum(Decimal(str(item['total_cost'])) for item in validated_items)
             tax_amount = TaxService.calculate_tax(float(subtotal), shop_id)
             total = subtotal + Decimal(str(tax_amount))
-            total_cost = sum(Decimal(str(item['cost_price'])) * item['quantity'] for item in validated_items)
 
-            # Get open register session
+            # Ensure register session is open
             register_session = RegisterSession.query.filter_by(
                 shop_id=shop_id,
                 closed_at=None,
@@ -94,7 +101,7 @@ class SalesService:
             if not register_session:
                 raise ValueError("No open register session. Please open the register first.")
 
-            # Create Sale
+            # Create Sale record
             sale = Sale(
                 shop_id=shop_id,
                 user_id=user_id,
@@ -105,12 +112,12 @@ class SalesService:
                 payment_method=payment_method,
                 customer_name=customer_data.get('name'),
                 customer_phone=customer_data.get('phone'),
-                profit=float(total - total_cost)
+                profit=float(subtotal - total_cost)  # Net profit before tax
             )
             db.session.add(sale)
             db.session.flush()
 
-            # Sale items + stock update
+            # Save cart items
             for item in validated_items:
                 cart_item = CartItem(
                     shop_id=shop_id,
@@ -118,10 +125,11 @@ class SalesService:
                     quantity=item['quantity'],
                     sale_id=sale.id,
                     unit_price=item['price'],
-                    total_price=item['price'] * item['quantity']
+                    total_price=item['subtotal']  # ← combo-based subtotal
                 )
                 db.session.add(cart_item)
 
+                # Reduce stock
                 product = Product.query.get(item['product_id'])
                 product.stock -= item['quantity']
                 db.session.add(product)
@@ -155,6 +163,7 @@ class SalesService:
             db.session.rollback()
             logger.error(f"Checkout failed for shop {shop_id}: {str(e)}", exc_info=True)
             raise ValueError(f"Checkout processing failed: {str(e)}")
+
 
     @staticmethod
     def get_recent_transactions(shop_id: int):
@@ -218,8 +227,7 @@ class CartService:
         """Get current cart contents with product validation"""
         cart_key = f'cart_{shop_id}_{user_id}'
         cart = session.get(cart_key, [])
-        
-        # Validate products still exist and get fresh prices
+
         valid_items = []
         for item in cart:
             product = ProductRepository.get_for_sale(item['product_id'], shop_id)
@@ -229,15 +237,16 @@ class CartService:
                     'quantity': item['quantity'],
                     'price': float(product.selling_price),
                     'name': product.name,
-                    'image': product.image_url
+                    'image': product.image_url,
+                    'subtotal': PricingUtil.calculate_combination_price(product, item['quantity'])
                 })
-        
-        # Update session if any items were removed
+
         if len(valid_items) != len(cart):
             session[cart_key] = valid_items
             session.modified = True
-            
+
         return valid_items
+
 
     @staticmethod
     def add_item(shop_id: int, user_id: int, product_id: int, quantity: int = 1) -> Dict:
@@ -245,36 +254,38 @@ class CartService:
         product = ProductRepository.get_for_sale(product_id, shop_id)
         if not product:
             raise ValueError("Product not available for sale")
-        
+
         cart_key = f'cart_{shop_id}_{user_id}'
         cart = session.get(cart_key, [])
-        
-        # Check if product already in cart
-        existing_item = next(
-            (item for item in cart if item['product_id'] == product_id),
-            None
-        )
-        
+
+        existing_item = next((item for item in cart if item['product_id'] == product_id), None)
+
         if existing_item:
             existing_item['quantity'] += quantity
         else:
             cart.append({
                 'product_id': product_id,
                 'quantity': quantity,
-                'price': float(product.selling_price),
+                'price': float(product.selling_price),  # keep for UI
                 'name': product.name,
                 'image': product.image_url
             })
-        
+
+        # Recalculate subtotal using combo logic
+        for item in cart:
+            product = ProductRepository.get_for_sale(item['product_id'], shop_id)
+            item['subtotal'] = PricingUtil.calculate_combination_price(product, item['quantity'])
+
         session[cart_key] = cart
         session.modified = True
-        
+
         return {
             'success': True,
-            'cart': session[cart_key],  # Add this
+            'cart': cart,
             'cart_count': sum(item['quantity'] for item in cart),
-            'cart_total': sum(item['price'] * item['quantity'] for item in cart)
+            'cart_total': sum(item['subtotal'] for item in cart)
         }
+
 
 
     @staticmethod
@@ -282,23 +293,28 @@ class CartService:
         """Update product quantity in cart"""
         if new_quantity <= 0:
             raise ValueError("Quantity must be positive")
-            
+
         cart_key = f'cart_{shop_id}_{user_id}'
         cart = session.get(cart_key, [])
-        
+
         item = next((i for i in cart if i['product_id'] == product_id), None)
         if not item:
             raise ValueError("Product not in cart")
-            
+
         item['quantity'] = new_quantity
+
+        product = ProductRepository.get_for_sale(product_id, shop_id)
+        item['subtotal'] = PricingUtil.calculate_combination_price(product, new_quantity)
+
         session[cart_key] = cart
         session.modified = True
-        
+
         return {
             'success': True,
             'cart_count': sum(i['quantity'] for i in cart),
-            'cart_total': sum(i['price'] * i['quantity'] for i in cart)
+            'cart_total': sum(i['subtotal'] for i in cart)
         }
+
 
     @staticmethod
     def clear(shop_id: int, user_id: int) -> None:

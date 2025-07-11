@@ -1,128 +1,128 @@
 {% extends 'base_layout.html' %}
 
-{% block title %} BhaPos | Premium Retail System {% endblock %}
+{% block title %} {{ current_shop.name }}  | Bhapos  {% endblock %}
 
 {% block content %}
 
-<div class="flex h-screen overflow-hidden bg-gray-25 font-sans">
-    <!-- Premium Sidebar -->
-    <div class="sidebar bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100 w-20 lg:w-72 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out shadow-xl">
+<div class="flex h-screen overflow-hidden bg-gray-25 font-sans antialiased">
+    <!-- Premium Side Navigation -->
+    <div class="sidebar bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100 w-20 lg:w-64 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out shadow-2xl z-20">
         <!-- Branding -->
         <div class="p-5 border-b border-gray-700 flex items-center justify-center lg:justify-start">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg">
                     <i class="fas fa-cash-register text-white text-lg"></i>
                 </div>
-                <h1 class="text-xl font-bold hidden lg:block">
-                    <span class="text-white">Bha</span><span class="text-amber-400">POS</span>
+                <h1 class="text-xl font-bold hidden lg:block text-white tracking-tight">
+                    <span class="text-amber-400">Bha</span>POS
                 </h1>
             </div>
         </div>
 
         <!-- User Profile -->
-        <div class="p-4 border-b border-gray-700 flex flex-col items-center lg:items-start">
-            <div class="relative mb-3">
-                <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-xl bg-gray-700 flex items-center justify-center text-amber-400 font-medium text-xl shadow-inner">
+        <div class="p-4 border-b border-gray-700 flex items-center justify-center lg:justify-start space-x-3">
+            <div class="relative">
+                <div class="w-10 h-10 lg:w-11 lg:h-11 rounded-lg bg-gray-700 flex items-center justify-center text-amber-400 font-medium shadow-inner">
                     {{ current_user.username[0]|upper }}
                 </div>
-                <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-400 border-2 border-gray-800"></div>
+                <div class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-green-400 border-2 border-gray-800"></div>
             </div>
-            <div class="text-center lg:text-left hidden lg:block">
-                <h3 class="font-medium text-white">{{ current_user.username }}</h3>
+            <div class="hidden lg:block">
+                <h3 class="font-medium text-white text-sm">{{ current_user.username }}</h3>
                 <p class="text-xs text-gray-400">Premium Cashier</p>
             </div>
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 overflow-y-auto p-4 space-y-1">
+        <nav class="flex-1 overflow-y-auto p-3 space-y-1">
             <!-- Register Section -->
             <div>
-                <h2 class="text-gray-400 uppercase text-[0.65rem] font-bold mb-3 tracking-wider hidden lg:block">REGISTER</h2>
+                <h2 class="text-gray-500 uppercase text-[0.6rem] font-bold mb-2 tracking-wider hidden lg:block">REGISTER</h2>
                 <ul class="space-y-1">
                     <li>
                         <button id="open-register-btn"
-                            class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group"
+                            class="w-full text-left py-2.5 px-2 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group"
                             title="Open Register">
-                            <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                            <div class="w-8 h-8 rounded-md bg-gray-700/70 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
                                 <i class="fas fa-lock-open text-sm"></i>
                             </div>
-                            <span class="truncate hidden lg:block ml-3 text-white">Open Register</span>
+                            <span class="truncate hidden lg:block ml-3 text-sm text-white">Open Register</span>
                         </button>
                     </li>
                     <li>
-                        <button id="sales-summary-btn"
-                            class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group hidden"
+                       <button id="sales-summary-btn"
+                            class="w-full text-left py-2.5 px-2 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group hidden"
                             title="Sales Summary">
-                            <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                            <div class="w-8 h-8 rounded-md bg-gray-700/70 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
                                 <i class="fas fa-chart-pie text-sm"></i>
                             </div>
-                            <span class="truncate hidden lg:block ml-3 text-white">Sales Analytics</span>
+                            <span class="truncate hidden lg:block ml-3 text-sm text-white">Sales Analytics</span>
                         </button>
                     </li>
                     <li>
                         <button id="close-register-btn"
-                            class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group hidden"
+                            class="w-full text-left py-2.5 px-2 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group hidden"
                             title="Close Register">
-                            <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                            <div class="w-8 h-8 rounded-md bg-gray-700/70 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
                                 <i class="fas fa-lock text-sm"></i>
                             </div>
-                            <span class="truncate hidden lg:block ml-3 text-white">Close Register</span>
+                            <span class="truncate hidden lg:block ml-3 text-sm text-white">Close Register</span>
                         </button>
                     </li>
                 </ul>
             </div>
 
             <!-- POS Section -->
-            <div class="pt-4">
-                <h2 class="text-gray-400 uppercase text-[0.65rem] font-bold mb-3 tracking-wider hidden lg:block">SALES</h2>
+            <div class="pt-2">
+                <h2 class="text-gray-500 uppercase text-[0.6rem] font-bold mb-2 tracking-wider hidden lg:block">SALES</h2>
                 <ul class="space-y-1">
                     <li>
                         <a href="#"
-                            class="w-full text-left py-3 px-3 rounded-xl bg-gray-700/30 flex items-center justify-center lg:justify-start group"
+                            class="w-full text-left py-2.5 px-2 rounded-lg bg-gray-700/30 flex items-center justify-center lg:justify-start group"
                             title="New Sale">
-                            <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+                            <div class="w-8 h-8 rounded-md bg-amber-500/10 flex items-center justify-center text-amber-400">
                                 <i class="fas fa-shopping-basket text-sm"></i>
                             </div>
-                            <span class="truncate hidden lg:block ml-3 text-white">New Sale</span>
-                            <span class="hidden lg:block ml-auto px-2 py-0.5 bg-amber-500/20 text-amber-400 text-xs rounded-full">Active</span>
+                            <span class="truncate hidden lg:block ml-3 text-sm text-white">New Sale</span>
+                            <span class="hidden lg:block ml-auto px-1.5 py-0.5 bg-amber-500/20 text-amber-400 text-[0.6rem] rounded">Active</span>
                         </a>
                     </li>
                     <li>
                         <a href="#"
-                            class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group"
+                            class="w-full text-left py-2.5 px-2 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group"
                             title="Sales History">
-                            <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                            <div class="w-8 h-8 rounded-md bg-gray-700/70 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
                                 <i class="fas fa-clock-rotate-left text-sm"></i>
                             </div>
-                            <span class="truncate hidden lg:block ml-3 text-white">Sales History</span>
+                            <span class="truncate hidden lg:block ml-3 text-sm text-white">Sales History</span>
                         </a>
                     </li>
                 </ul>
             </div>
 
             <!-- Management Section -->
-            <div class="pt-4">
-                <h2 class="text-gray-400 uppercase text-[0.65rem] font-bold mb-3 tracking-wider hidden lg:block">MANAGEMENT</h2>
+            <div class="pt-2">
+                <h2 class="text-gray-500 uppercase text-[0.6rem] font-bold mb-2 tracking-wider hidden lg:block">MANAGEMENT</h2>
                 <ul class="space-y-1">
                     <li>
                         <a href="#"
-                            class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group"
+                            class="w-full text-left py-2.5 px-2 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group"
                             title="Products">
-                            <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                            <div class="w-8 h-8 rounded-md bg-gray-700/70 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
                                 <i class="fas fa-boxes-stacked text-sm"></i>
                             </div>
-                            <span class="truncate hidden lg:block ml-3 text-white">Inventory</span>
+                            <span class="truncate hidden lg:block ml-3 text-sm text-white">Inventory</span>
                         </a>
                     </li>
                     {% if current_user.is_tenant() or current_user.is_admin() %}
                     <li>
                         <a href="{{ url_for('admin.admin_dashboard', shop_id=current_shop.id) }}"
-                            class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group"
+                            class="w-full text-left py-2.5 px-2 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group"
                             title="Manage Store">
-                            <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                            <div class="w-8 h-8 rounded-md bg-gray-700/70 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
                                 <i class="fas fa-sliders text-sm"></i>
                             </div>
-                            <span class="truncate hidden lg:block ml-3 text-white">Store Settings</span>
+                            <span class="truncate hidden lg:block ml-3 text-sm text-white">Store Settings</span>
                         </a>
                     </li>
                     {% endif %}
@@ -131,34 +131,34 @@
         </nav>
 
         <!-- Logout Section -->
-        <div class="p-4 border-t border-gray-700">
+        <div class="p-3 border-t border-gray-700">
             <a href="{{ url_for('auth.logout') }}"
-                class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group">
-                <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                class="w-full text-left py-2.5 px-2 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group">
+                <div class="w-8 h-8 rounded-md bg-gray-700/70 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
                     <i class="fas fa-arrow-right-from-bracket text-sm"></i>
                 </div>
-                <span class="truncate hidden lg:block ml-3 text-white">Logout</span>
+                <span class="truncate hidden lg:block ml-3 text-sm text-white">Logout</span>
             </a>
         </div>
     </div>
 
     <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col overflow-hidden bg-gray-50">
         <!-- Premium Top Bar -->
-        <header class="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between shadow-sm">
-            <div class="flex items-center space-x-6">
+        <header class="bg-white border-b border-gray-100 px-5 py-3 flex items-center justify-between shadow-sm">
+            <div class="flex items-center space-x-4">
                 <button id="menu-toggle" class="text-gray-500 hover:text-amber-500 transition-colors lg:hidden">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
 
                 <!-- Shop Info -->
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow">
-                        <i class="fas fa-store text-white text-lg"></i>
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow">
+                        <i class="fas fa-store text-white text-sm"></i>
                     </div>
                     <div>
-                        <h2 class="font-bold text-gray-800" id="shop-name">{{ current_shop.name }}</h2>
-                        <div class="flex items-center space-x-2">
+                        <h2 class="font-bold text-gray-800 text-sm" id="shop-name">{{ current_shop.name }}</h2>
+                        <div class="flex items-center space-x-1.5">
                             <span class="status-dot w-2 h-2 rounded-full bg-red-500"></span>
                             <span class="status-text text-xs text-gray-500">Register Closed</span>
                         </div>
@@ -166,37 +166,37 @@
                 </div>
             </div>
 
-            <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-4">
                 <!-- Notifications -->
                 <button class="relative text-gray-500 hover:text-amber-500 transition-colors">
-                    <i class="fas fa-bell text-xl"></i>
-                    <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow">3</span>
+                    <i class="fas fa-bell text-lg"></i>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[0.6rem] shadow">3</span>
                 </button>
 
                 <!-- Quick Actions -->
-                <div class="hidden md:flex items-center space-x-3">
-                    <button class="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
-                        <i class="fas fa-print"></i>
+                <div class="hidden md:flex items-center space-x-2">
+                    <button class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-print text-sm"></i>
                     </button>
-                    <button class="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
-                        <i class="fas fa-question"></i>
+                    <button class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-question text-sm"></i>
                     </button>
                 </div>
             </div>
         </header>
 
         <!-- Content Area -->
-        <main class="flex-1 overflow-hidden relative bg-gray-50">
+        <main class="flex-1 overflow-hidden relative bg-white">
             <!-- Register Closed State -->
-            <div id="register-closed-state" class="h-full flex flex-col items-center justify-center text-center p-8">
-                <div class="w-32 h-32 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center mb-8 shadow-inner border border-amber-200">
-                    <i class="fas fa-cash-register text-5xl text-amber-500"></i>
+            <div id="register-closed-state" class="h-full flex flex-col items-center justify-center text-center p-6">
+                <div class="w-28 h-28 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center mb-6 shadow-inner border border-amber-200">
+                    <i class="fas fa-cash-register text-4xl text-amber-500"></i>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Register Session Required</h3>
-                <p class="text-gray-500 max-w-md mb-8">Open a new register session to begin processing transactions. You'll need to enter the starting cash amount for accurate tracking.</p>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Register Session Required</h3>
+                <p class="text-gray-500 max-w-md mb-6">Open a new register session to begin processing transactions</p>
                 <button id="open-register-main-btn"
-                    class="bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-3.5 rounded-xl font-bold transition-all flex items-center shadow-lg hover:shadow-xl">
-                    <i class="fas fa-lock-open mr-3"></i>
+                    class="bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3 rounded-lg font-medium transition-all flex items-center shadow-md hover:shadow-lg">
+                    <i class="fas fa-lock-open mr-2"></i>
                     Start New Session
                 </button>
             </div>
@@ -204,164 +204,160 @@
             <!-- POS Interface (Hidden by default) -->
             <div id="pos-interface" class="h-full hidden flex flex-col lg:flex-row overflow-hidden">
                 <!-- Product Catalog (Left Panel) -->
-                <div class="flex-1 flex flex-col border-r border-gray-200 bg-white overflow-hidden">
+                <div class="flex-1 flex flex-col border-r border-gray-100 bg-white overflow-hidden">
                     <!-- Search and Categories -->
-                    <div class="p-5 border-b border-gray-100 bg-white/95 backdrop-blur-sm sticky top-0 z-10">
-                        <div class="flex flex-col space-y-4">
+                    <div class="p-4 border-b border-gray-100 bg-white/95 backdrop-blur-sm sticky top-0 z-10">
+                        <div class="flex flex-col space-y-3">
                             <!-- Search Bar -->
                             <div class="relative">
                                 <input type="text" id="product-search" placeholder="Search products..."
-                                    class="w-full pl-12 pr-5 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm text-gray-700 placeholder-gray-400"
+                                    class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm text-gray-700 placeholder-gray-400"
                                     style="background-color: #fafafa;">
-                                <i class="fas fa-search absolute left-4 top-4 text-gray-400"></i>
-                                <button class="absolute right-3 top-3.5 text-gray-400 hover:text-amber-500 transition-colors">
-                                    <i class="fas fa-sliders text-sm"></i>
-                                </button>
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                             </div>
 
                             <!-- Category Tabs -->
-                            <div class="flex overflow-x-auto pb-2 scrollbar-hide" id="category-tabs">
+                            <div class="flex overflow-x-auto pb-1 scrollbar-hide" id="category-tabs">
                                 <!-- Dynamically loaded -->
                             </div>
                         </div>
                     </div>
 
                     <!-- Product Grid -->
-                    <div class="flex-1 overflow-y-auto p-5 relative">
+                    <div class="flex-1 overflow-y-auto p-4 relative">
                         <!-- Loading State -->
                         <div id="loading-overlay-products"
                             class="hidden absolute inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center z-10">
-                            <div class="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-amber-500 mb-5"></div>
-                            <p class="text-gray-600 font-medium">Loading Premium Inventory</p>
-                            <p class="text-gray-400 text-sm mt-1">Please wait a moment</p>
+                            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mb-4"></div>
+                            <p class="text-gray-600 font-medium">Loading Inventory</p>
                         </div>
 
                         <!-- Product Grid -->
-                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
                             id="product-grid">
                             <!-- Products will be loaded here -->
                         </div>
 
                         <!-- Empty State -->
-                        <div id="products-empty-state" class="hidden text-center py-16">
+                        <div id="products-empty-state" class="hidden text-center py-12">
                             <div
-                                class="bg-gray-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner border border-gray-200">
-                                <i class="fas fa-box-open text-3xl text-gray-400"></i>
+                                class="bg-gray-100 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-inner border border-gray-200">
+                                <i class="fas fa-box-open text-2xl text-gray-400"></i>
                             </div>
-                            <h4 class="text-gray-500 font-medium mb-2">No products available</h4>
+                            <h4 class="text-gray-500 font-medium mb-1">No products available</h4>
                             <p class="text-gray-400 text-sm max-w-md mx-auto">Add products to your inventory or check your filters</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Shopping Cart (Right Panel) -->
+                <!-- Shopping Cart (Right Panel - Optimized for Mobile) -->
                 <div id="cart-container"
-                    class="w-full lg:w-96 flex flex-col border-t lg:border-t-0 border-gray-200 bg-white shadow-xl lg:shadow-none z-20 fixed lg:relative bottom-0 left-0 right-0 mx-auto max-w-[95vw] lg:max-w-none transform translate-y-full lg:translate-y-0 transition-transform duration-300 ease-in-out rounded-t-2xl lg:rounded-none overflow-hidden">
-                    <!-- Cart Header -->
-                    <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-4 text-white flex justify-between items-center">
+                    class="w-full lg:w-80 flex flex-col border-t lg:border-t-0 border-gray-100 bg-white shadow-xl lg:shadow-none z-20 fixed lg:relative bottom-0 left-0 right-0 mx-auto max-w-[100vw] lg:max-w-none transform translate-y-full lg:translate-y-0 transition-transform duration-300 ease-in-out rounded-t-xl lg:rounded-none overflow-hidden"
+                    style="max-height: 80vh;">
+                    
+                    <!-- Cart Header with Toggle -->
+                    <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-5 py-3 text-white flex justify-between items-center">
                         <div class="flex items-center">
                             <button id="cart-toggle" class="mr-3 lg:hidden text-white">
                                 <i class="fas fa-chevron-up"></i>
                             </button>
-                            <h3 class="text-lg font-bold flex items-center">
+                            <h3 class="text-base font-medium flex items-center">
                                 <i class="fas fa-shopping-basket mr-2"></i>
                                 Current Sale
                             </h3>
                         </div>
                         <button id="clear-cart"
-                            class="text-amber-300 hover:text-white transition-colors text-sm flex items-center">
-                            <i class="fas fa-trash-alt mr-1.5"></i>
-                            <span class="hidden sm:inline">Clear All</span>
+                            class="text-amber-300 hover:text-white transition-colors text-xs flex items-center">
+                            <i class="fas fa-trash-alt mr-1"></i>
+                            <span class="hidden sm:inline">Clear</span>
                         </button>
                     </div>
 
-                    <!-- Cart Items -->
-                    <div class="flex-1 overflow-y-auto px-5 py-4 max-h-[40vh] lg:max-h-none bg-gray-50">
-                        <div id="cart-items" class="space-y-3">
+                    <!-- Cart Items Container -->
+                    <div class="flex-1 overflow-y-auto px-4 py-3 bg-gray-50" style="max-height: calc(80vh - 200px);">
+                        <div id="cart-items" class="space-y-2">
                             <!-- Empty State -->
                             <div id="empty-cart"
-                                class="h-full flex flex-col items-center justify-center py-12 text-center">
+                                class="h-full flex flex-col items-center justify-center py-10 text-center">
                                 <div
-                                    class="bg-gray-200 w-20 h-20 rounded-2xl flex items-center justify-center mb-5 shadow-inner border border-gray-300">
-                                    <i class="fas fa-shopping-basket text-3xl text-gray-500"></i>
+                                    class="bg-gray-200 w-16 h-16 rounded-xl flex items-center justify-center mb-4 shadow-inner border border-gray-300">
+                                    <i class="fas fa-shopping-basket text-2xl text-gray-500"></i>
                                 </div>
-                                <h4 class="font-medium text-gray-600 mb-2">Your cart is empty</h4>
+                                <h4 class="font-medium text-gray-600 mb-1">Your cart is empty</h4>
                                 <p class="text-gray-400 text-sm">Begin by adding products</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Order Summary -->
-                    <div class="border-t border-gray-200 px-6 py-5 bg-white">
+                    <!-- Order Summary (Always Visible) -->
+                    <div class="border-t border-gray-100 px-4 py-4 bg-white">
                         <!-- Summary -->
-                        <div class="space-y-3 mb-4">
-                            <div class="flex justify-between">
+                        <div class="space-y-2 mb-3">
+                            <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Subtotal:</span>
                                 <span class="font-medium" id="subtotal">Ksh 0.00</span>
                             </div>
-                            <div class="flex justify-between">
+                            <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Tax (0%):</span>
                                 <span class="font-medium" id="tax">Ksh 0.00</span>
                             </div>
-                            <div class="flex justify-between text-gray-600">
+                            <div class="flex justify-between text-sm text-gray-600">
                                 <span>Discount:</span>
                                 <span class="text-green-500 font-medium" id="discount">- Ksh 0.00</span>
                             </div>
                         </div>
 
                         <!-- Total -->
-                        <div class="border-t border-gray-200 pt-4 mb-5">
-                            <div class="flex justify-between text-xl font-bold">
+                        <div class="border-t border-gray-100 pt-3 mb-4">
+                            <div class="flex justify-between text-base font-bold">
                                 <span class="text-gray-700">Total:</span>
                                 <span class="text-gray-900" id="total">Ksh 0.00</span>
                             </div>
                         </div>
 
                         <!-- Customer Info -->
-                        <div class="mb-5">
-                            <label class="block text-gray-700 text-sm font-semibold mb-2">Customer Details</label>
+                        <div class="mb-3">
+                            <label class="block text-gray-700 text-xs font-semibold mb-1">Customer</label>
                             <div class="relative">
-                                <input type="text" id="customer-name" placeholder="Enter customer name"
-                                    class="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm bg-gray-50">
+                                <input type="text" id="customer-name" placeholder="Enter name"
+                                    class="w-full pl-3 pr-8 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm text-sm bg-gray-50">
                                 <button
-                                    class="absolute right-3 top-3 text-gray-400 hover:text-amber-500 transition-colors">
-                                    <i class="fas fa-user-plus"></i>
+                                    class="absolute right-2 top-2 text-gray-400 hover:text-amber-500 transition-colors">
+                                    <i class="fas fa-user-plus text-xs"></i>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Payment Methods -->
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-semibold mb-3">Payment Method</label>
-                            <div class="grid grid-cols-3 gap-2" id="payment-methods">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-xs font-semibold mb-1">Payment</label>
+                            <div class="grid grid-cols-3 gap-1" id="payment-methods">
                                 <button
-                                    class="payment-method flex flex-col items-center justify-center py-2.5 border-2 rounded-xl hover:border-amber-400 transition-all active border-amber-500 bg-amber-50"
+                                    class="payment-method flex flex-col items-center justify-center py-1.5 border rounded-lg hover:border-amber-400 transition-all active border-amber-500 bg-amber-50"
                                     data-method="cash">
-                                    <i class="fas fa-money-bill-wave text-amber-600 mb-1 text-xl"></i>
-                                    <span class="text-xs font-medium mt-1">Cash</span>
+                                    <i class="fas fa-money-bill-wave text-amber-600 text-sm mb-0.5"></i>
+                                    <span class="text-[0.65rem] font-medium">Cash</span>
                                 </button>
                                 <button
-                                    class="payment-method flex flex-col items-center justify-center py-2.5 border-2 rounded-xl hover:border-amber-400 transition-all border-gray-200 bg-white"
+                                    class="payment-method flex flex-col items-center justify-center py-1.5 border rounded-lg hover:border-amber-400 transition-all border-gray-200 bg-white"
                                     data-method="card">
-                                    <i class="fas fa-credit-card text-amber-600 mb-1 text-xl"></i>
-                                    <span class="text-xs font-medium mt-1">Card</span>
+                                    <i class="fas fa-credit-card text-amber-600 text-sm mb-0.5"></i>
+                                    <span class="text-[0.65rem] font-medium">Card</span>
                                 </button>
                                 <button
-                                    class="payment-method flex flex-col items-center justify-center py-2.5 border-2 rounded-xl hover:border-amber-400 transition-all border-gray-200 bg-white"
+                                    class="payment-method flex flex-col items-center justify-center py-1.5 border rounded-lg hover:border-amber-400 transition-all border-gray-200 bg-white"
                                     data-method="mobile">
-                                    <i class="fas fa-mobile-screen text-amber-600 mb-1 text-xl"></i>
-                                    <span class="text-xs font-medium mt-1">M-Pesa</span>
+                                    <i class="fas fa-mobile-screen text-amber-600 text-sm mb-0.5"></i>
+                                    <span class="text-[0.65rem] font-medium">M-Pesa</span>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Complete Sale Button -->
                         <button id="complete-sale"
-                            class="w-full bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-4 rounded-xl font-bold flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="w-full bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 rounded-lg font-medium flex items-center justify-center shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm">
                             <i class="fas fa-check-circle mr-2"></i>
-                            <span>Complete Sale (</span>
-                            <span id="complete-sale-amount">Ksh 0.00</span>
-                            <span>)</span>
+                            Complete Sale (<span id="complete-sale-amount">Ksh 0.00</span>)
                         </button>
                     </div>
                 </div>
@@ -370,43 +366,33 @@
     </div>
 </div>
 
-<!-- Premium Modals -->
 <!-- Sales Summary Modal -->
 <div id="salesSummary" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
-    <div class="modal-backdrop fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="modal-backdrop fixed inset-0 bg-black/50"></div>
 
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl z-10 transform transition-all">
-        <div class="p-8">
-            <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h3 class="text-2xl font-bold text-gray-800">Today's Sales Analytics</h3>
-                    <p class="text-gray-500">Detailed overview of your sales performance</p>
-                </div>
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl z-10 transform transition-all animate-fade-in">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Today's Sales Summary</h3>
                 <button onclick="hideModal('salesSummary')"
-                    class="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors flex items-center justify-center">
+                    class="text-gray-400 hover:text-gray-600 transition-all btn-press">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Summary Cards -->
-                <div class="space-y-6">
-                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
-                        <h4 class="font-semibold text-gray-700 mb-4 flex items-center">
-                            <i class="fas fa-chart-line text-amber-500 mr-2"></i>
-                            Session Overview
-                        </h4>
-                        <div id="summaryData" class="space-y-4">
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h4 class="font-semibold text-gray-700 mb-3">Today's Overview</h4>
+                        <div id="summaryData" class="space-y-3">
                             <!-- Will be populated dynamically -->
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
-                        <h4 class="font-semibold text-gray-700 mb-4 flex items-center">
-                            <i class="fas fa-wallet text-amber-500 mr-2"></i>
-                            Payment Methods
-                        </h4>
-                        <div id="paymentSummary" class="space-y-3">
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h4 class="font-semibold text-gray-700 mb-3">Payment Methods</h4>
+                        <div id="paymentSummary" class="space-y-2">
                             <!-- Will be populated dynamically -->
                         </div>
                     </div>
@@ -414,11 +400,8 @@
 
                 <!-- Recent Sales -->
                 <div>
-                    <h4 class="font-semibold text-gray-700 mb-4 flex items-center">
-                        <i class="fas fa-clock-rotate-left text-amber-500 mr-2"></i>
-                        Recent Transactions
-                    </h4>
-                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 h-full">
+                    <h4 class="font-semibold text-gray-700 mb-3">Recent Transactions</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                         <ul id="recentSales" class="divide-y divide-gray-200">
                             <!-- Will be populated dynamically -->
                         </ul>
@@ -426,10 +409,10 @@
                 </div>
             </div>
 
-            <div class="mt-8 flex justify-end">
+            <div class="mt-6 flex justify-end">
                 <button onclick="hideModal('salesSummary')"
-                    class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors">
-                    Close Analytics
+                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all btn-press">
+                    Close
                 </button>
             </div>
         </div>
@@ -495,40 +478,40 @@
 
 <!-- Close Register Modal -->
 <div id="closeRegisterModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
-    <div class="modal-backdrop fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="modal-backdrop fixed inset-0 bg-black/50"></div>
 
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl z-10 transform transition-all">
-        <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-8 py-6 text-white rounded-t-2xl">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl z-10 transform transition-all animate-fade-in">
+        <div class="bg-gradient-to-r from-primary-600 to-primary-500 px-6 py-4 text-white rounded-t-xl">
             <h2 class="text-xl font-bold">Close Register Session</h2>
-            <p class="text-gray-300 text-sm">
+            <p class="text-primary-100 text-sm">
                 Session #<span id="current-session-id">--</span> •
                 Opened <span id="session-opened-at">--</span> by <span id="session-opened-by">--</span>
             </p>
         </div>
 
-        <div class="p-8">
+        <div class="p-6">
             <!-- Session Summary Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <h4 class="font-medium text-gray-700 mb-2">Opening Cash</h4>
-                    <p class="text-2xl font-bold text-gray-900" id="session-opening-cash">Ksh 0.00</p>
+                    <p class="text-2xl font-bold text-primary-600" id="session-opening-cash">Ksh 0.00</p>
                 </div>
-                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <h4 class="font-medium text-gray-700 mb-2">Total Sales</h4>
-                    <p class="text-2xl font-bold text-gray-900" id="session-total-sales">Ksh 0.00</p>
+                    <p class="text-2xl font-bold text-primary-600" id="session-total-sales">Ksh 0.00</p>
                 </div>
-                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <h4 class="font-medium text-gray-700 mb-2">Expected Cash</h4>
-                    <p class="text-2xl font-bold text-gray-900" id="session-expected-cash">Ksh 0.00</p>
+                    <p class="text-2xl font-bold text-primary-600" id="session-expected-cash">Ksh 0.00</p>
                 </div>
-                <div class="bg-amber-50 p-5 rounded-xl border-2 border-amber-200">
+                <div class="bg-gray-50 p-4 rounded-lg border-2 border-primary-200 bg-primary-50">
                     <h4 class="font-medium text-gray-700 mb-2">Counted Cash</h4>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 font-medium">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
                             Ksh
                         </div>
                         <input type="number" id="closingCash"
-                            class="w-full pl-14 pr-5 py-3 border-0 bg-transparent focus:ring-2 focus:ring-amber-400 rounded-xl transition-all text-2xl font-bold text-gray-900"
+                            class="w-full pl-12 pr-4 py-2 border-0 bg-transparent focus:ring-2 focus:ring-primary-500 rounded-lg transition-all text-2xl font-bold"
                             placeholder="0.00" step="0.01" min="0">
                     </div>
                 </div>
@@ -536,36 +519,36 @@
 
             <!-- Discrepancy Alert -->
             <div id="discrepancy-alert"
-                class="hidden mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start">
-                <i class="fas fa-exclamation-circle text-red-500 mt-1 mr-3"></i>
+                class="hidden mb-6 p-3 rounded-lg bg-danger-50 border border-danger-200 flex items-start">
+                <i class="fas fa-exclamation-circle text-danger-500 mt-1 mr-2"></i>
                 <div>
-                    <h4 class="font-medium text-red-700 mb-1" id="discrepancy-title">Discrepancy Detected</h4>
-                    <p class="text-red-600 text-sm" id="discrepancy-text"></p>
+                    <h4 class="font-medium text-danger-700 mb-1" id="discrepancy-title">Discrepancy Detected</h4>
+                    <p class="text-danger-600 text-sm" id="discrepancy-text"></p>
                 </div>
             </div>
 
             <!-- Notes -->
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-medium mb-3">Closing Notes</label>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-medium mb-2">Closing Notes</label>
                 <textarea id="closingNotes"
-                    class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm bg-gray-50"
-                    placeholder="Add any notes about this session..." rows="3"></textarea>
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all shadow-sm"
+                    placeholder="Any notes about this session..." rows="3"></textarea>
             </div>
         </div>
 
-        <div class="bg-gray-50 px-8 py-6 rounded-b-2xl flex justify-between">
+        <div class="bg-gray-50 px-6 py-4 rounded-b-xl flex justify-between">
             <button onclick="recountCash()"
-                class="px-6 py-3 text-gray-700 hover:bg-gray-200 rounded-xl transition-colors flex items-center">
+                class="px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-lg transition-all flex items-center btn-press">
                 <i class="fas fa-redo mr-2"></i>
                 <span>Recount Cash</span>
             </button>
-            <div class="space-x-4">
+            <div class="space-x-3">
                 <button onclick="hideModal('closeRegisterModal')"
-                    class="px-6 py-3 text-gray-700 hover:bg-gray-200 rounded-xl transition-colors">
+                    class="px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-lg transition-all btn-press">
                     Cancel
                 </button>
                 <button onclick="submitCloseRegister()"
-                    class="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl transition-all flex items-center space-x-2 shadow-md hover:shadow-lg">
+                    class="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all flex items-center space-x-2 btn-press shadow-md hover:shadow-lg">
                     <i class="fas fa-lock"></i>
                     <span>Close Register</span>
                 </button>
@@ -575,1414 +558,1272 @@
 </div>
 
 <!-- Premium Loading Overlay -->
-<div id="global-loading-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
-    <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-sm animate-fade-in">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-500 mx-auto mb-6"></div>
-        <h3 class="text-xl font-medium text-gray-800" id="loading-message">Processing Request</h3>
-        <p class="text-gray-500 text-sm mt-2" id="loading-submessage">Please wait while we complete this action</p>
+<div id="global-loading-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
+    <div class="bg-white p-6 rounded-xl shadow-xl text-center max-w-xs">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mx-auto mb-4"></div>
+        <h3 class="text-base font-medium text-gray-800" id="loading-message">Processing</h3>
+        <p class="text-gray-500 text-xs mt-1" id="loading-submessage">Please wait</p>
     </div>
 </div>
 
-<!-- Premium Notification Container -->
-<div id="notification-container" class="fixed top-6 right-6 space-y-3 z-50 w-80"></div>
+<!-- Premium Notifications -->
+<div id="notification-container" class="fixed top-4 right-4 space-y-2 z-50 w-72"></div>
+
 
 
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-// ====================
-// POS System Constants
-// ====================
-const API_BASE_URL = `/api/shops/${extractShopIdFromPath()}`;
-const currencyFormatter = new Intl.NumberFormat('en-KE', {
-    style: 'currency',
-    currency: 'KES',
-    minimumFractionDigits: 2
-});
+    // ====================
+    // POS System Constants
+    // ====================
+    const API_BASE_URL = `/api/shops/${extractShopIdFromPath()}`;
+    const currencyFormatter = new Intl.NumberFormat('en-KE', {
+        style: 'currency',
+        currency: 'KES',
+        minimumFractionDigits: 2
+    });
 
-// ====================
-// DOM Elements
-// ====================
-const elements = {
-    // Main UI
-    registerClosedState: document.getElementById('register-closed-state'),
-    posInterface: document.getElementById('pos-interface'),
-    registerStatus: document.getElementById('register-status'),
-    statusDot: document.querySelector('.status-dot'),
-    statusText: document.querySelector('.status-text'),
+    // ====================
+    // DOM Elements
+    // ====================
+    const elements = {
+        // Main UI
+        registerClosedState: document.getElementById('register-closed-state'),
+        posInterface: document.getElementById('pos-interface'),
+        registerStatus: document.getElementById('register-status'),
+        statusDot: document.querySelector('.status-dot'),
+        statusText: document.querySelector('.status-text'),
 
-    // Product Grid
-    productGrid: document.getElementById('product-grid'),
-    productsEmptyState: document.getElementById('products-empty-state'),
-    categoryTabs: document.getElementById('category-tabs'),
-    productSearch: document.getElementById('product-search'),
+        // Product Grid
+        productGrid: document.getElementById('product-grid'),
+        productsEmptyState: document.getElementById('products-empty-state'),
+        categoryTabs: document.getElementById('category-tabs'),
+        productSearch: document.getElementById('product-search'),
 
-    // Cart
-    cartItems: document.getElementById('cart-items'),
-    subtotalEl: document.getElementById('subtotal'),
-    taxEl: document.getElementById('tax'),
-    totalEl: document.getElementById('total'),
-    completeSaleBtn: document.getElementById('complete-sale'),
-    clearCartBtn: document.getElementById('clear-cart'),
-    emptyCart: document.getElementById('empty-cart'),
+        // Cart
+        cartItems: document.getElementById('cart-items'),
+        subtotalEl: document.getElementById('subtotal'),
+        taxEl: document.getElementById('tax'),
+        totalEl: document.getElementById('total'),
+        completeSaleBtn: document.getElementById('complete-sale'),
+        clearCartBtn: document.getElementById('clear-cart'),
+        emptyCart: document.getElementById('empty-cart'),
 
-    // Customer/Payment
-    customerNameInput: document.getElementById('customer-name'),
-    paymentMethods: document.getElementById('payment-methods'),
+        // Customer/Payment
+        customerNameInput: document.getElementById('customer-name'),
+        paymentMethods: document.getElementById('payment-methods'),
 
-    // Modals
-    openRegisterModal: document.getElementById('openRegisterModal'),
-    closeRegisterModal: document.getElementById('closeRegisterModal'),
-    salesSummary: document.getElementById('salesSummary'),
+        // Modals
+        openRegisterModal: document.getElementById('openRegisterModal'),
+        closeRegisterModal: document.getElementById('closeRegisterModal'),
+        salesSummary: document.getElementById('salesSummary'),
 
-    // Loading
-    globalLoadingOverlay: document.getElementById('global-loading-overlay'),
-    loadingMessage: document.getElementById('loading-message'),
-    loadingSubmessage: document.getElementById('loading-submessage'),
+        // Loading
+        globalLoadingOverlay: document.getElementById('global-loading-overlay'),
+        loadingMessage: document.getElementById('loading-message'),
+        loadingSubmessage: document.getElementById('loading-submessage'),
 
-    // Buttons
-    salesSummaryBtn: document.getElementById('sales-summary-btn'),
-    openRegisterBtn: document.getElementById('open-register-btn'),
-    openRegisterMainBtn: document.getElementById('open-register-main-btn'),
-    closeRegisterBtn: document.getElementById('close-register-btn')
-};
-
-// ====================
-// State Management
-// ====================
-const state = {
-    cart: [],
-    products: [],
-    categories: [],
-    selectedPaymentMethod: 'cash',
-    currentRegisterSession: null,
-    lastRegisterSession: null,
-    pendingCartUpdates: new Set(), // Track pending cart operations
-    shopInfo: null
-};
-
-// ====================
-// Utility Functions
-// ====================
-function extractShopIdFromPath(expectedPrefix = '/shops') {
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const shopIndex = pathParts.indexOf(expectedPrefix.replace('/', ''));
-    if (shopIndex === -1 || !pathParts[shopIndex + 1]) {
-        console.error('Could not locate shop segment in URL');
-        throw new Error('Invalid shop path');
-    }
-    return parseInt(pathParts[shopIndex + 1]);
-}
-
-function formatCurrency(amount) {
-    return currencyFormatter.format(amount || 0);
-}
-
-function formatDate(dateString) {
-    if (!dateString) return '--';
-    const options = {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        // Buttons
+        salesSummaryBtn: document.getElementById('sales-summary-btn'),
+        openRegisterBtn: document.getElementById('open-register-btn'),
+        openRegisterMainBtn: document.getElementById('open-register-main-btn'),
+        closeRegisterBtn: document.getElementById('close-register-btn')
     };
-    return new Date(dateString).toLocaleDateString('en-KE', options);
-}
 
-function formatTime(dateString) {
-    if (!dateString) return '--';
-    const options = { hour: '2-digit', minute: '2-digit' };
-    return new Date(dateString).toLocaleTimeString('en-KE', options);
-}
+    // ====================
+    // State Management
+    // ====================
+    const state = {
+        cart: [],
+        products: [],
+        categories: [],
+        selectedPaymentMethod: 'cash',
+        currentRegisterSession: null,
+        lastRegisterSession: null
+    };
 
-// ====================
-// UI Helper Functions
-// ====================
-function showLoading(message = 'Processing...', submessage = 'Please wait') {
-    elements.loadingMessage.textContent = message;
-    elements.loadingSubmessage.textContent = submessage;
-    elements.globalLoadingOverlay.classList.remove('hidden');
-}
+    // ====================
+    // Utility Functions
+    // ====================
+    function extractShopIdFromPath(expectedPrefix = '/shops') {
+        const pathParts = window.location.pathname.split('/').filter(Boolean);
+        const shopIndex = pathParts.indexOf(expectedPrefix.replace('/', ''));
+        if (shopIndex === -1 || !pathParts[shopIndex + 1]) {
+            console.error('Could not locate shop segment in URL');
+            throw new Error('Invalid shop path');
+        }
+        return parseInt(pathParts[shopIndex + 1]);
+    }
 
-function hideLoading() {
-    elements.globalLoadingOverlay.classList.add('hidden');
-}
+    function formatCurrency(amount) {
+        return currencyFormatter.format(amount || 0);
+    }
 
-function showModal(modalId) {
-    document.getElementById(modalId).classList.remove('hidden');
-    setTimeout(() => {
-        document.getElementById(modalId).classList.add('flex');
-    }, 10);
-}
+    function formatDate(dateString) {
+        if (!dateString) return '--';
+        const options = {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        return new Date(dateString).toLocaleDateString('en-KE', options);
+    }
 
-function hideModal(modalId) {
-    document.getElementById(modalId).classList.remove('flex');
-    setTimeout(() => {
-        document.getElementById(modalId).classList.add('hidden');
-    }, 300);
-}
+    function formatTime(dateString) {
+        if (!dateString) return '--';
+        const options = { hour: '2-digit', minute: '2-digit' };
+        return new Date(dateString).toLocaleTimeString('en-KE', options);
+    }
 
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `px-4 py-3 rounded-lg shadow-lg text-white animate-fade-in flex items-start ${type === 'success' ? 'bg-success-500' :
-            type === 'error' ? 'bg-danger-500' :
-                type === 'warning' ? 'bg-warning-500' : 'bg-primary-500'
-        }`;
+    // ====================
+    // UI Helper Functions
+    // ====================
+    function showLoading(message = 'Processing...', submessage = 'Please wait') {
+        elements.loadingMessage.textContent = message;
+        elements.loadingSubmessage.textContent = submessage;
+        elements.globalLoadingOverlay.classList.remove('hidden');
+    }
 
-    notification.innerHTML = `
-            <i class="fas ${type === 'success' ? 'fa-check-circle' :
-            type === 'error' ? 'fa-exclamation-circle' :
-                type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'
-        } mr-2 mt-0.5"></i> 
-            <span>${message}</span>
-        `;
+    function hideLoading() {
+        elements.globalLoadingOverlay.classList.add('hidden');
+    }
 
-    document.getElementById('notification-container').appendChild(notification);
+    function showModal(modalId) {
+        document.getElementById(modalId).classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById(modalId).classList.add('flex');
+        }, 10);
+    }
 
-    setTimeout(() => {
-        notification.classList.add('animate-fade-out');
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
+    function hideModal(modalId) {
+        document.getElementById(modalId).classList.remove('flex');
+        setTimeout(() => {
+            document.getElementById(modalId).classList.add('hidden');
+        }, 300);
+    }
 
-function handleError(context, error) {
-    console.error(`${context}:`, error);
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `px-4 py-3 rounded-lg shadow-lg text-white animate-fade-in flex items-start ${type === 'success' ? 'bg-success-500' :
+                type === 'error' ? 'bg-danger-500' :
+                    type === 'warning' ? 'bg-warning-500' : 'bg-primary-500'
+            }`;
 
-    let message = context;
-    if (error.response) {
-        if (error.response.status === 401) {
-            message = 'Session expired. Please login again.';
-            setTimeout(() => window.location.href = '/auth/login', 2000);
-        } else if (error.response.status === 403) {
-            message = 'You don\'t have permission for this action';
-        } else if (error.response.data?.message) {
-            message = error.response.data.message;
+        notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' :
+                type === 'error' ? 'fa-exclamation-circle' :
+                    type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'
+            } mr-2 mt-0.5"></i> 
+                <span>${message}</span>
+            `;
+
+        document.getElementById('notification-container').appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.add('animate-fade-out');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    function handleError(context, error) {
+        console.error(`${context}:`, error);
+
+        let message = context;
+        if (error.response) {
+            if (error.response.status === 401) {
+                message = 'Session expired. Please login again.';
+                setTimeout(() => window.location.href = '/auth/login', 2000);
+            } else if (error.response.status === 403) {
+                message = 'You don\'t have permission for this action';
+            } else if (error.response.data?.message) {
+                message = error.response.data.message;
+            }
+        }
+
+        showNotification(message, 'error');
+    }
+
+    // ====================
+    // Register Management
+    // ====================
+
+    async function checkRegisterStatus() {
+        try {
+            showLoading('Checking register status...');
+            const res = await axios.get(`${API_BASE_URL}/register/info`);
+            const data = res.data;
+
+            if (data.is_open) {
+                state.currentRegisterSession = data;
+                updateRegisterUI(true);
+                elements.registerClosedState.classList.add('hidden');
+                elements.posInterface.classList.remove('hidden');
+                elements.salesSummaryBtn.classList.remove('hidden'); // ✅ show
+                await initPOS();
+            } else {
+                state.currentRegisterSession = null;
+                updateRegisterUI(false);
+                elements.registerClosedState.classList.remove('hidden');
+                elements.posInterface.classList.add('hidden');
+                elements.salesSummaryBtn.classList.add('hidden'); // ✅ hide
+
+                if (data.last_session) {
+                    state.lastRegisterSession = data.last_session;
+                    updateLastSessionInfo();
+                }
+            }
+        } catch (err) {
+            handleError('Failed to check register status', err);
+        } finally {
+            hideLoading();
         }
     }
 
-    showNotification(message, 'error');
-}
 
-// ====================
-// Register Management
-// ====================
-async function checkRegisterStatus() {
-    try {
-        showLoading('Checking register status...');
-        const res = await axios.get(`${API_BASE_URL}/register/info`);
-        const data = res.data;
+    function updateRegisterUI(isOpen) {
+        const dot = elements.statusDot;
+        const text = elements.statusText;
 
-        if (data.is_open) {
-            state.currentRegisterSession = data;
-            updateRegisterUI(true);
-            elements.registerClosedState.classList.add('hidden');
-            elements.posInterface.classList.remove('hidden');
-            elements.salesSummaryBtn.classList.remove('hidden');
-            
-            // Initialize POS without blocking UI
-            initPOS().catch(err => {
-                console.error('Background initialization error:', err);
-            });
+        if (isOpen) {
+            dot.classList.replace('bg-danger-500', 'bg-success-500');
+            text.textContent = `Session #${state.currentRegisterSession.session_id} (Open)`;
+            elements.openRegisterBtn.classList.add('hidden');
+            elements.closeRegisterBtn.classList.remove('hidden');
+            elements.openRegisterMainBtn.classList.add('hidden');
         } else {
-            state.currentRegisterSession = null;
-            updateRegisterUI(false);
-            elements.registerClosedState.classList.remove('hidden');
-            elements.posInterface.classList.add('hidden');
-            elements.salesSummaryBtn.classList.add('hidden');
-
-            if (data.last_session) {
-                state.lastRegisterSession = data.last_session;
-                updateLastSessionInfo();
-            }
+            dot.classList.replace('bg-success-500', 'bg-danger-500');
+            text.textContent = 'Register Closed';
+            elements.openRegisterBtn.classList.remove('hidden');
+            elements.closeRegisterBtn.classList.add('hidden');
+            elements.openRegisterMainBtn.classList.remove('hidden');
         }
-    } catch (err) {
-        handleError('Failed to check register status', err);
-    } finally {
-        hideLoading();
     }
-}
 
-function updateRegisterUI(isOpen) {
-    const dot = elements.statusDot;
-    const text = elements.statusText;
-
-    if (isOpen) {
-        dot.classList.replace('bg-danger-500', 'bg-success-500');
-        text.textContent = `Session #${state.currentRegisterSession.session_id} (Open)`;
-        elements.openRegisterBtn.classList.add('hidden');
-        elements.closeRegisterBtn.classList.remove('hidden');
-        elements.openRegisterMainBtn.classList.add('hidden');
-    } else {
-        dot.classList.replace('bg-success-500', 'bg-danger-500');
-        text.textContent = 'Register Closed';
-        elements.openRegisterBtn.classList.remove('hidden');
-        elements.closeRegisterBtn.classList.add('hidden');
-        elements.openRegisterMainBtn.classList.remove('hidden');
+    function updateLastSessionInfo() {
+        const last = state.lastRegisterSession;
+        if (!last) return;
+        document.getElementById('last-session-date').textContent = formatDate(last.closed_at);
+        document.getElementById('last-session-balance').textContent = formatCurrency(last.closing_cash);
     }
-}
 
-function updateLastSessionInfo() {
-    const last = state.lastRegisterSession;
-    if (!last) return;
-    document.getElementById('last-session-date').textContent = formatDate(last.closed_at);
-    document.getElementById('last-session-balance').textContent = formatCurrency(last.closing_cash);
-}
+    async function openRegisterModal() {
+        try {
+            if (!state.lastRegisterSession) {
+                const res = await axios.get(`${API_BASE_URL}/register/history`);
+                const sessions = res.data.sessions;
 
-async function openRegisterModal() {
-    try {
-        if (!state.lastRegisterSession) {
-            const res = await axios.get(`${API_BASE_URL}/register/history`);
-            const sessions = res.data.sessions;
-
-            if (sessions && sessions.length > 0) {
-                state.lastRegisterSession = sessions[0];
-                updateLastSessionInfo();
+                if (sessions && sessions.length > 0) {
+                    state.lastRegisterSession = sessions[0];
+                    updateLastSessionInfo();
+                }
             }
+
+        } catch (err) {
+            console.warn('Failed to fetch last session:', err);
         }
 
         document.getElementById('openingCash').value = '';
         showModal('openRegisterModal');
-    } catch (err) {
-        console.warn('Failed to fetch last session:', err);
-        showModal('openRegisterModal');
-    }
-}
-
-async function submitOpenRegister() {
-    const amount = parseFloat(document.getElementById('openingCash').value);
-
-    if (isNaN(amount) || amount < 0) {
-        return showNotification('Enter a valid opening cash amount.', 'error');
     }
 
-    try {
-        showLoading('Opening register...');
-        const res = await axios.post(`${API_BASE_URL}/register/open`, { opening_cash: amount });
-        showNotification('Register session started.', 'success');
-        hideModal('openRegisterModal');
-        await checkRegisterStatus();
-    } catch (err) {
-        handleError('Failed to open register.', err);
-    } finally {
-        hideLoading();
-    }
-}
+    async function submitOpenRegister() {
+        const amount = parseFloat(document.getElementById('openingCash').value);
 
-async function closeRegisterModal() {
-    if (!state.currentRegisterSession) {
-        return showNotification('No open register session.', 'error');
-    }
-
-    try {
-        showLoading('Fetching summary...');
-        const res = await axios.get(`${API_BASE_URL}/register/summary`);
-
-        const summary = res.data.summary;
-
-        // Defensive check
-        if (!summary) {
-            showNotification('No session summary returned.', 'error');
-            return;
+        if (isNaN(amount) || amount < 0) {
+            return showNotification('Enter a valid opening cash amount.', 'error');
         }
 
-        // Populate the modal
-        document.getElementById('current-session-id').textContent = summary.session_id;
-        document.getElementById('session-opened-at').textContent = formatDate(summary.opened_at);
-        document.getElementById('session-opened-by').textContent = summary.opened_by || 'Unknown';
-        document.getElementById('session-opening-cash').textContent = formatCurrency(summary.opening_cash);
-        document.getElementById('session-total-sales').textContent = formatCurrency(summary.total_sales);
-        document.getElementById('session-expected-cash').textContent = summary.expected_cash.toFixed(2);
-
-        // Clear previous inputs and alerts
-        document.getElementById('closingCash').value = '';
-        document.getElementById('closingNotes').value = '';
-        document.getElementById('discrepancy-alert').classList.add('hidden');
-
-        showModal('closeRegisterModal');
-    } catch (err) {
-        handleError('Could not fetch session summary.', err);
-    } finally {
-        hideLoading();
-    }
-}
-
-async function submitCloseRegister() {
-    const closingCash = parseFloat(document.getElementById('closingCash').value);
-    const expectedCash = parseFloat(document.getElementById('session-expected-cash').textContent);
-    const notes = document.getElementById('closingNotes').value;
-
-    if (isNaN(closingCash)) {
-        return showNotification('Enter a valid closing cash amount.', 'error');
-    }
-
-    const discrepancy = closingCash - expectedCash;
-    const alertBox = document.getElementById('discrepancy-alert');
-
-    if (Math.abs(discrepancy) > 0.01) {
-        document.getElementById('discrepancy-title').textContent = discrepancy > 0 ? 'Overage Detected' : 'Shortage Detected';
-        document.getElementById('discrepancy-text').textContent =
-            `Expected: ${formatCurrency(expectedCash)} • Counted: ${formatCurrency(closingCash)} • Difference: ${formatCurrency(discrepancy)}`;
-
-        alertBox.classList.remove('hidden');
-        alertBox.classList.toggle('bg-warning-50', discrepancy > 0);
-        alertBox.classList.toggle('border-warning-200', discrepancy > 0);
-        alertBox.classList.toggle('bg-danger-50', discrepancy < 0);
-        alertBox.classList.toggle('border-danger-200', discrepancy < 0);
-
-        showNotification('Discrepancy noted. Proceeding with closure.', 'warning');
-    }
-
-    try {
-        showLoading('Closing register...');
-        await axios.put(`${API_BASE_URL}/register/close`, {
-            session_id: state.currentRegisterSession.session_id,
-            closing_cash: closingCash,
-            notes: notes
-        });
-
-        showNotification('Register closed successfully.', 'success');
-        hideModal('closeRegisterModal');
-        await checkRegisterStatus();
-    } catch (err) {
-        handleError('Failed to close register.', err);
-    } finally {
-        hideLoading();
-    }
-}
-
-// ====================
-// POS Initialization
-// ====================
-async function initPOS() {
-    try {
-        // Start loading critical data first
-        const criticalLoad = Promise.all([
-            loadShopData(),
-            loadUserData()
-        ]);
-
-        // Load other data in parallel
-        const secondaryLoad = Promise.all([
-            loadProducts(),
-            loadCategories(),
-            loadCart()
-        ]);
-
-        await criticalLoad;
-        
-        // Show notification when fully loaded
-        secondaryLoad.then(() => {
-            showNotification('POS system ready', 'success');
-        }).catch(error => {
-            console.error('Background loading error:', error);
-        });
-
-    } catch (error) {
-        handleError('Failed to initialize POS', error);
-    }
-}
-
-// ====================
-// Data Loading
-// ====================
-async function loadShopData() {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/shop-info`);
-        state.shopInfo = response.data;
-        document.getElementById('shop-name').textContent = state.shopInfo.name;
-        document.title = `${state.shopInfo.name} - POS System`;
-    } catch (error) {
-        throw new Error('Failed to load shop data');
-    }
-}
-
-async function loadProducts() {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/products`);
-        state.products = response.data;
-        renderProducts();
-    } catch (error) {
-        throw new Error('Failed to load products');
-    }
-}
-
-async function loadCategories() {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/categories`);
-        state.categories = response.data;
-        renderCategories();
-    } catch (error) {
-        throw new Error('Failed to load categories');
-    }
-}
-
-async function loadUserData() {
-    try {
-        const response = await axios.get('/auth/api/auth/current-user');
-        const name = response?.data?.name;
-        if (name) {
-            document.getElementById('current-user').textContent = `Cashier: ${name}`;
+        try {
+            showLoading('Opening register...');
+            const res = await axios.post(`${API_BASE_URL}/register/open`, { opening_cash: amount });
+            showNotification('Register session started.', 'success');
+            hideModal('openRegisterModal');
+            await checkRegisterStatus();
+        } catch (err) {
+            handleError('Failed to open register.', err);
+        } finally {
+            hideLoading();
         }
-    } catch (error) {
-        console.error('Failed to load user data:', error);
-    }
-}
-
-async function loadCart() {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/cart/items`);
-        state.cart = response.data.cart || [];
-        updateCartUI();
-    } catch (error) {
-        throw new Error('Failed to load cart');
-    }
-}
-
-// ====================
-// Product Display
-// ====================
-function renderProducts() {
-    if (state.products.length === 0) {
-        elements.productGrid.classList.add('hidden');
-        elements.productsEmptyState.classList.remove('hidden');
-        return;
     }
 
-    elements.productGrid.classList.remove('hidden');
-    elements.productsEmptyState.classList.add('hidden');
-
-    elements.productGrid.innerHTML = state.products.map(product => {
-        const hasDiscount = product.discount > 0;
-        const finalPrice = product.price * (1 - (product.discount / 100));
-        const isOutOfStock = product.stock <= 0;
-        const isLowStock = product.stock > 0 && product.stock <= 5;
-        const stockPercentage = Math.min(100, (product.stock / 10) * 100);
-
-        return `
-            <div class="product-card pos-card relative bg-gray-50 rounded-lg overflow-hidden shadow-sm border border-gray-200 cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary-300 group" 
-                 data-id="${product.id}"
-                 data-category="${product.category || 'general'}"
-                 data-stock="${product.stock}">
-                
-                <!-- Image with status overlays -->
-                <div class="relative aspect-[1/1] bg-white flex items-center justify-center p-1">
-                    <img src="${product.image_url || 'https://via.placeholder.com/300?text=No+Image'}"
-                         alt="${product.name}" 
-                         class="object-contain w-full h-full mix-blend-multiply opacity-90 rounded-sm">
-                    
-                    <!-- Stock status badge -->
-                    ${isOutOfStock ? `
-                        <div class="absolute inset-0 bg-white/90 flex items-center justify-center">
-                            <span class="bg-red-500 text-white text-[0.6rem] font-bold px-1.5 py-0.5 rounded-full">SOLD OUT</span>
-                        </div>` : ''
-                    }
-
-                    <!-- Visual stock indicator -->
-                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-100">
-                        <div class="h-full ${isLowStock ? 'bg-yellow-400' : 'bg-green-500'}" 
-                             style="width: ${stockPercentage}%"></div>
-                    </div>
-
-                    <!-- Quick actions overlay -->
-                    <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center space-x-2">
-                        <button class="quick-action-btn bg-white/90 hover:bg-white text-gray-800 rounded-full w-7 h-7 flex items-center justify-center shadow-sm transform translate-y-2 group-hover:translate-y-0 transition-transform duration-200" title="Quick add">
-                            <i class="fas fa-plus text-xs text-primary-600"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Product info -->
-                <div class="p-2">
-                    <!-- Name and discount badge -->
-                    <div class="flex justify-between items-start gap-1 min-h-[2.5rem]">
-                        <h4 class="font-medium text-gray-800 line-clamp-2 leading-tight text-1rem]">${product.name}</h4>
-                        ${hasDiscount ? `
-                            <span class="flex-shrink-0 bg-green-100 text-green-800 text-[0.6rem] font-bold px-1 py-0.5 rounded">${product.discount}% OFF</span>` : ''
-                    }
-                    </div>
-
-                    <!-- Category -->
-                    <span class="text-gray-500 text-[0.65rem] truncate">${product.category || 'General'}</span>
-
-                    <!-- Price and stock -->
-                    <div class="flex justify-between items-center mt-2">
-                        <div class="flex items-baseline gap-1">
-                            ${hasDiscount ? `
-                                <span class="font-bold text-primary-600 text-[0.85rem]">${formatCurrency(finalPrice)}</span>
-                                <span class="text-gray-400 text-[0.65rem] line-through">${formatCurrency(product.price)}</span>` : `
-                                <span class="font-bold text-primary-600 text-[0.85rem]">${formatCurrency(product.price)}</span>`
-                    }
-                        </div>
-
-                        ${!isOutOfStock ? `
-                            <span class="text-[0.6rem] font-mono px-1 py-0.5 rounded ${isLowStock ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'}">
-                                ${product.stock}x
-                            </span>` : ''
-                    }
-                    </div>
-                </div>
-
-                <!-- Add to cart button -->
-                <button class="add-to-cart absolute bottom-0 left-0 right-0 bg-primary-600 hover:bg-primary-700 text-white text-[0.7rem] font-medium py-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center space-x-1"
-                    ${isOutOfStock ? 'disabled' : ''}
-                    title="Add to cart">
-                    <i class="fas fa-cart-plus text-[0.7rem]"></i>
-                    <span>Add</span>
-                </button>
-            </div>`;
-    }).join('');
-
-    // Attach event handlers
-    document.querySelectorAll('.add-to-cart, .quick-action-btn').forEach(button => {
-        button.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const productId = parseInt(e.currentTarget.closest('.pos-card').dataset.id);
-            
-            // Visual feedback
-            const icon = e.currentTarget.querySelector('i');
-            if (icon) {
-                const originalIcon = icon.className;
-                icon.className = 'fas fa-check';
-                setTimeout(() => {
-                    icon.className = originalIcon;
-                }, 1000);
-            }
-            
-            // Optimistic update
-            await addToCart(productId);
-        });
-    });
-}
-
-function renderCategories() {
-    if (state.categories.length > 0) {
-        elements.categoryTabs.innerHTML = `
-            <button class="category-tab px-4 py-2 rounded-full font-medium text-sm transition-all mr-2 mb-2 btn-press
-                        bg-primary-600 text-white shadow-sm hover:shadow-md" 
-                    data-id="all">
-                <i class="fas fa-layer-group mr-1.5"></i> All Products
-            </button>
-            ${state.categories.map(category => `
-                <button class="category-tab px-4 py-2 rounded-full font-medium text-sm transition-all mr-2 mb-2 btn-press
-                            bg-white text-gray-700 border border-gray-200 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-600" 
-                        data-id="${category.id}">
-                    ${category.icon ? `<i class="${category.icon} mr-1.5"></i>` : ''}
-                    ${category.name}
-                </button>
-            `).join('')}`;
-
-        // Add event listeners to category tabs
-        document.querySelectorAll('.category-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const categoryId = tab.dataset.id;
-                filterProductsByCategory(categoryId);
-
-                // Update active tab
-                document.querySelectorAll('.category-tab').forEach(t => {
-                    t.classList.remove(
-                        'bg-primary-600', 'text-white',
-                        'border-primary-300', 'bg-primary-50', 'text-primary-600'
-                    );
-                    t.classList.add('bg-white', 'text-gray-700', 'border-gray-200');
-                });
-
-                if (categoryId === 'all') {
-                    tab.classList.remove('bg-white', 'text-gray-700', 'border-gray-200');
-                    tab.classList.add('bg-primary-600', 'text-white');
-                } else {
-                    tab.classList.remove('bg-white', 'text-gray-700', 'border-gray-200');
-                    tab.classList.add('border-primary-300', 'bg-primary-50', 'text-primary-600');
-                }
-            });
-        });
-    }
-}
-
-function filterProductsByCategory(categoryId) {
-    let filteredProducts = [];
-
-    if (categoryId === 'all') {
-        filteredProducts = state.products;
-    } else {
-        filteredProducts = state.products.filter(p => p.category_id == categoryId);
-    }
-
-    if (filteredProducts.length === 0) {
-        elements.productGrid.classList.add('hidden');
-        elements.productsEmptyState.classList.remove('hidden');
-        return;
-    }
-
-    elements.productGrid.classList.remove('hidden');
-    elements.productsEmptyState.classList.add('hidden');
-
-    // Temporary swap to render filtered products
-    const originalProducts = state.products;
-    state.products = filteredProducts;
-    renderProducts();
-    state.products = originalProducts;
-}
-
-// ====================
-// Cart Management
-// ====================
-async function addToCart(productId) {
-    // Check if already processing this product
-    if (state.pendingCartUpdates.has(productId)) return;
-    state.pendingCartUpdates.add(productId);
-
-    try {
-        const product = state.products.find(p => p.id === productId);
-        if (!product) return;
-
-        // Optimistic update - add to local cart immediately
-        const existingItem = state.cart.find(item => item.product_id === productId);
-        
-        if (existingItem) {
-            existingItem.quantity += 1;
-        } else {
-            state.cart.push({
-                product_id: productId,
-                name: product.name,
-                price: product.price,
-                discount: product.discount,
-                image_url: product.image_url,
-                quantity: 1
-            });
+    async function closeRegisterModal() {
+        if (!state.currentRegisterSession) {
+            return showNotification('No open register session.', 'error');
         }
 
-        // Update UI immediately
-        updateCartUI();
+        try {
+            showLoading('Fetching summary...');
+            const res = await axios.get(`${API_BASE_URL}/register/summary`);
 
-        // Sync with server in background
-        await axios.post(`${API_BASE_URL}/cart?action=add`, {
-            product_id: productId,
-            quantity: 1
-        });
+            const summary = res.data.summary; // ✅ Access the nested 'summary' object
 
-        // Refresh cart silently to ensure consistency
-        const response = await axios.get(`${API_BASE_URL}/cart/items`);
-        state.cart = response.data.cart || [];
-        updateCartUI();
-
-        showNotification(`${product.name} added to cart`, 'success');
-    } catch (error) {
-        // Revert optimistic update on error
-        const existingItem = state.cart.find(item => item.product_id === productId);
-        if (existingItem) {
-            if (existingItem.quantity > 1) {
-                existingItem.quantity -= 1;
-            } else {
-                state.cart = state.cart.filter(item => item.product_id !== productId);
-            }
-        }
-        updateCartUI();
-        handleError('Failed to add item to cart', error);
-    } finally {
-        state.pendingCartUpdates.delete(productId);
-    }
-}
-
-function updateCartUI() {
-    // Calculate totals
-    const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const tax = subtotal * 0;
-    const total = subtotal + tax;
-
-    // Update UI
-    elements.subtotalEl.textContent = formatCurrency(subtotal);
-    elements.taxEl.textContent = formatCurrency(tax);
-    elements.totalEl.textContent = formatCurrency(total);
-    document.getElementById('complete-sale-amount').textContent = formatCurrency(total);
-
-    // Enable/disable complete sale button
-    elements.completeSaleBtn.disabled = state.cart.length === 0;
-
-    // Handle empty cart
-    if (state.cart.length === 0) {
-        elements.emptyCart.classList.remove('hidden');
-        elements.cartItems.innerHTML = `
-                <div class="text-center py-8 text-gray-500">
-                    <i class="fas fa-shopping-cart fa-2x mb-2"></i>
-                    <p>Your cart is empty</p>
-                </div>`;
-        return;
-    }
-
-    elements.emptyCart.classList.add('hidden');
-    renderCartItems();
-}
-
-function renderCartItems() {
-    elements.cartItems.innerHTML = state.cart.map(item => {
-        const isPending = state.pendingCartUpdates.has(item.product_id);
-        
-        return `
-        <div class="cart-item bg-white rounded-lg shadow-xs border border-gray-200 p-3 mb-2 flex items-start justify-between transition-all ${isPending ? 'opacity-75' : ''}" data-id="${item.product_id}">
-            <div class="flex items-start flex-1 min-w-0">
-                <div class="product-image bg-gray-50 rounded-md w-12 h-12 flex-shrink-0 flex items-center justify-center mr-3 overflow-hidden">
-                    <img src="${item.image_url || 'https://via.placeholder.com/100?text=Product'}" 
-                         alt="${item.name}" 
-                         class="max-h-full max-w-full object-contain mix-blend-multiply">
-                </div>
-                
-                <div class="product-details flex-1 min-w-0">
-                    <div class="flex justify-between items-start">
-                        <h4 class="product-name font-medium text-gray-800 text-sm truncate">${item.name}</h4>
-                        <button class="remove-item text-gray-400 hover:text-danger-500 transition-all ml-2 btn-press" ${isPending ? 'disabled' : ''}>
-                            <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-times'} text-xs"></i>
-                        </button>
-                    </div>
-                    
-                    <p class="text-gray-500 text-xs mt-0.5">${formatCurrency(item.price)} each</p>
-                    
-                    <div class="quantity-controls flex items-center mt-2">
-                        <button class="decrease-quantity w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 transition-all btn-press" ${isPending ? 'disabled' : ''}>
-                            <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-minus'} text-xs"></i>
-                        </button>
-                        <span class="quantity-display mx-2 text-sm font-medium w-6 text-center">${item.quantity}</span>
-                        <button class="increase-quantity w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 transition-all btn-press" ${isPending ? 'disabled' : ''}>
-                            <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-plus'} text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="product-total ml-4 text-right flex-shrink-0">
-                <p class="font-semibold text-primary-600 whitespace-nowrap">${formatCurrency(item.price * item.quantity)}</p>
-                ${item.discount > 0 ? `
-                    <span class="text-success-600 text-xs font-medium bg-success-50 px-1.5 py-0.5 rounded-full mt-1 inline-block">
-                        Saved ${formatCurrency(item.price * item.quantity * item.discount / 100)}
-                    </span>
-                ` : ''}
-            </div>
-        </div>`;
-    }).join('');
-
-    // Add event listeners to cart items
-    document.querySelectorAll('.decrease-quantity:not([disabled])').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const productId = parseInt(button.closest('.cart-item').dataset.id);
-            button.classList.add('bg-primary-100', 'text-primary-600');
-            updateCartItemQuantity(productId, -1);
-            setTimeout(() => button.classList.remove('bg-primary-100', 'text-primary-600'), 200);
-        });
-    });
-
-    document.querySelectorAll('.increase-quantity:not([disabled])').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const productId = parseInt(button.closest('.cart-item').dataset.id);
-            button.classList.add('bg-primary-100', 'text-primary-600');
-            updateCartItemQuantity(productId, 1);
-            setTimeout(() => button.classList.remove('bg-primary-100', 'text-primary-600'), 200);
-        });
-    });
-
-    document.querySelectorAll('.remove-item:not([disabled])').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const productId = parseInt(button.closest('.cart-item').dataset.id);
-            button.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i>';
-            removeFromCart(productId);
-        });
-    });
-}
-
-async function updateCartItemQuantity(productId, delta) {
-    // Check if already processing this product
-    if (state.pendingCartUpdates.has(productId)) return;
-    state.pendingCartUpdates.add(productId);
-
-    try {
-        const currentItem = state.cart.find(item => item.product_id === productId);
-        if (!currentItem) return;
-
-        const newQuantity = currentItem.quantity + delta;
-        if (newQuantity < 1) return;
-
-        // Optimistic update
-        currentItem.quantity = newQuantity;
-        updateCartUI();
-
-        // Sync with server
-        await axios.post(`${API_BASE_URL}/cart?action=update`, {
-            product_id: productId,
-            quantity: newQuantity
-        });
-
-        // Refresh cart silently to ensure consistency
-        const response = await axios.get(`${API_BASE_URL}/cart/items`);
-        state.cart = response.data.cart || [];
-        updateCartUI();
-    } catch (error) {
-        // Revert optimistic update on error
-        const currentItem = state.cart.find(item => item.product_id === productId);
-        if (currentItem) {
-            currentItem.quantity -= delta;
-            updateCartUI();
-        }
-        handleError('Failed to update quantity', error);
-    } finally {
-        state.pendingCartUpdates.delete(productId);
-    }
-}
-
-async function removeFromCart(productId) {
-    // Check if already processing this product
-    if (state.pendingCartUpdates.has(productId)) return;
-    state.pendingCartUpdates.add(productId);
-
-    try {
-        // Optimistic update
-        state.cart = state.cart.filter(item => item.product_id !== productId);
-        updateCartUI();
-
-        // Sync with server
-        await axios.post(`${API_BASE_URL}/cart?action=remove`, {
-            product_id: productId
-        });
-
-        // Refresh cart silently to ensure consistency
-        const response = await axios.get(`${API_BASE_URL}/cart/items`);
-        state.cart = response.data.cart || [];
-        updateCartUI();
-
-        showNotification('Item removed from cart', 'success');
-    } catch (error) {
-        // Revert optimistic update on error
-        const response = await axios.get(`${API_BASE_URL}/cart/items`);
-        state.cart = response.data.cart || [];
-        updateCartUI();
-        handleError('Failed to remove item', error);
-    } finally {
-        state.pendingCartUpdates.delete(productId);
-    }
-}
-
-async function clearCart() {
-    if (state.cart.length === 0) return;
-
-    // Confirm before clearing
-    const confirmation = confirm('Are you sure you want to clear the cart?');
-    if (!confirmation) return;
-
-    try {
-        showLoading('Clearing cart');
-
-        await axios.post(`${API_BASE_URL}/cart?action=clear`);
-        state.cart = [];
-        updateCartUI();
-
-        showNotification('Cart cleared', 'success');
-    } catch (error) {
-        handleError('Failed to clear cart', error);
-    } finally {
-        hideLoading();
-    }
-}
-
-// ====================
-// Checkout Process
-// ====================
-async function completeSale() {
-    if (state.cart.length === 0) {
-        showNotification('Please add items to cart before completing sale', 'error');
-        return;
-    }
-
-    try {
-        showLoading('Processing sale', 'Generating receipt...');
-
-        const customerName = elements.customerNameInput.value;
-
-        const cart_items = state.cart.map(item => ({
-            product_id: item.product_id,
-            quantity: item.quantity
-        }));
-
-        const response = await axios.post(`${API_BASE_URL}/transactions`, {
-            cart_items,
-            payment_method: state.selectedPaymentMethod,
-            customer_name: customerName
-        });
-
-        showNotification('Sale completed successfully!', 'success');
-
-        // Generate receipt
-        const receiptResponse = await axios.get(`${API_BASE_URL}/receipts?sale_id=${response.data.sale_id}`);
-        handleReceipt(receiptResponse.data);
-
-        // Reset cart
-        state.cart = [];
-        updateCartUI();
-        elements.customerNameInput.value = '';
-    } catch (error) {
-        handleError('Failed to complete sale', error);
-    } finally {
-        hideLoading();
-    }
-}
-
-function handleReceipt(receiptData) {
-    if (!receiptData || typeof receiptData !== 'object') {
-        console.error('Invalid receipt data:', receiptData);
-        alert('Unable to generate receipt. Please try again.');
-        return;
-    }
-
-    const receiptWindow = window.open('', '_blank', 'width=340,height=600');
-    receiptWindow.document.write(`
-            <html>
-            <head>
-                <title>Receipt #${receiptData.id}</title>
-                <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Roboto:wght@300;400;500&display=swap');
-                    
-                    body {
-                        font-family: 'Roboto', sans-serif;
-                        width: 80mm;
-                        margin: 0 auto;
-                        padding: 15px 10px;
-                        color: #333;
-                        font-size: 14px;
-                        line-height: 1.4;
-                    }
-                    
-                    .header {
-                        text-align: center;
-                        margin-bottom: 15px;
-                        padding-bottom: 10px;
-                        border-bottom: 1px solid #eee;
-                    }
-                    
-                    .shop-name {
-                        font-family: 'Roboto', sans-serif;
-                        font-weight: 500;
-                        font-size: 1.4em;
-                        letter-spacing: 0.5px;
-                        margin-bottom: 3px;
-                        color: #222;
-                    }
-                    
-                    .shop-details {
-                        font-size: 0.9em;
-                        color: #666;
-                        margin-bottom: 5px;
-                    }
-                    
-                    .receipt-info {
-                        margin-bottom: 15px;
-                        font-size: 0.9em;
-                        color: #555;
-                    }
-                    
-                    .receipt-info div {
-                        margin-bottom: 3px;
-                    }
-                    
-                    .items {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-bottom: 15px;
-                        font-family: 'Roboto Mono', monospace;
-                    }
-                    
-                    .items thead th {
-                        text-align: left;
-                        border-bottom: 2px solid #ddd;
-                        padding: 5px 0;
-                        font-weight: 500;
-                        font-size: 0.9em;
-                        color: #555;
-                    }
-                    
-                    .items tbody td {
-                        padding: 6px 0;
-                        border-bottom: 1px solid #eee;
-                        vertical-align: top;
-                    }
-                    
-                    .items tbody tr:last-child td {
-                        border-bottom: none;
-                    }
-                    
-                    .items td:nth-child(1) {
-                        width: 40%;
-                    }
-                    
-                    .items td:nth-child(2) {
-                        width: 15%;
-                        text-align: center;
-                    }
-                    
-                    .items td:nth-child(3),
-                    .items td:nth-child(4) {
-                        width: 22.5%;
-                        text-align: right;
-                    }
-                    
-                    .total {
-                        margin: 15px 0;
-                        padding-top: 10px;
-                        border-top: 2px dashed #ddd;
-                        font-family: 'Roboto Mono', monospace;
-                    }
-                    
-                    .total div {
-                        display: flex;
-                        justify-content: space-between;
-                        margin-bottom: 6px;
-                    }
-                    
-                    .grand-total {
-                        font-weight: 500;
-                        font-size: 1.1em;
-                        margin-top: 8px;
-                        color: #000;
-                    }
-                    
-                    .payment-method {
-                        margin-top: 15px;
-                        padding-top: 8px;
-                        border-top: 1px dashed #ddd;
-                        font-size: 0.9em;
-                    }
-                    
-                    .footer {
-                        text-align: center;
-                        margin-top: 25px;
-                        font-size: 0.85em;
-                        color: #777;
-                        padding-top: 10px;
-                        border-top: 1px solid #eee;
-                    }
-                    
-                    .barcode {
-                        margin-top: 15px;
-                        text-align: center;
-                        font-family: 'Libre Barcode 39', cursive;
-                        font-size: 28px;
-                    }
-                    
-                    .thank-you {
-                        font-weight: 500;
-                        margin-top: 5px;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <div class="shop-name">${receiptData.shop.name}</div>
-                    <div class="shop-details">${receiptData.shop.location}</div>
-                    <div class="shop-details">${receiptData.shop.contact || ''}</div>
-                </div>
-                
-                <div class="receipt-info">
-                    <div><strong>Receipt #</strong> ${receiptData.id}</div>
-                    <div><strong>Date:</strong> ${receiptData.date}</div>
-                    <div><strong>Cashier:</strong> ${receiptData.cashier}</div>
-                    ${receiptData.customer ? `<div><strong>Customer:</strong> ${receiptData.customer.name}</div>` : ''}
-                </div>
-                
-                <table class="items">
-                    <thead>
-                        <tr>
-                            <th>ITEM</th>
-                            <th>QTY</th>
-                            <th>PRICE</th>
-                            <th>TOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${receiptData.items.map(item => `
-                            <tr>
-                                <td>${item.name}</td>
-                                <td>${item.quantity}</td>
-                                <td>${formatCurrency(item.unit_price)}</td>
-                                <td>${formatCurrency(item.total)}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                
-                <div class="total">
-                    <div><span>Subtotal:</span> <span>${formatCurrency(receiptData.subtotal)}</span></div>
-                    <div><span>Tax (16%):</span> <span>${formatCurrency(receiptData.tax)}</span></div>
-                    <div class="grand-total"><span>TOTAL:</span> <span>${formatCurrency(receiptData.total)}</span></div>
-                </div>
-                
-                <div class="payment-method">
-                    <div><strong>Payment Method:</strong> ${receiptData.payment_method}</div>
-                    ${receiptData.change_due ? `<div><strong>Change Due:</strong> ${formatCurrency(receiptData.change_due)}</div>` : ''}
-                </div>
-                
-                <div class="footer">
-                    <div class="barcode">*${receiptData.id}*</div>
-                    <div class="thank-you">THANK YOU!</div>
-                    <div>Please come again</div>
-                    <div style="margin-top: 8px;">${receiptData.shop.return_policy || 'Goods sold are not returnable'}</div>
-                </div>
-            </body>
-            </html>
-        `);
-    receiptWindow.document.close();
-
-    // Auto-print receipt
-    setTimeout(() => {
-        receiptWindow.print();
-        receiptWindow.close();
-    }, 500);
-}
-
-// ====================
-// Sales Summary
-// ====================
-async function loadSalesSummary() {
-    if (!state.currentRegisterSession) {
-        return showNotification('Register is closed. No summary available.', 'error');
-    }
-
-    try {
-        showLoading('Loading sales summary');
-
-        const response = await axios.get(`${API_BASE_URL}/sales/summary`);
-        const data = response.data;
-
-        if (!data.success) {
-            return handleError(data.error || 'Could not load sales summary');
-        }
-
-        const summary = data.summary;
-
-        // Update summary data
-        document.getElementById('summaryData').innerHTML = `
-            <div class="flex justify-between py-2 border-b border-gray-200">
-                <span>Opened By:</span>
-                <strong>${summary.opened_by}</strong>
-            </div>
-            <div class="flex justify-between py-2 border-b border-gray-200">
-                <span>Opened At:</span>
-                <strong>${formatDate(summary.opened_at)}</strong>
-            </div>
-            <div class="flex justify-between py-2 border-b border-gray-200">
-                <span>Opening Cash:</span>
-                <strong>${formatCurrency(summary.opening_cash)}</strong>
-            </div>
-            <div class="flex justify-between py-2 border-b border-gray-200">
-                <span>Total Sales:</span>
-                <strong>${formatCurrency(summary.total_sales || 0)}</strong>
-            </div>
-            <div class="flex justify-between py-2 border-b border-gray-200">
-                <span>Expected Cash:</span>
-                <strong>${formatCurrency(summary.expected_cash || 0)}</strong>
-            </div>
-            <div class="flex justify-between py-2 border-b border-gray-200">
-                <span>Transactions:</span>
-                <strong>${summary.sales_count || 0}</strong>
-            </div>
-            <div class="flex justify-between py-2 border-b border-gray-200">
-                <span>Total Tax:</span>
-                <strong>${formatCurrency(summary.total_tax || 0)}</strong>
-            </div>
-        `;
-
-        // Update payment methods
-        const paymentSummary = document.getElementById('paymentSummary');
-        paymentSummary.innerHTML = '';
-
-        if (summary.payment_methods && Object.keys(summary.payment_methods).length > 0) {
-            Object.entries(summary.payment_methods).forEach(([method, amount]) => {
-                const row = document.createElement('div');
-                row.className = 'flex justify-between py-1 border-b border-gray-100';
-                row.innerHTML = `
-                    <span class="text-gray-600">${method}</span>
-                    <span class="font-semibold">${formatCurrency(amount)}</span>
-                `;
-                paymentSummary.appendChild(row);
-            });
-        } else {
-            paymentSummary.innerHTML = `<p class="text-sm text-gray-500">No payment data available.</p>`;
-        }
-
-        // Update recent sales
-        document.getElementById('recentSales').innerHTML = data.recent_sales.map(sale => `
-            <li class="flex justify-between items-center py-2 border-b border-gray-100">
-                <div>
-                    <span class="font-medium">#${sale.id}</span>
-                    <span class="text-gray-500 text-sm block">${sale.customer || 'Walk-in'}</span>
-                </div>
-                <div class="text-right">
-                    <span class="font-medium text-blue-600">${formatCurrency(sale.total)}</span>
-                    <span class="text-gray-500 text-xs block">${formatDate(sale.date)}</span>
-                </div>
-            </li>
-        `).join('');
-
-        // Show modal
-        showModal('salesSummary');
-
-    } catch (error) {
-        handleError('Failed to load sales summary', error);
-    } finally {
-        hideLoading();
-    }
-}
-
-// ====================
-// Payment Method Selection
-// ====================
-function setupPaymentMethods() {
-    elements.paymentMethods.addEventListener('click', (e) => {
-        const button = e.target.closest('.payment-method');
-        if (!button) return;
-
-        document.querySelectorAll('.payment-method').forEach(btn => {
-            btn.classList.remove('active', 'border-primary-500', 'bg-primary-50');
-        });
-
-        button.classList.add('active', 'border-primary-500', 'bg-primary-50');
-        state.selectedPaymentMethod = button.dataset.method;
-    });
-}
-
-// ====================
-// Product Search
-// ====================
-function setupProductSearch() {
-    let searchTimeout;
-
-    elements.productSearch.addEventListener('input', () => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            const query = elements.productSearch.value.trim();
-
-            if (query.length === 0) {
-                loadProducts();
+            // Defensive check
+            if (!summary) {
+                showNotification('No session summary returned.', 'error');
                 return;
             }
 
-            searchProducts(query);
-        }, 300);
-    });
-}
+            // Populate the modal
+            document.getElementById('current-session-id').textContent = summary.session_id;
+            document.getElementById('session-opened-at').textContent = formatDate(summary.opened_at);
+            document.getElementById('session-opened-by').textContent = summary.opened_by || 'Unknown';
+            document.getElementById('session-opening-cash').textContent = formatCurrency(summary.opening_cash);
+            document.getElementById('session-total-sales').textContent = formatCurrency(summary.total_sales);
+            document.getElementById('session-expected-cash').textContent = summary.expected_cash.toFixed(2);
 
-async function searchProducts(query) {
-    try {
-        showLoading('Searching products');
+            // Clear previous inputs and alerts
+            document.getElementById('closingCash').value = '';
+            document.getElementById('closingNotes').value = '';
+            document.getElementById('discrepancy-alert').classList.add('hidden');
 
-        const response = await axios.post(`${API_BASE_URL}/products/search`, { query });
-        state.products = response.data;
-        renderProducts();
-    } catch (error) {
-        handleError('Search failed', error);
-    } finally {
-        hideLoading();
-    }
-}
-
-// ====================
-// Mobile Responsiveness
-// ====================
-function setupMobileUI() {
-    // Toggle sidebar on mobile
-    document.getElementById('menu-toggle').addEventListener('click', function() {
-        document.querySelector('.sidebar').classList.toggle('w-16');
-        document.querySelector('.sidebar').classList.toggle('w-64');
-        
-        // Toggle icons-only mode
-        const sidebarItems = document.querySelectorAll('.sidebar span, .sidebar h2');
-        sidebarItems.forEach(item => {
-            item.classList.toggle('hidden');
-            item.classList.toggle('md:block');
-        });
-    });
-
-    // Toggle cart visibility on mobile
-    let cartVisible = false;
-    const cartContainer = document.getElementById('cart-container');
-    const cartToggle = document.getElementById('cart-toggle');
-    
-    cartToggle.addEventListener('click', function() {
-        cartVisible = !cartVisible;
-        if (cartVisible) {
-            cartContainer.classList.remove('translate-y-full');
-            cartToggle.innerHTML = '<i class="fas fa-chevron-down"></i>';
-        } else {
-            cartContainer.classList.add('translate-y-full');
-            cartToggle.innerHTML = '<i class="fas fa-chevron-up"></i>';
-        }
-    });
-
-    // Auto-show cart when items are added on mobile
-    function showCartOnMobile() {
-        if (window.innerWidth < 768 && !cartVisible) {
-            cartVisible = true;
-            cartContainer.classList.remove('translate-y-full');
-            cartToggle.innerHTML = '<i class="fas fa-chevron-down"></i>';
+            showModal('closeRegisterModal');
+        } catch (err) {
+            handleError('Could not fetch session summary.', err);
+        } finally {
+            hideLoading();
         }
     }
 
-    // Watch for cart changes to auto-show on mobile
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList') {
-                showCartOnMobile();
+
+    async function submitCloseRegister() {
+        const closingCash = parseFloat(document.getElementById('closingCash').value);
+        const expectedCash = parseFloat(document.getElementById('session-expected-cash').textContent);
+        const notes = document.getElementById('closingNotes').value;
+
+        if (isNaN(closingCash)) {
+            return showNotification('Enter a valid closing cash amount.', 'error');
+        }
+
+        const discrepancy = closingCash - expectedCash;
+        const alertBox = document.getElementById('discrepancy-alert');
+
+        if (Math.abs(discrepancy) > 0.01) {
+            document.getElementById('discrepancy-title').textContent = discrepancy > 0 ? 'Overage Detected' : 'Shortage Detected';
+            document.getElementById('discrepancy-text').textContent =
+                `Expected: ${formatCurrency(expectedCash)} • Counted: ${formatCurrency(closingCash)} • Difference: ${formatCurrency(discrepancy)}`;
+
+            alertBox.classList.remove('hidden');
+            alertBox.classList.toggle('bg-warning-50', discrepancy > 0);
+            alertBox.classList.toggle('border-warning-200', discrepancy > 0);
+            alertBox.classList.toggle('bg-danger-50', discrepancy < 0);
+            alertBox.classList.toggle('border-danger-200', discrepancy < 0);
+
+            showNotification('Discrepancy noted. Proceeding with closure.', 'warning');
+        }
+
+        try {
+            showLoading('Closing register...');
+            await axios.put(`${API_BASE_URL}/register/close`, {
+                session_id: state.currentRegisterSession.session_id,
+                closing_cash: closingCash,
+                notes: notes
+            });
+
+            showNotification('Register closed successfully.', 'success');
+            hideModal('closeRegisterModal');
+            await checkRegisterStatus();
+        } catch (err) {
+            handleError('Failed to close register.', err);
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // ====================
+    // POS Initialization
+    // ====================
+    async function initPOS() {
+        try {
+            showLoading('Initializing POS', 'Loading inventory...');
+
+            // Load shop data
+            await loadShopData();
+
+            // Load products and categories
+            await Promise.all([loadProducts(), loadCategories()]);
+
+            // Load cart
+            await loadCart();
+
+            // Load user data
+            await loadUserData();
+
+            showNotification('POS system ready', 'success');
+        } catch (error) {
+            handleError('Failed to initialize POS', error);
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // ====================
+    // Data Loading
+    // ====================
+    async function loadShopData() {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/shop-info`);
+            document.getElementById('shop-name').textContent = response.data.name;
+            document.title = `${response.data.name} - POS System`;
+        } catch (error) {
+            throw new Error('Failed to load shop data');
+        }
+    }
+
+    async function loadProducts() {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/products`);
+            state.products = response.data;
+            renderProducts();
+        } catch (error) {
+            throw new Error('Failed to load products');
+        }
+    }
+
+    async function loadCategories() {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/categories`);
+            state.categories = response.data;
+            renderCategories();
+        } catch (error) {
+            throw new Error('Failed to load categories');
+        }
+    }
+
+    async function loadUserData() {
+        try {
+            const response = await axios.get('/auth/api/auth/current-user');
+            const name = response?.data?.name;
+            if (name) {
+                document.getElementById('current-user').textContent = `Cashier: ${name}`;
             }
+        } catch (error) {
+            console.error('Failed to load user data:', error);
+        }
+    }
+
+    async function loadCart() {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/cart/items`);
+            state.cart = response.data.cart || [];
+            updateCart();
+        } catch (error) {
+            throw new Error('Failed to load cart');
+        }
+    }
+
+    // ====================
+    // Product Display
+    // ====================
+    function renderProducts() {
+        if (state.products.length === 0) {
+            elements.productGrid.classList.add('hidden');
+            elements.productsEmptyState.classList.remove('hidden');
+            return;
+        }
+
+        elements.productGrid.classList.remove('hidden');
+        elements.productsEmptyState.classList.add('hidden');
+
+        elements.productGrid.innerHTML = state.products.map(product => {
+            const hasDiscount = product.discount > 0;
+            const finalPrice = product.price * (1 - (product.discount / 100));
+            const isOutOfStock = product.stock <= 0;
+            const isLowStock = product.stock > 0 && product.stock <= 5;
+            const stockPercentage = Math.min(100, (product.stock / 10) * 100);
+
+            return `
+        <div class="product-card pos-card relative bg-gray-50 rounded-lg overflow-hidden shadow-sm border border-gray-200 cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary-300 group" 
+             data-id="${product.id}"
+             data-category="${product.category || 'general'}"
+             data-stock="${product.stock}">
+            
+            <!-- Image with status overlays -->
+            <div class="relative aspect-[1/1] bg-white flex items-center justify-center p-1">
+                <img src="${product.image_url || 'https://via.placeholder.com/300?text=No+Image'}"
+                     alt="${product.name}" 
+                     class="object-contain w-full h-full mix-blend-multiply opacity-90 rounded-sm">
+                
+                <!-- Stock status badge -->
+                ${isOutOfStock ? `
+                    <div class="absolute inset-0 bg-white/90 flex items-center justify-center">
+                        <span class="bg-red-500 text-white text-[0.6rem] font-bold px-1.5 py-0.5 rounded-full">SOLD OUT</span>
+                    </div>` : ''
+                }
+
+                <!-- Visual stock indicator -->
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-100">
+                    <div class="h-full ${isLowStock ? 'bg-yellow-400' : 'bg-green-500'}" 
+                         style="width: ${stockPercentage}%"></div>
+                </div>
+
+                <!-- Quick actions overlay -->
+                <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center space-x-2">
+                    <button class="quick-action-btn bg-white/90 hover:bg-white text-gray-800 rounded-full w-7 h-7 flex items-center justify-center shadow-sm transform translate-y-2 group-hover:translate-y-0 transition-transform duration-200" title="Quick add">
+                        <i class="fas fa-plus text-xs text-primary-600"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product info -->
+            <div class="p-2">
+                <!-- Name and discount badge -->
+                <div class="flex justify-between items-start gap-1 min-h-[2.5rem]">
+                    <h4 class="font-medium text-gray-800 line-clamp-2 leading-tight text-1rem]">${product.name}</h4>
+                    ${hasDiscount ? `
+                        <span class="flex-shrink-0 bg-green-100 text-green-800 text-[0.6rem] font-bold px-1 py-0.5 rounded">${product.discount}% OFF</span>` : ''
+                }
+                </div>
+
+                <!-- Category -->
+                <span class="text-gray-500 text-[0.65rem] truncate">${product.category || 'General'}</span>
+
+                <!-- Price and stock -->
+                <div class="flex justify-between items-center mt-2">
+                    <div class="flex items-baseline gap-1">
+                        ${hasDiscount ? `
+                            <span class="font-bold text-primary-600 text-[0.85rem]">${formatCurrency(finalPrice)}</span>
+                            <span class="text-gray-400 text-[0.65rem] line-through">${formatCurrency(product.price)}</span>` : `
+                            <span class="font-bold text-primary-600 text-[0.85rem]">${formatCurrency(product.price)}</span>`
+                }
+                    </div>
+
+                    ${!isOutOfStock ? `
+                        <span class="text-[0.6rem] font-mono px-1 py-0.5 rounded ${isLowStock ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'}">
+                            ${product.stock}x
+                        </span>` : ''
+                }
+                </div>
+            </div>
+
+            <!-- Add to cart button -->
+            <button class="add-to-cart absolute bottom-0 left-0 right-0 bg-primary-600 hover:bg-primary-700 text-white text-[0.7rem] font-medium py-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center space-x-1"
+                ${isOutOfStock ? 'disabled' : ''}
+                title="Add to cart">
+                <i class="fas fa-cart-plus text-[0.7rem]"></i>
+                <span>Add</span>
+            </button>
+        </div>`;
+        }).join('');
+
+        // Attach event handlers
+        document.querySelectorAll('.add-to-cart, .quick-action-btn').forEach(button => {
+            button.addEventListener('click', e => {
+                e.stopPropagation();
+                const productId = parseInt(e.currentTarget.closest('.pos-card').dataset.id);
+                addToCart(productId);
+
+                // Visual feedback
+                const icon = e.currentTarget.querySelector('i');
+                if (icon) {
+                    const originalIcon = icon.className;
+                    icon.className = 'fas fa-check';
+
+                    setTimeout(() => {
+                        icon.className = originalIcon;
+                    }, 1000);
+                }
+            });
         });
-    });
+    }
 
-    observer.observe(document.getElementById('cart-items'), {
-        childList: true,
-        subtree: true
-    });
-}
+    function renderCategories() {
+        if (state.categories.length > 0) {
+            elements.categoryTabs.innerHTML = `
+                <button class="category-tab px-4 py-2 rounded-full font-medium text-sm transition-all-slow mr-2 mb-2 btn-press
+                            bg-primary-600 text-white shadow-sm hover:shadow-md" 
+                        data-id="all">
+                    <i class="fas fa-layer-group mr-1.5"></i> All Products
+                </button>
+                ${state.categories.map(category => `
+                    <button class="category-tab px-4 py-2 rounded-full font-medium text-sm transition-all-slow mr-2 mb-2 btn-press
+                                bg-white text-gray-700 border border-gray-200 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-600" 
+                            data-id="${category.id}">
+                        ${category.icon ? `<i class="${category.icon} mr-1.5"></i>` : ''}
+                        ${category.name}
+                    </button>
+                `).join('')}`;
 
-// ====================
-// Event Listeners
-// ====================
-function setupEventListeners() {
-    // Register buttons
-    elements.openRegisterBtn.addEventListener('click', openRegisterModal);
-    elements.openRegisterMainBtn.addEventListener('click', openRegisterModal);
-    elements.closeRegisterBtn.addEventListener('click', closeRegisterModal);
-    elements.salesSummaryBtn.addEventListener('click', loadSalesSummary);
+            // Add event listeners to category tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const categoryId = tab.dataset.id;
+                    filterProductsByCategory(categoryId);
 
-    // Cart buttons
-    elements.clearCartBtn.addEventListener('click', clearCart);
-    elements.completeSaleBtn.addEventListener('click', completeSale);
+                    // Update active tab
+                    document.querySelectorAll('.category-tab').forEach(t => {
+                        t.classList.remove(
+                            'bg-primary-600', 'text-white',
+                            'border-primary-300', 'bg-primary-50', 'text-primary-600'
+                        );
+                        t.classList.add('bg-white', 'text-gray-700', 'border-gray-200');
+                    });
 
-    // Payment methods
-    setupPaymentMethods();
+                    if (categoryId === 'all') {
+                        tab.classList.remove('bg-white', 'text-gray-700', 'border-gray-200');
+                        tab.classList.add('bg-primary-600', 'text-white');
+                    } else {
+                        tab.classList.remove('bg-white', 'text-gray-700', 'border-gray-200');
+                        tab.classList.add('border-primary-300', 'bg-primary-50', 'text-primary-600');
+                    }
+                });
+            });
+        }
+    }
 
-    // Product search
-    setupProductSearch();
+    function filterProductsByCategory(categoryId) {
+        let filteredProducts = [];
 
-    // Mobile UI
-    setupMobileUI();
+        if (categoryId === 'all') {
+            filteredProducts = state.products;
+        } else {
+            filteredProducts = state.products.filter(p => p.category_id == categoryId);
+        }
 
-    // Close modals when clicking outside
-    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-        backdrop.addEventListener('click', (e) => {
-            if (e.target === backdrop) {
-                const modal = backdrop.closest('.hidden');
-                if (modal) {
+        if (filteredProducts.length === 0) {
+            elements.productGrid.classList.add('hidden');
+            elements.productsEmptyState.classList.remove('hidden');
+            return;
+        }
+
+        elements.productGrid.classList.remove('hidden');
+        elements.productsEmptyState.classList.add('hidden');
+
+        // Temporary swap to render filtered products
+        const originalProducts = state.products;
+        state.products = filteredProducts;
+        renderProducts();
+        state.products = originalProducts;
+    }
+
+    // ====================
+    // Cart Management
+    // ====================
+    async function addToCart(productId) {
+        try {
+            showLoading('Adding to cart');
+
+            const product = state.products.find(p => p.id === productId);
+            if (!product) return;
+
+            await axios.post(`${API_BASE_URL}/cart?action=add`, {
+                product_id: productId,
+                quantity: 1
+            });
+
+            // Refresh cart
+            await loadCart();
+
+            showNotification(`${product.name} added to cart`, 'success');
+        } catch (error) {
+            handleError('Failed to add item to cart', error);
+        } finally {
+            hideLoading();
+        }
+    }
+
+    function updateCart() {
+        // Calculate totals
+        const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const tax = subtotal * 0
+        const total = subtotal + tax;
+
+        // Update UI
+        elements.subtotalEl.textContent = formatCurrency(subtotal);
+        elements.taxEl.textContent = formatCurrency(tax);
+        elements.totalEl.textContent = formatCurrency(total);
+        document.getElementById('complete-sale-amount').textContent = formatCurrency(total);
+
+        // Enable/disable complete sale button
+        elements.completeSaleBtn.disabled = state.cart.length === 0;
+
+        // Handle empty cart
+        if (state.cart.length === 0) {
+            elements.emptyCart.classList.remove('hidden');
+            elements.cartItems.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                        <p>Your cart is empty</p>
+                    </div>`;
+            return;
+        }
+
+        elements.emptyCart.classList.add('hidden');
+        renderCartItems();
+    }
+
+    function renderCartItems() {
+        elements.cartItems.innerHTML = state.cart.map(item => `
+            <div class="cart-item bg-white rounded-lg shadow-xs border border-gray-200 p-3 mb-2 flex items-start justify-between transition-all-slow" data-id="${item.product_id}">
+                <div class="flex items-start flex-1 min-w-0">
+                    <div class="product-image bg-gray-50 rounded-md w-12 h-12 flex-shrink-0 flex items-center justify-center mr-3 overflow-hidden">
+                        <img src="${item.image_url || 'https://via.placeholder.com/100?text=Product'}" 
+                             alt="${item.name}" 
+                             class="max-h-full max-w-full object-contain mix-blend-multiply">
+                    </div>
+                    
+                    <div class="product-details flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h4 class="product-name font-medium text-gray-800 text-sm truncate">${item.name}</h4>
+                            <button class="remove-item text-gray-400 hover:text-danger-500 transition-all-slow ml-2 btn-press">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                        </div>
+                        
+                        <p class="text-gray-500 text-xs mt-0.5">${formatCurrency(item.price)} each</p>
+                        
+                        <div class="quantity-controls flex items-center mt-2">
+                            <button class="decrease-quantity w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 transition-all-slow btn-press">
+                                <i class="fas fa-minus text-xs"></i>
+                            </button>
+                            <span class="quantity-display mx-2 text-sm font-medium w-6 text-center">${item.quantity}</span>
+                            <button class="increase-quantity w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 transition-all-slow btn-press">
+                                <i class="fas fa-plus text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-total ml-4 text-right flex-shrink-0">
+                    <p class="font-semibold text-primary-600 whitespace-nowrap">${formatCurrency(item.price * item.quantity)}</p>
+                    ${item.discount > 0 ? `
+                        <span class="text-success-600 text-xs font-medium bg-success-50 px-1.5 py-0.5 rounded-full mt-1 inline-block">
+                            Saved ${formatCurrency(item.price * item.quantity * item.discount / 100)}
+                        </span>
+                    ` : ''}
+                </div>
+            </div>
+            `).join('');
+
+        // Add event listeners to cart items
+        document.querySelectorAll('.decrease-quantity').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const productId = parseInt(button.closest('.cart-item').dataset.id);
+                button.classList.add('bg-primary-100', 'text-primary-600');
+                updateCartItemQuantity(productId, -1);
+                setTimeout(() => button.classList.remove('bg-primary-100', 'text-primary-600'), 200);
+            });
+        });
+
+        document.querySelectorAll('.increase-quantity').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const productId = parseInt(button.closest('.cart-item').dataset.id);
+                button.classList.add('bg-primary-100', 'text-primary-600');
+                updateCartItemQuantity(productId, 1);
+                setTimeout(() => button.classList.remove('bg-primary-100', 'text-primary-600'), 200);
+            });
+        });
+
+        document.querySelectorAll('.remove-item').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const productId = parseInt(button.closest('.cart-item').dataset.id);
+                button.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i>';
+                setTimeout(() => removeFromCart(productId), 300);
+            });
+        });
+    }
+
+    async function updateCartItemQuantity(productId, delta) {
+        try {
+            const currentItem = state.cart.find(item => item.product_id === productId);
+            if (!currentItem) return;
+
+            const newQuantity = currentItem.quantity + delta;
+            if (newQuantity < 1) return;
+
+            await axios.post(`${API_BASE_URL}/cart?action=update`, {
+                product_id: productId,
+                quantity: newQuantity
+            });
+
+            await loadCart();
+        } catch (error) {
+            handleError('Failed to update quantity', error);
+        }
+    }
+
+    async function removeFromCart(productId) {
+        try {
+            showLoading('Removing item');
+
+            await axios.post(`${API_BASE_URL}/cart?action=remove`, {
+                product_id: productId
+            });
+
+            await loadCart();
+            showNotification('Item removed from cart', 'success');
+        } catch (error) {
+            handleError('Failed to remove item', error);
+        } finally {
+            hideLoading();
+        }
+    }
+
+     async function clearCart() {
+        if (state.cart.length === 0) return;
+
+        // Confirm before clearing
+        const confirmation = confirm('Are you sure you want to clear the cart?');
+        if (!confirmation) return;
+
+        try {
+            showLoading('Clearing cart');
+
+            await axios.post(`${API_BASE_URL}/cart?action=clear`);
+
+            await loadCart();
+            showNotification('Cart cleared', 'success');
+        } catch (error) {
+            handleError('Failed to clear cart', error);
+        } finally {
+            hideLoading();
+        }
+    }
+
+
+    
+    // ====================
+    // Checkout Process
+    // ====================
+    async function completeSale() {
+        if (state.cart.length === 0) {
+            showNotification('Please add items to cart before completing sale', 'error');
+            return;
+        }
+
+        try {
+            showLoading('Processing sale', 'Generating receipt...');
+
+            const customerName = elements.customerNameInput.value;
+
+            const cart_items = state.cart.map(item => ({
+                product_id: item.product_id,
+                quantity: item.quantity
+            }));
+
+            const response = await axios.post(`${API_BASE_URL}/transactions`, {
+                cart_items,
+                payment_method: state.selectedPaymentMethod,
+                customer_name: customerName
+            });
+
+            showNotification('Sale completed successfully!', 'success');
+
+            // Generate receipt
+            const receiptResponse = await axios.get(`${API_BASE_URL}/receipts?sale_id=${response.data.sale_id}`);
+            handleReceipt(receiptResponse.data);
+
+            // Reset cart
+            state.cart = [];
+            updateCart();
+            elements.customerNameInput.value = '';
+        } catch (error) {
+            handleError('Failed to complete sale', error);
+        } finally {
+            hideLoading();
+        }
+    }
+
+    function handleReceipt(receiptData) {
+        if (!receiptData || typeof receiptData !== 'object') {
+            console.error('Invalid receipt data:', receiptData);
+            alert('Unable to generate receipt. Please try again.');
+            return;
+        }
+
+        const receiptWindow = window.open('', '_blank', 'width=340,height=600');
+        receiptWindow.document.write(`
+                <html>
+                <head>
+                    <title>Receipt #${receiptData.id}</title>
+                    <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Roboto:wght@300;400;500&display=swap');
+                        
+                        body {
+                            font-family: 'Roboto', sans-serif;
+                            width: 80mm;
+                            margin: 0 auto;
+                            padding: 15px 10px;
+                            color: #333;
+                            font-size: 14px;
+                            line-height: 1.4;
+                        }
+                        
+                        .header {
+                            text-align: center;
+                            margin-bottom: 15px;
+                            padding-bottom: 10px;
+                            border-bottom: 1px solid #eee;
+                        }
+                        
+                        .shop-name {
+                            font-family: 'Roboto', sans-serif;
+                            font-weight: 500;
+                            font-size: 1.4em;
+                            letter-spacing: 0.5px;
+                            margin-bottom: 3px;
+                            color: #222;
+                        }
+                        
+                        .shop-details {
+                            font-size: 0.9em;
+                            color: #666;
+                            margin-bottom: 5px;
+                        }
+                        
+                        .receipt-info {
+                            margin-bottom: 15px;
+                            font-size: 0.9em;
+                            color: #555;
+                        }
+                        
+                        .receipt-info div {
+                            margin-bottom: 3px;
+                        }
+                        
+                        .items {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 15px;
+                            font-family: 'Roboto Mono', monospace;
+                        }
+                        
+                        .items thead th {
+                            text-align: left;
+                            border-bottom: 2px solid #ddd;
+                            padding: 5px 0;
+                            font-weight: 500;
+                            font-size: 0.9em;
+                            color: #555;
+                        }
+                        
+                        .items tbody td {
+                            padding: 6px 0;
+                            border-bottom: 1px solid #eee;
+                            vertical-align: top;
+                        }
+                        
+                        .items tbody tr:last-child td {
+                            border-bottom: none;
+                        }
+                        
+                        .items td:nth-child(1) {
+                            width: 40%;
+                        }
+                        
+                        .items td:nth-child(2) {
+                            width: 15%;
+                            text-align: center;
+                        }
+                        
+                        .items td:nth-child(3),
+                        .items td:nth-child(4) {
+                            width: 22.5%;
+                            text-align: right;
+                        }
+                        
+                        .total {
+                            margin: 15px 0;
+                            padding-top: 10px;
+                            border-top: 2px dashed #ddd;
+                            font-family: 'Roboto Mono', monospace;
+                        }
+                        
+                        .total div {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-bottom: 6px;
+                        }
+                        
+                        .grand-total {
+                            font-weight: 500;
+                            font-size: 1.1em;
+                            margin-top: 8px;
+                            color: #000;
+                        }
+                        
+                        .payment-method {
+                            margin-top: 15px;
+                            padding-top: 8px;
+                            border-top: 1px dashed #ddd;
+                            font-size: 0.9em;
+                        }
+                        
+                        .footer {
+                            text-align: center;
+                            margin-top: 25px;
+                            font-size: 0.85em;
+                            color: #777;
+                            padding-top: 10px;
+                            border-top: 1px solid #eee;
+                        }
+                        
+                        .barcode {
+                            margin-top: 15px;
+                            text-align: center;
+                            font-family: 'Libre Barcode 39', cursive;
+                            font-size: 28px;
+                        }
+                        
+                        .thank-you {
+                            font-weight: 500;
+                            margin-top: 5px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="shop-name">${receiptData.shop.name}</div>
+                        <div class="shop-details">${receiptData.shop.location}</div>
+                        <div class="shop-details">${receiptData.shop.contact || ''}</div>
+                    </div>
+                    
+                    <div class="receipt-info">
+                        <div><strong>Receipt #</strong> ${receiptData.id}</div>
+                        <div><strong>Date:</strong> ${receiptData.date}</div>
+                        <div><strong>Cashier:</strong> ${receiptData.cashier}</div>
+                        ${receiptData.customer ? `<div><strong>Customer:</strong> ${receiptData.customer.name}</div>` : ''}
+                    </div>
+                    
+                    <table class="items">
+                        <thead>
+                            <tr>
+                                <th>ITEM</th>
+                                <th>QTY</th>
+                                <th>PRICE</th>
+                                <th>TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${receiptData.items.map(item => `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>${formatCurrency(item.unit_price)}</td>
+                                    <td>${formatCurrency(item.total)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <div class="total">
+                        <div><span>Subtotal:</span> <span>${formatCurrency(receiptData.subtotal)}</span></div>
+                        <div><span>Tax (16%):</span> <span>${formatCurrency(receiptData.tax)}</span></div>
+                        <div class="grand-total"><span>TOTAL:</span> <span>${formatCurrency(receiptData.total)}</span></div>
+                    </div>
+                    
+                    <div class="payment-method">
+                        <div><strong>Payment Method:</strong> ${receiptData.payment_method}</div>
+                        ${receiptData.change_due ? `<div><strong>Change Due:</strong> ${formatCurrency(receiptData.change_due)}</div>` : ''}
+                    </div>
+                    
+                    <div class="footer">
+                        <div class="barcode">*${receiptData.id}*</div>
+                        <div class="thank-you">THANK YOU!</div>
+                        <div>Please come again</div>
+                        <div style="margin-top: 8px;">${receiptData.shop.return_policy || 'Goods sold are not returnable'}</div>
+                    </div>
+                </body>
+                </html>
+            `);
+        receiptWindow.document.close();
+
+        // Auto-print receipt
+        setTimeout(() => {
+            receiptWindow.print();
+            receiptWindow.close();
+        }, 500);
+    }
+
+
+    // ====================
+    // Sales Summary
+    // ====================
+    async function loadSalesSummary() {
+        if (!state.currentRegisterSession) {
+            return showNotification('Register is closed. No summary available.', 'error');
+        }
+
+        try {
+            showLoading('Loading sales summary');
+
+            const response = await axios.get(`${API_BASE_URL}/sales/summary`);
+            const data = response.data;
+
+            if (!data.success) {
+                return handleError(data.error || 'Could not load sales summary');
+            }
+
+            const summary = data.summary;
+
+            // Update summary data
+            document.getElementById('summaryData').innerHTML = `
+                <div class="flex justify-between py-2 border-b border-gray-200">
+                    <span>Opened By:</span>
+                    <strong>${summary.opened_by}</strong>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-200">
+                    <span>Opened At:</span>
+                    <strong>${formatDate(summary.opened_at)}</strong>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-200">
+                    <span>Opening Cash:</span>
+                    <strong>${formatCurrency(summary.opening_cash)}</strong>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-200">
+                    <span>Total Sales:</span>
+                    <strong>${formatCurrency(summary.total_sales || 0)}</strong>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-200">
+                    <span>Expected Cash:</span>
+                    <strong>${formatCurrency(summary.expected_cash || 0)}</strong>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-200">
+                    <span>Transactions:</span>
+                    <strong>${summary.sales_count || 0}</strong>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-200">
+                    <span>Total Tax:</span>
+                    <strong>${formatCurrency(summary.total_tax || 0)}</strong>
+                </div>
+            `;
+
+            // Update payment methods
+            const paymentSummary = document.getElementById('paymentSummary');
+            paymentSummary.innerHTML = '';
+
+            if (summary.payment_methods && Object.keys(summary.payment_methods).length > 0) {
+                Object.entries(summary.payment_methods).forEach(([method, amount]) => {
+                    const row = document.createElement('div');
+                    row.className = 'flex justify-between py-1 border-b border-gray-100';
+                    row.innerHTML = `
+                        <span class="text-gray-600">${method}</span>
+                        <span class="font-semibold">${formatCurrency(amount)}</span>
+                    `;
+                    paymentSummary.appendChild(row);
+                });
+            } else {
+                paymentSummary.innerHTML = `<p class="text-sm text-gray-500">No payment data available.</p>`;
+            }
+
+            // Update recent sales
+            document.getElementById('recentSales').innerHTML = data.recent_sales.map(sale => `
+                <li class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <div>
+                        <span class="font-medium">#${sale.id}</span>
+                        <span class="text-gray-500 text-sm block">${sale.customer || 'Walk-in'}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-medium text-blue-600">${formatCurrency(sale.total)}</span>
+                        <span class="text-gray-500 text-xs block">${formatDate(sale.date)}</span>
+                    </div>
+                </li>
+            `).join('');
+
+            // Show modal
+            showModal('salesSummary');
+
+        } catch (error) {
+            handleError('Failed to load sales summary', error);
+        } finally {
+            hideLoading();
+        }
+    }
+
+
+    // ====================
+    // Payment Method Selection
+    // ====================
+    function setupPaymentMethods() {
+        elements.paymentMethods.addEventListener('click', (e) => {
+            const button = e.target.closest('.payment-method');
+            if (!button) return;
+
+            document.querySelectorAll('.payment-method').forEach(btn => {
+                btn.classList.remove('active', 'border-primary-500', 'bg-primary-50');
+            });
+
+            button.classList.add('active', 'border-primary-500', 'bg-primary-50');
+            state.selectedPaymentMethod = button.dataset.method;
+        });
+    }
+
+    // ====================
+    // Product Search
+    // ====================
+    function setupProductSearch() {
+        let searchTimeout;
+
+        elements.productSearch.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = elements.productSearch.value.trim();
+
+                if (query.length === 0) {
+                    loadProducts();
+                    return;
+                }
+
+                searchProducts(query);
+            }, 300);
+        });
+    }
+
+    async function searchProducts(query) {
+        try {
+            showLoading('Searching products');
+
+            const response = await axios.post(`${API_BASE_URL}/products/search`, { query });
+            state.products = response.data;
+            renderProducts();
+        } catch (error) {
+            handleError('Search failed', error);
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // ====================
+    // Event Listeners
+    // ====================
+    function setupEventListeners() {
+        // Register buttons
+        elements.openRegisterBtn.addEventListener('click', openRegisterModal);
+        elements.openRegisterMainBtn.addEventListener('click', openRegisterModal);
+        elements.closeRegisterBtn.addEventListener('click', closeRegisterModal);
+        elements.salesSummaryBtn.addEventListener('click', loadSalesSummary);
+        // Cart buttons
+        elements.clearCartBtn.addEventListener('click', clearCart);
+        elements.completeSaleBtn.addEventListener('click', completeSale);
+
+        // Payment methods
+        setupPaymentMethods();
+
+        // Product search
+        setupProductSearch();
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
                     hideModal(modal.id);
                 }
-            }
+            });
         });
-    });
-}
+    }
 
-// ====================
-// Initialize POS System
-// ====================
-document.addEventListener('DOMContentLoaded', () => {
-    setupEventListeners();
-    checkRegisterStatus();
-});
+    // ====================
+    // Initialize POS System
+    // ====================
+    document.addEventListener('DOMContentLoaded', () => {
+        setupEventListeners();
+        checkRegisterStatus();
+    });
 </script>
 
 {% endblock %}
