@@ -733,7 +733,7 @@ def get_fast_moving_products(business_id):
 
 
 def get_slow_moving_products(business_id):
-    """Get slow moving products through business shops"""
+    """Get slowest moving products through business shops"""
     shop_ids = [shop.id for shop in Shop.query.filter_by(
         business_id=business_id,
         is_deleted=False
@@ -743,9 +743,10 @@ def get_slow_moving_products(business_id):
         return []
     
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    
+
     return db.session.query(
-        Product,
+        Product.id.label("product_id"),
+        Product.name.label("product_name"),
         func.sum(CartItem.quantity).label('total_sold')
     ).join(
         CartItem, CartItem.product_id == Product.id
@@ -762,6 +763,7 @@ def get_slow_moving_products(business_id):
     ).order_by(
         func.sum(CartItem.quantity).asc()
     ).limit(5).all()
+
 
 
 
