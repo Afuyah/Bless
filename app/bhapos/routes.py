@@ -1223,7 +1223,19 @@ def manage_shop_users(shop_id):
 def tenant_shops():
     if current_user.role != Role.TENANT:
         abort(403)
+    
     business = current_user.business
-    shops = Shop.query.filter_by(business_id=business.id).all()
+    if not business:
+        flash("No business is associated with your account.", "warning")
+        return redirect(url_for('home.index'))
+
+    try:
+        shops = Shop.query.filter_by(business_id=business.id, is_deleted=False).all()
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Error fetching shops: {e}", exc_info=True)
+        flash("Unable to load shops at the moment.", "danger")
+        shops = []
+
     return render_template('bhapos/tenants/shops.html', business=business, shops=shops)
 
