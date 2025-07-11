@@ -11,12 +11,12 @@
         <div class="flex-1 overflow-y-auto">
             <div class="p-2 md:p-4 border-b border-primary-700 flex flex-col items-center md:items-start">
                 <div class="flex items-center space-x-0 md:space-x-3">
-                    <div class="bg-white/10 p-2 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-store text-lg text-primary-200"></i>
+                    <div class="bg-white/20 p-2 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-store text-lg text-primary-100"></i>
                     </div>
                     <div class="min-w-0 hidden md:block">
-                        <h1 class="text-lg font-semibold truncate" id="shop-name">{{ current_shop.name }}</h1>
-                        <p class="text-primary-200 text-sm truncate" id="current-user">
+                        <h1 class="text-lg font-semibold truncate text-white" id="shop-name">{{ current_shop.name }}</h1>
+                        <p class="text-primary-100 text-sm truncate" id="current-user">
                             Cashier: {{ current_user.username }}
                         </p>
                     </div>
@@ -26,30 +26,30 @@
             <nav class="p-2 md:p-4 space-y-6">
                 <!-- Register Section -->
                 <div>
-                    <h2 class="text-primary-300 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">Register</h2>
+                    <h2 class="text-primary-200 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">Register</h2>
                     <ul class="space-y-1">
                         <li>
                             <button id="open-register-btn"
                                 class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press"
                                 title="Open Register">
-                                <i class="fas fa-cash-register text-primary-300 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">Open Register</span>
+                                <i class="fas fa-cash-register text-primary-100 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3 text-white">Open Register</span>
                             </button>
                         </li>
                         <li>
                             <button id="sales-summary-btn"
                                 class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press hidden"
                                 title="Sales Summary">
-                                <i class="fas fa-clipboard-list text-primary-300 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">Sales Summary</span>
+                                <i class="fas fa-clipboard-list text-primary-100 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3 text-white">Sales Summary</span>
                             </button>
                         </li>
                         <li>
                             <button id="close-register-btn"
                                 class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press hidden"
                                 title="Close Register">
-                                <i class="fas fa-door-closed text-primary-300 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">Close Register</span>
+                                <i class="fas fa-door-closed text-primary-100 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3 text-white">Close Register</span>
                             </button>
                         </li>
                     </ul>
@@ -57,22 +57,22 @@
 
                 <!-- POS Section -->
                 <div>
-                    <h2 class="text-primary-300 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">POS</h2>
+                    <h2 class="text-primary-200 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">POS</h2>
                     <ul class="space-y-1">
                         <li>
                             <a href="#"
                                 class="w-full text-left py-2 px-1 md:px-3 rounded-lg bg-primary-700/30 flex items-center justify-center md:justify-start btn-press"
                                 title="New Sale">
-                                <i class="fas fa-shopping-cart text-primary-300 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">New Sale</span>
+                                <i class="fas fa-shopping-cart text-primary-100 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3 text-white">New Sale</span>
                             </a>
                         </li>
                         <li>
                             <a href="#"
                                 class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press"
                                 title="Sales History">
-                                <i class="fas fa-history text-primary-300 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">Sales History</span>
+                                <i class="fas fa-history text-primary-100 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3 text-white">Sales History</span>
                             </a>
                         </li>
                     </ul>
@@ -80,14 +80,14 @@
 
                 <!-- Management Section -->
                 <div>
-                    <h2 class="text-primary-300 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">Management</h2>
+                    <h2 class="text-primary-200 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">Management</h2>
                     <ul class="space-y-1">
                         <li>
                             <a href="#"
                                 class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press"
                                 title="Products">
-                                <i class="fas fa-boxes text-primary-300 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">Products</span>
+                                <i class="fas fa-boxes text-primary-100 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3 text-white">Products</span>
                             </a>
                         </li>
 
@@ -96,8 +96,8 @@
                             <a href="{{ url_for('admin.admin_dashboard', shop_id=current_shop.id) }}"
                                 class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press"
                                 title="Manage Store">
-                                <i class="fas fa-cogs text-primary-300 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">Manage Store</span>
+                                <i class="fas fa-cogs text-primary-100 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3 text-white">Manage Store</span>
                             </a>
                         </li>
                         {% endif %}
@@ -111,8 +111,8 @@
             <a href="{{ url_for('auth.logout') }}"
                 class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press"
                 title="Logout">
-                <i class="fas fa-sign-out-alt text-primary-300 w-5 text-center"></i>
-                <span class="truncate hidden md:block ml-3">Logout</span>
+                <i class="fas fa-sign-out-alt text-primary-100 w-5 text-center"></i>
+                <span class="truncate hidden md:block ml-3 text-white">Logout</span>
             </a>
         </div>
     </div>
@@ -209,6 +209,12 @@
                             <!-- Products will be loaded here -->
                         </div>
 
+                        <!-- Loading more indicator -->
+                        <div id="loading-more-products" class="hidden py-4 text-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+                            <p class="text-gray-500 text-sm mt-2">Loading more products...</p>
+                        </div>
+
                         <!-- Empty State -->
                         <div id="products-empty-state" class="hidden text-center py-12">
                             <div
@@ -221,9 +227,9 @@
                     </div>
                 </div>
 
-                 <!-- Shopping Cart (Right Panel) -->
+                <!-- Shopping Cart (Right Panel) -->
                 <div id="cart-container"
-                    class="w-full md:w-96 flex flex-col border-t md:border-t-0 border-gray-200 bg-white shadow-lg md:shadow-none z-20 fixed md:relative bottom-0 transform translate-y-full md:translate-y-0 transition-transform duration-300 ease-in-out">
+                    class="w-full md:w-96 flex flex-col border-t md:border-t-0 border-gray-200 bg-white shadow-lg md:shadow-none z-20 fixed md:relative bottom-0 left-0 right-0 mx-auto max-w-[95vw] md:max-w-none transform translate-y-full md:translate-y-0 transition-transform duration-300 ease-in-out">
                     <!-- Cart Header with toggle button on mobile -->
                     <div class="bg-gradient-to-r from-primary-600 to-primary-500 px-4 md:px-5 py-3 md:py-4 text-white flex justify-between items-center">
                         <div class="flex items-center">
