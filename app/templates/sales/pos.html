@@ -1,326 +1,363 @@
 {% extends 'base_layout.html' %}
 
-{% block title %} BhaPos {% endblock %}
+{% block title %} BhaPos | Premium Retail System {% endblock %}
 
 {% block content %}
 
-<div class="flex h-screen overflow-hidden bg-gray-50">
-    <!-- Sidebar - Light Grey -->
-    <div class="sidebar bg-gray-100 text-gray-800 w-16 md:w-64 flex-shrink-0 flex flex-col border-r border-gray-200 transition-all duration-200 ease-in-out">
-        <!-- Top Section -->
-        <div class="flex-1 overflow-y-auto">
-            <div class="p-2 md:p-4 border-b border-gray-200 flex flex-col items-center md:items-start">
-                <div class="flex items-center space-x-0 md:space-x-3">
-                    <div class="bg-white p-2 rounded-lg flex items-center justify-center shadow-sm">
-                        <i class="fas fa-store text-lg text-gray-600"></i>
-                    </div>
-                    <div class="min-w-0 hidden md:block">
-                        <h1 class="text-lg font-semibold truncate" id="shop-name">{{ current_shop.name }}</h1>
-                        <p class="text-gray-500 text-sm truncate" id="current-user">
-                            Cashier: {{ current_user.username }}
-                        </p>
-                    </div>
+<div class="flex h-screen overflow-hidden bg-gray-25 font-sans">
+    <!-- Premium Sidebar -->
+    <div class="sidebar bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100 w-20 lg:w-72 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out shadow-xl">
+        <!-- Branding -->
+        <div class="p-5 border-b border-gray-700 flex items-center justify-center lg:justify-start">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+                    <i class="fas fa-cash-register text-white text-lg"></i>
                 </div>
+                <h1 class="text-xl font-bold hidden lg:block">
+                    <span class="text-white">Bha</span><span class="text-amber-400">POS</span>
+                </h1>
             </div>
-
-            <nav class="p-2 md:p-4 space-y-4">
-                <!-- Register Section -->
-                <div>
-                    <h2 class="text-gray-500 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">Register</h2>
-                    <ul class="space-y-1">
-                        <li>
-                            <button id="open-register-btn"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start"
-                                title="Open Register">
-                                <i class="fas fa-cash-register text-gray-600 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">Open Register</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button id="sales-summary-btn"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start hidden"
-                                title="Sales Summary">
-                                <i class="fas fa-clipboard-list text-gray-600 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">Sales Summary</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button id="close-register-btn"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start hidden"
-                                title="Close Register">
-                                <i class="fas fa-door-closed text-gray-600 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">Close Register</span>
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- POS Section -->
-                <div>
-                    <h2 class="text-gray-500 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">POS</h2>
-                    <ul class="space-y-1">
-                        <li>
-                            <a href="#"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-md bg-gray-200 flex items-center justify-center md:justify-start"
-                                title="New Sale">
-                                <i class="fas fa-shopping-cart text-gray-600 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">New Sale</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start"
-                                title="Sales History">
-                                <i class="fas fa-history text-gray-600 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">Sales History</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Management Section -->
-                <div>
-                    <h2 class="text-gray-500 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">Management</h2>
-                    <ul class="space-y-1">
-                        <li>
-                            <a href="#"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start"
-                                title="Products">
-                                <i class="fas fa-boxes text-gray-600 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">Products</span>
-                            </a>
-                        </li>
-
-                        {% if current_user.is_tenant() or current_user.is_admin() %}
-                        <li>
-                            <a href="{{ url_for('admin.admin_dashboard', shop_id=current_shop.id) }}"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start"
-                                title="Manage Store">
-                                <i class="fas fa-cogs text-gray-600 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3">Manage Store</span>
-                            </a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </nav>
         </div>
 
+        <!-- User Profile -->
+        <div class="p-4 border-b border-gray-700 flex flex-col items-center lg:items-start">
+            <div class="relative mb-3">
+                <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-xl bg-gray-700 flex items-center justify-center text-amber-400 font-medium text-xl shadow-inner">
+                    {{ current_user.username[0]|upper }}
+                </div>
+                <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-400 border-2 border-gray-800"></div>
+            </div>
+            <div class="text-center lg:text-left hidden lg:block">
+                <h3 class="font-medium text-white">{{ current_user.username }}</h3>
+                <p class="text-xs text-gray-400">Premium Cashier</p>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto p-4 space-y-1">
+            <!-- Register Section -->
+            <div>
+                <h2 class="text-gray-400 uppercase text-[0.65rem] font-bold mb-3 tracking-wider hidden lg:block">REGISTER</h2>
+                <ul class="space-y-1">
+                    <li>
+                        <button id="open-register-btn"
+                            class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group"
+                            title="Open Register">
+                            <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                                <i class="fas fa-lock-open text-sm"></i>
+                            </div>
+                            <span class="truncate hidden lg:block ml-3 text-white">Open Register</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button id="sales-summary-btn"
+                            class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group hidden"
+                            title="Sales Summary">
+                            <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                                <i class="fas fa-chart-pie text-sm"></i>
+                            </div>
+                            <span class="truncate hidden lg:block ml-3 text-white">Sales Analytics</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button id="close-register-btn"
+                            class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group hidden"
+                            title="Close Register">
+                            <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                                <i class="fas fa-lock text-sm"></i>
+                            </div>
+                            <span class="truncate hidden lg:block ml-3 text-white">Close Register</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- POS Section -->
+            <div class="pt-4">
+                <h2 class="text-gray-400 uppercase text-[0.65rem] font-bold mb-3 tracking-wider hidden lg:block">SALES</h2>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#"
+                            class="w-full text-left py-3 px-3 rounded-xl bg-gray-700/30 flex items-center justify-center lg:justify-start group"
+                            title="New Sale">
+                            <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+                                <i class="fas fa-shopping-basket text-sm"></i>
+                            </div>
+                            <span class="truncate hidden lg:block ml-3 text-white">New Sale</span>
+                            <span class="hidden lg:block ml-auto px-2 py-0.5 bg-amber-500/20 text-amber-400 text-xs rounded-full">Active</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#"
+                            class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group"
+                            title="Sales History">
+                            <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                                <i class="fas fa-clock-rotate-left text-sm"></i>
+                            </div>
+                            <span class="truncate hidden lg:block ml-3 text-white">Sales History</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Management Section -->
+            <div class="pt-4">
+                <h2 class="text-gray-400 uppercase text-[0.65rem] font-bold mb-3 tracking-wider hidden lg:block">MANAGEMENT</h2>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#"
+                            class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group"
+                            title="Products">
+                            <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                                <i class="fas fa-boxes-stacked text-sm"></i>
+                            </div>
+                            <span class="truncate hidden lg:block ml-3 text-white">Inventory</span>
+                        </a>
+                    </li>
+                    {% if current_user.is_tenant() or current_user.is_admin() %}
+                    <li>
+                        <a href="{{ url_for('admin.admin_dashboard', shop_id=current_shop.id) }}"
+                            class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group"
+                            title="Manage Store">
+                            <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                                <i class="fas fa-sliders text-sm"></i>
+                            </div>
+                            <span class="truncate hidden lg:block ml-3 text-white">Store Settings</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+
         <!-- Logout Section -->
-        <div class="p-2 md:p-4 border-t border-gray-200">
+        <div class="p-4 border-t border-gray-700">
             <a href="{{ url_for('auth.logout') }}"
-                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start"
-                title="Logout">
-                <i class="fas fa-sign-out-alt text-gray-600 w-5 text-center"></i>
-                <span class="truncate hidden md:block ml-3">Logout</span>
+                class="w-full text-left py-3 px-3 rounded-xl hover:bg-gray-700/50 transition-all flex items-center justify-center lg:justify-start group">
+                <div class="w-8 h-8 rounded-lg bg-gray-700 group-hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                    <i class="fas fa-arrow-right-from-bracket text-sm"></i>
+                </div>
+                <span class="truncate hidden lg:block ml-3 text-white">Logout</span>
             </a>
         </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Content Area -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        <!-- Top Bar -->
-        <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <button id="menu-toggle" class="text-gray-600 hover:text-black transition-colors md:hidden">
-                    <i class="fas fa-bars text-lg"></i>
+        <!-- Premium Top Bar -->
+        <header class="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between shadow-sm">
+            <div class="flex items-center space-x-6">
+                <button id="menu-toggle" class="text-gray-500 hover:text-amber-500 transition-colors lg:hidden">
+                    <i class="fas fa-bars text-xl"></i>
                 </button>
 
-                <!-- Register Status -->
-                <div id="register-status"
-                    class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-gray-100 text-sm font-medium">
-                    <span class="status-dot w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                    <span class="status-text">Register Closed</span>
+                <!-- Shop Info -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow">
+                        <i class="fas fa-store text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-gray-800" id="shop-name">{{ current_shop.name }}</h2>
+                        <div class="flex items-center space-x-2">
+                            <span class="status-dot w-2 h-2 rounded-full bg-red-500"></span>
+                            <span class="status-text text-xs text-gray-500">Register Closed</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-6">
                 <!-- Notifications -->
-                <div class="relative">
-                    <button class="text-gray-600 hover:text-black transition-colors relative">
-                        <i class="fas fa-bell text-lg"></i>
-                        <span
-                            class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">3</span>
-                    </button>
-                </div>
+                <button class="relative text-gray-500 hover:text-amber-500 transition-colors">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow">3</span>
+                </button>
 
-                <!-- User Profile -->
-                <div class="flex items-center space-x-2">
-                    <div
-                        class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-medium shadow-sm">
-                        {{ current_user.username[0]|upper }}
-                    </div>
-                    <span class="hidden md:inline text-sm font-medium">{{ current_user.username }}</span>
+                <!-- Quick Actions -->
+                <div class="hidden md:flex items-center space-x-3">
+                    <button class="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-print"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-question"></i>
+                    </button>
                 </div>
             </div>
         </header>
 
         <!-- Content Area -->
-        <main class="flex-1 overflow-hidden relative bg-white">
+        <main class="flex-1 overflow-hidden relative bg-gray-50">
             <!-- Register Closed State -->
-            <div id="register-closed-state" class="h-full flex flex-col items-center justify-center text-center p-6">
-                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-6 shadow-sm">
-                    <i class="fas fa-cash-register text-3xl text-gray-600"></i>
+            <div id="register-closed-state" class="h-full flex flex-col items-center justify-center text-center p-8">
+                <div class="w-32 h-32 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center mb-8 shadow-inner border border-amber-200">
+                    <i class="fas fa-cash-register text-5xl text-amber-500"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Register is Closed</h3>
-                <p class="text-gray-500 max-w-md mb-6">Please open the register to start processing sales. You'll need
-                    to enter the starting cash amount.</p>
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Register Session Required</h3>
+                <p class="text-gray-500 max-w-md mb-8">Open a new register session to begin processing transactions. You'll need to enter the starting cash amount for accurate tracking.</p>
                 <button id="open-register-main-btn"
-                    class="bg-black hover:bg-gray-800 text-white px-6 py-2.5 rounded-md font-medium transition-colors flex items-center shadow-sm">
-                    <i class="fas fa-cash-register mr-2"></i>
-                    Open Register
+                    class="bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-3.5 rounded-xl font-bold transition-all flex items-center shadow-lg hover:shadow-xl">
+                    <i class="fas fa-lock-open mr-3"></i>
+                    Start New Session
                 </button>
             </div>
 
             <!-- POS Interface (Hidden by default) -->
-            <div id="pos-interface" class="h-full hidden flex flex-col md:flex-row overflow-hidden">
+            <div id="pos-interface" class="h-full hidden flex flex-col lg:flex-row overflow-hidden">
                 <!-- Product Catalog (Left Panel) -->
                 <div class="flex-1 flex flex-col border-r border-gray-200 bg-white overflow-hidden">
                     <!-- Search and Categories -->
-                    <div class="p-3 md:p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
-                        <div class="flex flex-col space-y-3">
+                    <div class="p-5 border-b border-gray-100 bg-white/95 backdrop-blur-sm sticky top-0 z-10">
+                        <div class="flex flex-col space-y-4">
                             <!-- Search Bar -->
                             <div class="relative">
                                 <input type="text" id="product-search" placeholder="Search products..."
-                                    class="w-full pl-10 pr-4 py-2 md:py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors shadow-sm">
-                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                    class="w-full pl-12 pr-5 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm text-gray-700 placeholder-gray-400"
+                                    style="background-color: #fafafa;">
+                                <i class="fas fa-search absolute left-4 top-4 text-gray-400"></i>
+                                <button class="absolute right-3 top-3.5 text-gray-400 hover:text-amber-500 transition-colors">
+                                    <i class="fas fa-sliders text-sm"></i>
+                                </button>
                             </div>
 
-                            <!-- Category Tabs - Horizontal scrolling on mobile -->
-                            <div class="flex overflow-x-auto pb-1 md:pb-2 scrollbar-hide" id="category-tabs">
+                            <!-- Category Tabs -->
+                            <div class="flex overflow-x-auto pb-2 scrollbar-hide" id="category-tabs">
                                 <!-- Dynamically loaded -->
                             </div>
                         </div>
                     </div>
 
                     <!-- Product Grid -->
-                    <div class="flex-1 overflow-y-auto p-3 md:p-4 relative">
+                    <div class="flex-1 overflow-y-auto p-5 relative">
                         <!-- Loading State -->
                         <div id="loading-overlay-products"
                             class="hidden absolute inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center z-10">
-                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black mb-4"></div>
-                            <p class="text-gray-600 font-medium">Loading Inventory...</p>
+                            <div class="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-amber-500 mb-5"></div>
+                            <p class="text-gray-600 font-medium">Loading Premium Inventory</p>
+                            <p class="text-gray-400 text-sm mt-1">Please wait a moment</p>
                         </div>
 
-                        <!-- Product Grid - Responsive columns -->
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"
+                        <!-- Product Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
                             id="product-grid">
                             <!-- Products will be loaded here -->
                         </div>
 
                         <!-- Empty State -->
-                        <div id="products-empty-state" class="hidden text-center py-12">
+                        <div id="products-empty-state" class="hidden text-center py-16">
                             <div
-                                class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                                <i class="fas fa-box-open text-2xl text-gray-500"></i>
+                                class="bg-gray-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner border border-gray-200">
+                                <i class="fas fa-box-open text-3xl text-gray-400"></i>
                             </div>
-                            <h4 class="text-gray-500 font-medium mb-1">No products found</h4>
-                            <p class="text-gray-400 text-sm">Add products to your inventory</p>
+                            <h4 class="text-gray-500 font-medium mb-2">No products available</h4>
+                            <p class="text-gray-400 text-sm max-w-md mx-auto">Add products to your inventory or check your filters</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Shopping Cart (Right Panel) -->
                 <div id="cart-container"
-                    class="w-full md:w-96 flex flex-col border-t md:border-t-0 border-gray-200 bg-white shadow-lg md:shadow-none z-20 fixed md:relative bottom-0 left-0 right-0 mx-auto max-w-[95vw] md:max-w-none transform translate-y-full md:translate-y-0 transition-transform duration-200 ease-in-out">
-                    <!-- Cart Header with toggle button on mobile -->
-                    <div class="bg-black px-4 md:px-5 py-3 md:py-4 text-white flex justify-between items-center">
+                    class="w-full lg:w-96 flex flex-col border-t lg:border-t-0 border-gray-200 bg-white shadow-xl lg:shadow-none z-20 fixed lg:relative bottom-0 left-0 right-0 mx-auto max-w-[95vw] lg:max-w-none transform translate-y-full lg:translate-y-0 transition-transform duration-300 ease-in-out rounded-t-2xl lg:rounded-none overflow-hidden">
+                    <!-- Cart Header -->
+                    <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-4 text-white flex justify-between items-center">
                         <div class="flex items-center">
-                            <button id="cart-toggle" class="mr-2 md:hidden text-white">
+                            <button id="cart-toggle" class="mr-3 lg:hidden text-white">
                                 <i class="fas fa-chevron-up"></i>
                             </button>
-                            <h3 class="text-lg font-bold">Current Sale</h3>
+                            <h3 class="text-lg font-bold flex items-center">
+                                <i class="fas fa-shopping-basket mr-2"></i>
+                                Current Sale
+                            </h3>
                         </div>
                         <button id="clear-cart"
-                            class="text-gray-300 hover:text-white transition-colors text-sm flex items-center">
-                            <i class="fas fa-trash-alt mr-1 md:mr-2"></i>
-                            <span class="hidden sm:inline">Clear</span>
+                            class="text-amber-300 hover:text-white transition-colors text-sm flex items-center">
+                            <i class="fas fa-trash-alt mr-1.5"></i>
+                            <span class="hidden sm:inline">Clear All</span>
                         </button>
                     </div>
 
                     <!-- Cart Items -->
-                    <div class="flex-1 overflow-y-auto px-3 md:px-4 py-2 md:py-3 max-h-[40vh] md:max-h-none">
-                        <div id="cart-items" class="space-y-2">
+                    <div class="flex-1 overflow-y-auto px-5 py-4 max-h-[40vh] lg:max-h-none bg-gray-50">
+                        <div id="cart-items" class="space-y-3">
                             <!-- Empty State -->
                             <div id="empty-cart"
-                                class="h-full flex flex-col items-center justify-center py-8 text-center">
+                                class="h-full flex flex-col items-center justify-center py-12 text-center">
                                 <div
-                                    class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mb-3 shadow-sm">
-                                    <i class="fas fa-shopping-cart text-2xl text-gray-500"></i>
+                                    class="bg-gray-200 w-20 h-20 rounded-2xl flex items-center justify-center mb-5 shadow-inner border border-gray-300">
+                                    <i class="fas fa-shopping-basket text-3xl text-gray-500"></i>
                                 </div>
-                                <h4 class="font-medium text-gray-600 mb-1">Your cart is empty</h4>
-                                <p class="text-gray-400 text-sm">Add products to begin</p>
+                                <h4 class="font-medium text-gray-600 mb-2">Your cart is empty</h4>
+                                <p class="text-gray-400 text-sm">Begin by adding products</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Order Summary -->
-                    <div class="border-t border-gray-200 px-4 md:px-5 py-3 md:py-4 bg-gray-50">
+                    <div class="border-t border-gray-200 px-6 py-5 bg-white">
                         <!-- Summary -->
-                        <div class="space-y-2 mb-3">
+                        <div class="space-y-3 mb-4">
                             <div class="flex justify-between">
-                                <span class="text-gray-600 text-sm">Subtotal:</span>
+                                <span class="text-gray-600">Subtotal:</span>
                                 <span class="font-medium" id="subtotal">Ksh 0.00</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-600 text-sm">Tax (0):</span>
+                                <span class="text-gray-600">Tax (0%):</span>
                                 <span class="font-medium" id="tax">Ksh 0.00</span>
                             </div>
-                            <div class="flex justify-between text-gray-600 text-sm">
+                            <div class="flex justify-between text-gray-600">
                                 <span>Discount:</span>
-                                <span class="text-green-600 font-medium" id="discount">- Ksh 0.00</span>
+                                <span class="text-green-500 font-medium" id="discount">- Ksh 0.00</span>
                             </div>
                         </div>
 
                         <!-- Total -->
-                        <div class="border-t border-gray-200 pt-3 mb-4">
-                            <div class="flex justify-between text-lg font-bold">
+                        <div class="border-t border-gray-200 pt-4 mb-5">
+                            <div class="flex justify-between text-xl font-bold">
                                 <span class="text-gray-700">Total:</span>
-                                <span class="text-black" id="total">Ksh 0.00</span>
+                                <span class="text-gray-900" id="total">Ksh 0.00</span>
                             </div>
                         </div>
 
                         <!-- Customer Info -->
-                        <div class="mb-3 md:mb-4">
-                            <label class="block text-gray-700 text-sm font-semibold mb-1 md:mb-2">Customer</label>
+                        <div class="mb-5">
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Customer Details</label>
                             <div class="relative">
                                 <input type="text" id="customer-name" placeholder="Enter customer name"
-                                    class="w-full pl-3 md:pl-4 pr-8 md:pr-10 py-1.5 md:py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-black focus:border-black transition-colors shadow-sm">
+                                    class="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm bg-gray-50">
                                 <button
-                                    class="absolute right-2 top-1.5 md:top-2 text-gray-400 hover:text-black transition-colors">
-                                    <i class="fas fa-user-plus text-sm md:text-base"></i>
+                                    class="absolute right-3 top-3 text-gray-400 hover:text-amber-500 transition-colors">
+                                    <i class="fas fa-user-plus"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Payment Methods - Simplified on mobile -->
-                        <div class="mb-4 md:mb-5">
-                            <label class="block text-gray-700 text-sm font-semibold mb-1 md:mb-2">Payment Method</label>
-                            <div class="grid grid-cols-3 gap-1 md:gap-2" id="payment-methods">
+                        <!-- Payment Methods -->
+                        <div class="mb-6">
+                            <label class="block text-gray-700 text-sm font-semibold mb-3">Payment Method</label>
+                            <div class="grid grid-cols-3 gap-2" id="payment-methods">
                                 <button
-                                    class="payment-method flex flex-col items-center justify-center py-1 md:py-2 border rounded-md hover:border-black transition-colors active border-black bg-gray-100"
+                                    class="payment-method flex flex-col items-center justify-center py-2.5 border-2 rounded-xl hover:border-amber-400 transition-all active border-amber-500 bg-amber-50"
                                     data-method="cash">
-                                    <i class="fas fa-money-bill-wave text-gray-700 mb-0 md:mb-1 text-base md:text-lg"></i>
-                                    <span class="text-xs font-medium">Cash</span>
+                                    <i class="fas fa-money-bill-wave text-amber-600 mb-1 text-xl"></i>
+                                    <span class="text-xs font-medium mt-1">Cash</span>
                                 </button>
                                 <button
-                                    class="payment-method flex flex-col items-center justify-center py-1 md:py-2 border rounded-md hover:border-black transition-colors border-gray-300 bg-white"
+                                    class="payment-method flex flex-col items-center justify-center py-2.5 border-2 rounded-xl hover:border-amber-400 transition-all border-gray-200 bg-white"
                                     data-method="card">
-                                    <i class="fas fa-credit-card text-gray-700 mb-0 md:mb-1 text-base md:text-lg"></i>
-                                    <span class="text-xs font-medium">Card</span>
+                                    <i class="fas fa-credit-card text-amber-600 mb-1 text-xl"></i>
+                                    <span class="text-xs font-medium mt-1">Card</span>
                                 </button>
                                 <button
-                                    class="payment-method flex flex-col items-center justify-center py-1 md:py-2 border rounded-md hover:border-black transition-colors border-gray-300 bg-white"
+                                    class="payment-method flex flex-col items-center justify-center py-2.5 border-2 rounded-xl hover:border-amber-400 transition-all border-gray-200 bg-white"
                                     data-method="mobile">
-                                    <i class="fas fa-mobile-alt text-gray-700 mb-0 md:mb-1 text-base md:text-lg"></i>
-                                    <span class="text-xs font-medium">M-Pesa</span>
+                                    <i class="fas fa-mobile-screen text-amber-600 mb-1 text-xl"></i>
+                                    <span class="text-xs font-medium mt-1">M-Pesa</span>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Complete Sale Button -->
                         <button id="complete-sale"
-                            class="w-full bg-black hover:bg-gray-800 text-white py-2.5 md:py-3 rounded-md font-bold flex items-center justify-center shadow-sm hover:shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="w-full bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-4 rounded-xl font-bold flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                             <i class="fas fa-check-circle mr-2"></i>
                             <span>Complete Sale (</span>
                             <span id="complete-sale-amount">Ksh 0.00</span>
@@ -333,33 +370,43 @@
     </div>
 </div>
 
+<!-- Premium Modals -->
 <!-- Sales Summary Modal -->
 <div id="salesSummary" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
-    <div class="modal-backdrop fixed inset-0 bg-black/50"></div>
+    <div class="modal-backdrop fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
 
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl z-10">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-800">Today's Sales Summary</h3>
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl z-10 transform transition-all">
+        <div class="p-8">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">Today's Sales Analytics</h3>
+                    <p class="text-gray-500">Detailed overview of your sales performance</p>
+                </div>
                 <button onclick="hideModal('salesSummary')"
-                    class="text-gray-400 hover:text-gray-600 transition-colors">
+                    class="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors flex items-center justify-center">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Summary Cards -->
-                <div class="space-y-4">
-                    <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
-                        <h4 class="font-semibold text-gray-700 mb-3">Today's Overview</h4>
-                        <div id="summaryData" class="space-y-3">
+                <div class="space-y-6">
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h4 class="font-semibold text-gray-700 mb-4 flex items-center">
+                            <i class="fas fa-chart-line text-amber-500 mr-2"></i>
+                            Session Overview
+                        </h4>
+                        <div id="summaryData" class="space-y-4">
                             <!-- Will be populated dynamically -->
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
-                        <h4 class="font-semibold text-gray-700 mb-3">Payment Methods</h4>
-                        <div id="paymentSummary" class="space-y-2">
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h4 class="font-semibold text-gray-700 mb-4 flex items-center">
+                            <i class="fas fa-wallet text-amber-500 mr-2"></i>
+                            Payment Methods
+                        </h4>
+                        <div id="paymentSummary" class="space-y-3">
                             <!-- Will be populated dynamically -->
                         </div>
                     </div>
@@ -367,8 +414,11 @@
 
                 <!-- Recent Sales -->
                 <div>
-                    <h4 class="font-semibold text-gray-700 mb-3">Recent Transactions</h4>
-                    <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                    <h4 class="font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-clock-rotate-left text-amber-500 mr-2"></i>
+                        Recent Transactions
+                    </h4>
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 h-full">
                         <ul id="recentSales" class="divide-y divide-gray-200">
                             <!-- Will be populated dynamically -->
                         </ul>
@@ -376,10 +426,10 @@
                 </div>
             </div>
 
-            <div class="mt-6 flex justify-end">
+            <div class="mt-8 flex justify-end">
                 <button onclick="hideModal('salesSummary')"
-                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors">
-                    Close
+                    class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors">
+                    Close Analytics
                 </button>
             </div>
         </div>
@@ -388,20 +438,20 @@
 
 <!-- Open Register Modal -->
 <div id="openRegisterModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
-    <div class="modal-backdrop fixed inset-0 bg-black/50"></div>
+    <div class="modal-backdrop fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
 
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-md z-10">
-        <div class="bg-black px-6 py-4 text-white rounded-t-lg">
-            <h2 class="text-xl font-bold">Open Register Session</h2>
-            <p class="text-gray-300 text-sm">Enter opening cash amount</p>
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md z-10 transform transition-all">
+        <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-8 py-6 text-white rounded-t-2xl">
+            <h2 class="text-xl font-bold">Open New Register Session</h2>
+            <p class="text-gray-300 text-sm">Enter opening cash amount to begin</p>
         </div>
 
-        <div class="p-6">
+        <div class="p-8">
             <!-- Last Session Summary -->
-            <div class="bg-gray-50 p-4 rounded-md mb-6 border border-gray-200">
-                <h4 class="font-medium text-gray-700 mb-3 flex items-center">
-                    <i class="fas fa-history mr-2 text-gray-600"></i>
-                    Last Session
+            <div class="bg-gray-50 p-5 rounded-xl mb-8 border border-gray-200">
+                <h4 class="font-medium text-gray-700 mb-4 flex items-center">
+                    <i class="fas fa-history text-amber-500 mr-2"></i>
+                    Previous Session
                 </h4>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -417,26 +467,26 @@
 
             <!-- Opening Cash Input -->
             <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-medium mb-2">Opening Cash Amount</label>
+                <label class="block text-gray-700 text-sm font-medium mb-3">Opening Cash Amount</label>
                 <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 font-medium">
                         Ksh
                     </div>
                     <input type="number" id="openingCash"
-                        class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-md focus:ring-1 focus:ring-black focus:border-black transition-colors shadow-sm"
+                        class="w-full pl-14 pr-5 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm bg-gray-50"
                         placeholder="0.00" step="0.01" min="0">
                 </div>
             </div>
         </div>
 
-        <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end space-x-3">
+        <div class="bg-gray-50 px-8 py-6 rounded-b-2xl flex justify-end space-x-4">
             <button onclick="hideModal('openRegisterModal')"
-                class="px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                class="px-6 py-3 text-gray-700 hover:bg-gray-200 rounded-xl transition-colors">
                 Cancel
             </button>
             <button onclick="submitOpenRegister()"
-                class="px-4 py-2.5 bg-black hover:bg-gray-800 text-white rounded-md transition-colors flex items-center space-x-2 shadow-sm">
-                <i class="fas fa-cash-register"></i>
+                class="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl transition-all flex items-center space-x-2 shadow-md hover:shadow-lg">
+                <i class="fas fa-lock-open"></i>
                 <span>Start Session</span>
             </button>
         </div>
@@ -445,10 +495,10 @@
 
 <!-- Close Register Modal -->
 <div id="closeRegisterModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
-    <div class="modal-backdrop fixed inset-0 bg-black/50"></div>
+    <div class="modal-backdrop fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
 
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl z-10">
-        <div class="bg-black px-6 py-4 text-white rounded-t-lg">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl z-10 transform transition-all">
+        <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-8 py-6 text-white rounded-t-2xl">
             <h2 class="text-xl font-bold">Close Register Session</h2>
             <p class="text-gray-300 text-sm">
                 Session #<span id="current-session-id">--</span> •
@@ -456,29 +506,29 @@
             </p>
         </div>
 
-        <div class="p-6">
+        <div class="p-8">
             <!-- Session Summary Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
                     <h4 class="font-medium text-gray-700 mb-2">Opening Cash</h4>
-                    <p class="text-2xl font-bold text-black" id="session-opening-cash">Ksh 0.00</p>
+                    <p class="text-2xl font-bold text-gray-900" id="session-opening-cash">Ksh 0.00</p>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
                     <h4 class="font-medium text-gray-700 mb-2">Total Sales</h4>
-                    <p class="text-2xl font-bold text-black" id="session-total-sales">Ksh 0.00</p>
+                    <p class="text-2xl font-bold text-gray-900" id="session-total-sales">Ksh 0.00</p>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
                     <h4 class="font-medium text-gray-700 mb-2">Expected Cash</h4>
-                    <p class="text-2xl font-bold text-black" id="session-expected-cash">Ksh 0.00</p>
+                    <p class="text-2xl font-bold text-gray-900" id="session-expected-cash">Ksh 0.00</p>
                 </div>
-                <div class="bg-gray-100 p-4 rounded-md border-2 border-gray-300">
+                <div class="bg-amber-50 p-5 rounded-xl border-2 border-amber-200">
                     <h4 class="font-medium text-gray-700 mb-2">Counted Cash</h4>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 font-medium">
                             Ksh
                         </div>
                         <input type="number" id="closingCash"
-                            class="w-full pl-12 pr-4 py-2 border-0 bg-transparent focus:ring-1 focus:ring-black rounded-md transition-colors text-2xl font-bold"
+                            class="w-full pl-14 pr-5 py-3 border-0 bg-transparent focus:ring-2 focus:ring-amber-400 rounded-xl transition-all text-2xl font-bold text-gray-900"
                             placeholder="0.00" step="0.01" min="0">
                     </div>
                 </div>
@@ -486,8 +536,8 @@
 
             <!-- Discrepancy Alert -->
             <div id="discrepancy-alert"
-                class="hidden mb-6 p-3 rounded-md bg-red-50 border border-red-200 flex items-start">
-                <i class="fas fa-exclamation-circle text-red-500 mt-1 mr-2"></i>
+                class="hidden mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start">
+                <i class="fas fa-exclamation-circle text-red-500 mt-1 mr-3"></i>
                 <div>
                     <h4 class="font-medium text-red-700 mb-1" id="discrepancy-title">Discrepancy Detected</h4>
                     <p class="text-red-600 text-sm" id="discrepancy-text"></p>
@@ -495,27 +545,27 @@
             </div>
 
             <!-- Notes -->
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-medium mb-2">Closing Notes</label>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-medium mb-3">Closing Notes</label>
                 <textarea id="closingNotes"
-                    class="w-full p-3 border border-gray-300 rounded-md focus:ring-1 focus:ring-black focus:border-black transition-colors shadow-sm"
-                    placeholder="Any notes about this session..." rows="3"></textarea>
+                    class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm bg-gray-50"
+                    placeholder="Add any notes about this session..." rows="3"></textarea>
             </div>
         </div>
 
-        <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-between">
+        <div class="bg-gray-50 px-8 py-6 rounded-b-2xl flex justify-between">
             <button onclick="recountCash()"
-                class="px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-md transition-colors flex items-center">
+                class="px-6 py-3 text-gray-700 hover:bg-gray-200 rounded-xl transition-colors flex items-center">
                 <i class="fas fa-redo mr-2"></i>
                 <span>Recount Cash</span>
             </button>
-            <div class="space-x-3">
+            <div class="space-x-4">
                 <button onclick="hideModal('closeRegisterModal')"
-                    class="px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                    class="px-6 py-3 text-gray-700 hover:bg-gray-200 rounded-xl transition-colors">
                     Cancel
                 </button>
                 <button onclick="submitCloseRegister()"
-                    class="px-4 py-2.5 bg-black hover:bg-gray-800 text-white rounded-md transition-colors flex items-center space-x-2 shadow-sm">
+                    class="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl transition-all flex items-center space-x-2 shadow-md hover:shadow-lg">
                     <i class="fas fa-lock"></i>
                     <span>Close Register</span>
                 </button>
@@ -524,17 +574,17 @@
     </div>
 </div>
 
-<!-- Loading Overlay -->
-<div id="global-loading-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
-    <div class="bg-white p-6 rounded-lg shadow-lg text-center max-w-xs">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
-        <h3 class="text-lg font-medium text-gray-800" id="loading-message">Processing...</h3>
-        <p class="text-gray-500 text-sm mt-1" id="loading-submessage">Please wait</p>
+<!-- Premium Loading Overlay -->
+<div id="global-loading-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-sm animate-fade-in">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-500 mx-auto mb-6"></div>
+        <h3 class="text-xl font-medium text-gray-800" id="loading-message">Processing Request</h3>
+        <p class="text-gray-500 text-sm mt-2" id="loading-submessage">Please wait while we complete this action</p>
     </div>
 </div>
 
-<!-- Notification Container -->
-<div id="notification-container" class="fixed top-4 right-4 space-y-2 z-50"></div>
+<!-- Premium Notification Container -->
+<div id="notification-container" class="fixed top-6 right-6 space-y-3 z-50 w-80"></div>
 
 
 
