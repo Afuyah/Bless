@@ -534,19 +534,20 @@ class User(UserMixin, BaseModel, ShopScopedMixin, BusinessScopedMixin):
             'last_name': self.last_name,
             'full_name': self.get_full_name(),
             'phone': self.phone,
-            'role': self.role.value,
+            'role': self.role.value if self.role else None,
             'business_id': self.business_id,
             'shop_id': self.shop_id,
             'last_login': self.last_login.isoformat() if self.last_login else None,
-            'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat()
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
-        
+
         if include_sensitive:
             data['email_verified'] = self.email_verified
             data['is_locked'] = self.is_locked()
-        
+
         return data
+
     
        
 class Category(BaseModel, ShopScopedMixin):
