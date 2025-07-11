@@ -390,7 +390,7 @@ class ProductService:
             return [{
                 'id': p.id,
                 'name': p.name,
-                'price': float(p.selling_price),  # ✅ Fixed
+                'price': float(p.selling_price),  
                 'image': p.image_url or '/static/images/product-placeholder.png',
                 'category': p.category.name,
                 'category_id': p.category.id,

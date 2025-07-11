@@ -4,52 +4,52 @@
 
 {% block content %}
 
-<div class="flex h-screen overflow-hidden">
-    <!-- Sidebar - Collapsible -->
-    <div class="sidebar bg-gradient-to-b from-primary-800 to-primary-900 text-white w-16 md:w-64 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out">
+<div class="flex h-screen overflow-hidden bg-gray-50">
+    <!-- Sidebar - Light Grey -->
+    <div class="sidebar bg-gray-100 text-gray-800 w-16 md:w-64 flex-shrink-0 flex flex-col border-r border-gray-200 transition-all duration-200 ease-in-out">
         <!-- Top Section -->
         <div class="flex-1 overflow-y-auto">
-            <div class="p-2 md:p-4 border-b border-primary-700 flex flex-col items-center md:items-start">
+            <div class="p-2 md:p-4 border-b border-gray-200 flex flex-col items-center md:items-start">
                 <div class="flex items-center space-x-0 md:space-x-3">
-                    <div class="bg-white/20 p-2 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-store text-lg text-primary-100"></i>
+                    <div class="bg-white p-2 rounded-lg flex items-center justify-center shadow-sm">
+                        <i class="fas fa-store text-lg text-gray-600"></i>
                     </div>
                     <div class="min-w-0 hidden md:block">
-                        <h1 class="text-lg font-semibold truncate text-white" id="shop-name">{{ current_shop.name }}</h1>
-                        <p class="text-primary-100 text-sm truncate" id="current-user">
+                        <h1 class="text-lg font-semibold truncate" id="shop-name">{{ current_shop.name }}</h1>
+                        <p class="text-gray-500 text-sm truncate" id="current-user">
                             Cashier: {{ current_user.username }}
                         </p>
                     </div>
                 </div>
             </div>
 
-            <nav class="p-2 md:p-4 space-y-6">
+            <nav class="p-2 md:p-4 space-y-4">
                 <!-- Register Section -->
                 <div>
-                    <h2 class="text-primary-200 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">Register</h2>
+                    <h2 class="text-gray-500 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">Register</h2>
                     <ul class="space-y-1">
                         <li>
                             <button id="open-register-btn"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press"
+                                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start"
                                 title="Open Register">
-                                <i class="fas fa-cash-register text-primary-100 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3 text-white">Open Register</span>
+                                <i class="fas fa-cash-register text-gray-600 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3">Open Register</span>
                             </button>
                         </li>
                         <li>
                             <button id="sales-summary-btn"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press hidden"
+                                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start hidden"
                                 title="Sales Summary">
-                                <i class="fas fa-clipboard-list text-primary-100 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3 text-white">Sales Summary</span>
+                                <i class="fas fa-clipboard-list text-gray-600 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3">Sales Summary</span>
                             </button>
                         </li>
                         <li>
                             <button id="close-register-btn"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press hidden"
+                                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start hidden"
                                 title="Close Register">
-                                <i class="fas fa-door-closed text-primary-100 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3 text-white">Close Register</span>
+                                <i class="fas fa-door-closed text-gray-600 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3">Close Register</span>
                             </button>
                         </li>
                     </ul>
@@ -57,22 +57,22 @@
 
                 <!-- POS Section -->
                 <div>
-                    <h2 class="text-primary-200 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">POS</h2>
+                    <h2 class="text-gray-500 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">POS</h2>
                     <ul class="space-y-1">
                         <li>
                             <a href="#"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-lg bg-primary-700/30 flex items-center justify-center md:justify-start btn-press"
+                                class="w-full text-left py-2 px-1 md:px-3 rounded-md bg-gray-200 flex items-center justify-center md:justify-start"
                                 title="New Sale">
-                                <i class="fas fa-shopping-cart text-primary-100 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3 text-white">New Sale</span>
+                                <i class="fas fa-shopping-cart text-gray-600 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3">New Sale</span>
                             </a>
                         </li>
                         <li>
                             <a href="#"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press"
+                                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start"
                                 title="Sales History">
-                                <i class="fas fa-history text-primary-100 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3 text-white">Sales History</span>
+                                <i class="fas fa-history text-gray-600 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3">Sales History</span>
                             </a>
                         </li>
                     </ul>
@@ -80,24 +80,24 @@
 
                 <!-- Management Section -->
                 <div>
-                    <h2 class="text-primary-200 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">Management</h2>
+                    <h2 class="text-gray-500 uppercase text-xs font-bold mb-2 tracking-wider hidden md:block">Management</h2>
                     <ul class="space-y-1">
                         <li>
                             <a href="#"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press"
+                                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start"
                                 title="Products">
-                                <i class="fas fa-boxes text-primary-100 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3 text-white">Products</span>
+                                <i class="fas fa-boxes text-gray-600 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3">Products</span>
                             </a>
                         </li>
 
                         {% if current_user.is_tenant() or current_user.is_admin() %}
                         <li>
                             <a href="{{ url_for('admin.admin_dashboard', shop_id=current_shop.id) }}"
-                                class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press"
+                                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start"
                                 title="Manage Store">
-                                <i class="fas fa-cogs text-primary-100 w-5 text-center"></i>
-                                <span class="truncate hidden md:block ml-3 text-white">Manage Store</span>
+                                <i class="fas fa-cogs text-gray-600 w-5 text-center"></i>
+                                <span class="truncate hidden md:block ml-3">Manage Store</span>
                             </a>
                         </li>
                         {% endif %}
@@ -107,12 +107,12 @@
         </div>
 
         <!-- Logout Section -->
-        <div class="p-2 md:p-4 border-t border-primary-700">
+        <div class="p-2 md:p-4 border-t border-gray-200">
             <a href="{{ url_for('auth.logout') }}"
-                class="w-full text-left py-2 px-1 md:px-3 rounded-lg hover:bg-primary-700/50 transition-all flex items-center justify-center md:justify-start btn-press"
+                class="w-full text-left py-2 px-1 md:px-3 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center md:justify-start"
                 title="Logout">
-                <i class="fas fa-sign-out-alt text-primary-100 w-5 text-center"></i>
-                <span class="truncate hidden md:block ml-3 text-white">Logout</span>
+                <i class="fas fa-sign-out-alt text-gray-600 w-5 text-center"></i>
+                <span class="truncate hidden md:block ml-3">Logout</span>
             </a>
         </div>
     </div>
@@ -122,14 +122,14 @@
         <!-- Top Bar -->
         <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-4">
-                <button id="menu-toggle" class="text-gray-500 hover:text-primary-600 transition-all btn-press md:hidden">
+                <button id="menu-toggle" class="text-gray-600 hover:text-black transition-colors md:hidden">
                     <i class="fas fa-bars text-lg"></i>
                 </button>
 
                 <!-- Register Status -->
                 <div id="register-status"
                     class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-gray-100 text-sm font-medium">
-                    <span class="status-dot w-2.5 h-2.5 rounded-full bg-danger-500 animate-pulse"></span>
+                    <span class="status-dot w-2.5 h-2.5 rounded-full bg-red-500"></span>
                     <span class="status-text">Register Closed</span>
                 </div>
             </div>
@@ -137,17 +137,17 @@
             <div class="flex items-center space-x-4">
                 <!-- Notifications -->
                 <div class="relative">
-                    <button class="text-gray-500 hover:text-primary-600 transition-all btn-press relative">
+                    <button class="text-gray-600 hover:text-black transition-colors relative">
                         <i class="fas fa-bell text-lg"></i>
                         <span
-                            class="absolute -top-1 -right-1 bg-danger-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs animate-pulse">3</span>
+                            class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">3</span>
                     </button>
                 </div>
 
                 <!-- User Profile -->
                 <div class="flex items-center space-x-2">
                     <div
-                        class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-medium shadow-sm">
+                        class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-medium shadow-sm">
                         {{ current_user.username[0]|upper }}
                     </div>
                     <span class="hidden md:inline text-sm font-medium">{{ current_user.username }}</span>
@@ -156,17 +156,17 @@
         </header>
 
         <!-- Content Area -->
-        <main class="flex-1 overflow-hidden relative">
+        <main class="flex-1 overflow-hidden relative bg-white">
             <!-- Register Closed State -->
             <div id="register-closed-state" class="h-full flex flex-col items-center justify-center text-center p-6">
-                <div class="w-20 h-20 rounded-full bg-primary-50 flex items-center justify-center mb-6 shadow-inner-sm">
-                    <i class="fas fa-cash-register text-3xl text-primary-600"></i>
+                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-6 shadow-sm">
+                    <i class="fas fa-cash-register text-3xl text-gray-600"></i>
                 </div>
                 <h3 class="text-xl font-bold text-gray-800 mb-2">Register is Closed</h3>
                 <p class="text-gray-500 max-w-md mb-6">Please open the register to start processing sales. You'll need
                     to enter the starting cash amount.</p>
                 <button id="open-register-main-btn"
-                    class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all flex items-center btn-press shadow-md hover:shadow-lg">
+                    class="bg-black hover:bg-gray-800 text-white px-6 py-2.5 rounded-md font-medium transition-colors flex items-center shadow-sm">
                     <i class="fas fa-cash-register mr-2"></i>
                     Open Register
                 </button>
@@ -177,12 +177,12 @@
                 <!-- Product Catalog (Left Panel) -->
                 <div class="flex-1 flex flex-col border-r border-gray-200 bg-white overflow-hidden">
                     <!-- Search and Categories -->
-                    <div class="p-2 md:p-4 border-b border-gray-200 bg-white/95 backdrop-blur-sm sticky top-0 z-10">
+                    <div class="p-3 md:p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
                         <div class="flex flex-col space-y-3">
                             <!-- Search Bar -->
                             <div class="relative">
                                 <input type="text" id="product-search" placeholder="Search products..."
-                                    class="w-full pl-10 pr-4 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all shadow-sm">
+                                    class="w-full pl-10 pr-4 py-2 md:py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors shadow-sm">
                                 <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                             </div>
 
@@ -194,32 +194,25 @@
                     </div>
 
                     <!-- Product Grid -->
-                    <div class="flex-1 overflow-y-auto p-2 md:p-4 relative">
+                    <div class="flex-1 overflow-y-auto p-3 md:p-4 relative">
                         <!-- Loading State -->
                         <div id="loading-overlay-products"
-                            class="hidden absolute inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center z-10 transition-all">
-                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
+                            class="hidden absolute inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center z-10">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black mb-4"></div>
                             <p class="text-gray-600 font-medium">Loading Inventory...</p>
-                            <p class="text-gray-400 text-sm mt-1">Please wait a moment</p>
                         </div>
 
                         <!-- Product Grid - Responsive columns -->
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3"
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"
                             id="product-grid">
                             <!-- Products will be loaded here -->
-                        </div>
-
-                        <!-- Loading more indicator -->
-                        <div id="loading-more-products" class="hidden py-4 text-center">
-                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-                            <p class="text-gray-500 text-sm mt-2">Loading more products...</p>
                         </div>
 
                         <!-- Empty State -->
                         <div id="products-empty-state" class="hidden text-center py-12">
                             <div
-                                class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner-sm">
-                                <i class="fas fa-box-open text-2xl text-gray-400"></i>
+                                class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                <i class="fas fa-box-open text-2xl text-gray-500"></i>
                             </div>
                             <h4 class="text-gray-500 font-medium mb-1">No products found</h4>
                             <p class="text-gray-400 text-sm">Add products to your inventory</p>
@@ -229,9 +222,9 @@
 
                 <!-- Shopping Cart (Right Panel) -->
                 <div id="cart-container"
-                    class="w-full md:w-96 flex flex-col border-t md:border-t-0 border-gray-200 bg-white shadow-lg md:shadow-none z-20 fixed md:relative bottom-0 left-0 right-0 mx-auto max-w-[95vw] md:max-w-none transform translate-y-full md:translate-y-0 transition-transform duration-300 ease-in-out">
+                    class="w-full md:w-96 flex flex-col border-t md:border-t-0 border-gray-200 bg-white shadow-lg md:shadow-none z-20 fixed md:relative bottom-0 left-0 right-0 mx-auto max-w-[95vw] md:max-w-none transform translate-y-full md:translate-y-0 transition-transform duration-200 ease-in-out">
                     <!-- Cart Header with toggle button on mobile -->
-                    <div class="bg-gradient-to-r from-primary-600 to-primary-500 px-4 md:px-5 py-3 md:py-4 text-white flex justify-between items-center">
+                    <div class="bg-black px-4 md:px-5 py-3 md:py-4 text-white flex justify-between items-center">
                         <div class="flex items-center">
                             <button id="cart-toggle" class="mr-2 md:hidden text-white">
                                 <i class="fas fa-chevron-up"></i>
@@ -239,7 +232,7 @@
                             <h3 class="text-lg font-bold">Current Sale</h3>
                         </div>
                         <button id="clear-cart"
-                            class="text-white/80 hover:text-white transition-all text-sm flex items-center btn-press">
+                            class="text-gray-300 hover:text-white transition-colors text-sm flex items-center">
                             <i class="fas fa-trash-alt mr-1 md:mr-2"></i>
                             <span class="hidden sm:inline">Clear</span>
                         </button>
@@ -252,8 +245,8 @@
                             <div id="empty-cart"
                                 class="h-full flex flex-col items-center justify-center py-8 text-center">
                                 <div
-                                    class="bg-primary-50 w-16 h-16 rounded-full flex items-center justify-center mb-3 shadow-inner-sm">
-                                    <i class="fas fa-shopping-cart text-2xl text-primary-400"></i>
+                                    class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mb-3 shadow-sm">
+                                    <i class="fas fa-shopping-cart text-2xl text-gray-500"></i>
                                 </div>
                                 <h4 class="font-medium text-gray-600 mb-1">Your cart is empty</h4>
                                 <p class="text-gray-400 text-sm">Add products to begin</p>
@@ -275,7 +268,7 @@
                             </div>
                             <div class="flex justify-between text-gray-600 text-sm">
                                 <span>Discount:</span>
-                                <span class="text-success-600 font-medium" id="discount">- Ksh 0.00</span>
+                                <span class="text-green-600 font-medium" id="discount">- Ksh 0.00</span>
                             </div>
                         </div>
 
@@ -283,7 +276,7 @@
                         <div class="border-t border-gray-200 pt-3 mb-4">
                             <div class="flex justify-between text-lg font-bold">
                                 <span class="text-gray-700">Total:</span>
-                                <span class="text-primary-600" id="total">Ksh 0.00</span>
+                                <span class="text-black" id="total">Ksh 0.00</span>
                             </div>
                         </div>
 
@@ -292,9 +285,9 @@
                             <label class="block text-gray-700 text-sm font-semibold mb-1 md:mb-2">Customer</label>
                             <div class="relative">
                                 <input type="text" id="customer-name" placeholder="Enter customer name"
-                                    class="w-full pl-3 md:pl-4 pr-8 md:pr-10 py-1.5 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all shadow-sm">
+                                    class="w-full pl-3 md:pl-4 pr-8 md:pr-10 py-1.5 md:py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-black focus:border-black transition-colors shadow-sm">
                                 <button
-                                    class="absolute right-2 top-1.5 md:top-2 text-gray-400 hover:text-primary-500 transition-all btn-press">
+                                    class="absolute right-2 top-1.5 md:top-2 text-gray-400 hover:text-black transition-colors">
                                     <i class="fas fa-user-plus text-sm md:text-base"></i>
                                 </button>
                             </div>
@@ -305,21 +298,21 @@
                             <label class="block text-gray-700 text-sm font-semibold mb-1 md:mb-2">Payment Method</label>
                             <div class="grid grid-cols-3 gap-1 md:gap-2" id="payment-methods">
                                 <button
-                                    class="payment-method flex flex-col items-center justify-center py-1 md:py-2 border-2 rounded-lg md:rounded-xl hover:border-primary-400 transition-all btn-press active border-primary-500 bg-primary-50"
+                                    class="payment-method flex flex-col items-center justify-center py-1 md:py-2 border rounded-md hover:border-black transition-colors active border-black bg-gray-100"
                                     data-method="cash">
-                                    <i class="fas fa-money-bill-wave text-primary-500 mb-0 md:mb-1 text-base md:text-lg"></i>
+                                    <i class="fas fa-money-bill-wave text-gray-700 mb-0 md:mb-1 text-base md:text-lg"></i>
                                     <span class="text-xs font-medium">Cash</span>
                                 </button>
                                 <button
-                                    class="payment-method flex flex-col items-center justify-center py-1 md:py-2 border-2 rounded-lg md:rounded-xl hover:border-primary-400 transition-all btn-press border-gray-200 bg-white"
+                                    class="payment-method flex flex-col items-center justify-center py-1 md:py-2 border rounded-md hover:border-black transition-colors border-gray-300 bg-white"
                                     data-method="card">
-                                    <i class="fas fa-credit-card text-primary-500 mb-0 md:mb-1 text-base md:text-lg"></i>
+                                    <i class="fas fa-credit-card text-gray-700 mb-0 md:mb-1 text-base md:text-lg"></i>
                                     <span class="text-xs font-medium">Card</span>
                                 </button>
                                 <button
-                                    class="payment-method flex flex-col items-center justify-center py-1 md:py-2 border-2 rounded-lg md:rounded-xl hover:border-primary-400 transition-all btn-press border-gray-200 bg-white"
+                                    class="payment-method flex flex-col items-center justify-center py-1 md:py-2 border rounded-md hover:border-black transition-colors border-gray-300 bg-white"
                                     data-method="mobile">
-                                    <i class="fas fa-mobile-alt text-primary-500 mb-0 md:mb-1 text-base md:text-lg"></i>
+                                    <i class="fas fa-mobile-alt text-gray-700 mb-0 md:mb-1 text-base md:text-lg"></i>
                                     <span class="text-xs font-medium">M-Pesa</span>
                                 </button>
                             </div>
@@ -327,8 +320,7 @@
 
                         <!-- Complete Sale Button -->
                         <button id="complete-sale"
-                            class="w-full bg-gradient-to-r from-success-500 to-success-600 hover:from-success-600 hover:to-success-700 text-white py-2.5 md:py-3.5 rounded-lg md:rounded-xl font-bold flex items-center justify-center shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed btn-press"
-                            disabled>
+                            class="w-full bg-black hover:bg-gray-800 text-white py-2.5 md:py-3 rounded-md font-bold flex items-center justify-center shadow-sm hover:shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                             <i class="fas fa-check-circle mr-2"></i>
                             <span>Complete Sale (</span>
                             <span id="complete-sale-amount">Ksh 0.00</span>
@@ -340,16 +332,17 @@
         </main>
     </div>
 </div>
+
 <!-- Sales Summary Modal -->
 <div id="salesSummary" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div class="modal-backdrop fixed inset-0 bg-black/50"></div>
 
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl z-10 transform transition-all animate-fade-in">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl z-10">
         <div class="p-6">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-gray-800">Today's Sales Summary</h3>
                 <button onclick="hideModal('salesSummary')"
-                    class="text-gray-400 hover:text-gray-600 transition-all btn-press">
+                    class="text-gray-400 hover:text-gray-600 transition-colors">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -357,14 +350,14 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Summary Cards -->
                 <div class="space-y-4">
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
                         <h4 class="font-semibold text-gray-700 mb-3">Today's Overview</h4>
                         <div id="summaryData" class="space-y-3">
                             <!-- Will be populated dynamically -->
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
                         <h4 class="font-semibold text-gray-700 mb-3">Payment Methods</h4>
                         <div id="paymentSummary" class="space-y-2">
                             <!-- Will be populated dynamically -->
@@ -375,7 +368,7 @@
                 <!-- Recent Sales -->
                 <div>
                     <h4 class="font-semibold text-gray-700 mb-3">Recent Transactions</h4>
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
                         <ul id="recentSales" class="divide-y divide-gray-200">
                             <!-- Will be populated dynamically -->
                         </ul>
@@ -385,7 +378,7 @@
 
             <div class="mt-6 flex justify-end">
                 <button onclick="hideModal('salesSummary')"
-                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all btn-press">
+                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors">
                     Close
                 </button>
             </div>
@@ -397,17 +390,17 @@
 <div id="openRegisterModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div class="modal-backdrop fixed inset-0 bg-black/50"></div>
 
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md z-10 transform transition-all animate-fade-in">
-        <div class="bg-gradient-to-r from-primary-600 to-primary-500 px-6 py-4 text-white rounded-t-xl">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md z-10">
+        <div class="bg-black px-6 py-4 text-white rounded-t-lg">
             <h2 class="text-xl font-bold">Open Register Session</h2>
-            <p class="text-primary-100 text-sm">Enter opening cash amount</p>
+            <p class="text-gray-300 text-sm">Enter opening cash amount</p>
         </div>
 
         <div class="p-6">
             <!-- Last Session Summary -->
-            <div class="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
+            <div class="bg-gray-50 p-4 rounded-md mb-6 border border-gray-200">
                 <h4 class="font-medium text-gray-700 mb-3 flex items-center">
-                    <i class="fas fa-history mr-2 text-primary-500"></i>
+                    <i class="fas fa-history mr-2 text-gray-600"></i>
                     Last Session
                 </h4>
                 <div class="grid grid-cols-2 gap-4">
@@ -430,19 +423,19 @@
                         Ksh
                     </div>
                     <input type="number" id="openingCash"
-                        class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all shadow-sm"
+                        class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-md focus:ring-1 focus:ring-black focus:border-black transition-colors shadow-sm"
                         placeholder="0.00" step="0.01" min="0">
                 </div>
             </div>
         </div>
 
-        <div class="bg-gray-50 px-6 py-4 rounded-b-xl flex justify-end space-x-3">
+        <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end space-x-3">
             <button onclick="hideModal('openRegisterModal')"
-                class="px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-lg transition-all btn-press">
+                class="px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
                 Cancel
             </button>
             <button onclick="submitOpenRegister()"
-                class="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all flex items-center space-x-2 btn-press shadow-md hover:shadow-lg">
+                class="px-4 py-2.5 bg-black hover:bg-gray-800 text-white rounded-md transition-colors flex items-center space-x-2 shadow-sm">
                 <i class="fas fa-cash-register"></i>
                 <span>Start Session</span>
             </button>
@@ -454,10 +447,10 @@
 <div id="closeRegisterModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div class="modal-backdrop fixed inset-0 bg-black/50"></div>
 
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl z-10 transform transition-all animate-fade-in">
-        <div class="bg-gradient-to-r from-primary-600 to-primary-500 px-6 py-4 text-white rounded-t-xl">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl z-10">
+        <div class="bg-black px-6 py-4 text-white rounded-t-lg">
             <h2 class="text-xl font-bold">Close Register Session</h2>
-            <p class="text-primary-100 text-sm">
+            <p class="text-gray-300 text-sm">
                 Session #<span id="current-session-id">--</span> •
                 Opened <span id="session-opened-at">--</span> by <span id="session-opened-by">--</span>
             </p>
@@ -466,26 +459,26 @@
         <div class="p-6">
             <!-- Session Summary Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
                     <h4 class="font-medium text-gray-700 mb-2">Opening Cash</h4>
-                    <p class="text-2xl font-bold text-primary-600" id="session-opening-cash">Ksh 0.00</p>
+                    <p class="text-2xl font-bold text-black" id="session-opening-cash">Ksh 0.00</p>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
                     <h4 class="font-medium text-gray-700 mb-2">Total Sales</h4>
-                    <p class="text-2xl font-bold text-primary-600" id="session-total-sales">Ksh 0.00</p>
+                    <p class="text-2xl font-bold text-black" id="session-total-sales">Ksh 0.00</p>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
                     <h4 class="font-medium text-gray-700 mb-2">Expected Cash</h4>
-                    <p class="text-2xl font-bold text-primary-600" id="session-expected-cash">Ksh 0.00</p>
+                    <p class="text-2xl font-bold text-black" id="session-expected-cash">Ksh 0.00</p>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-lg border-2 border-primary-200 bg-primary-50">
+                <div class="bg-gray-100 p-4 rounded-md border-2 border-gray-300">
                     <h4 class="font-medium text-gray-700 mb-2">Counted Cash</h4>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
                             Ksh
                         </div>
                         <input type="number" id="closingCash"
-                            class="w-full pl-12 pr-4 py-2 border-0 bg-transparent focus:ring-2 focus:ring-primary-500 rounded-lg transition-all text-2xl font-bold"
+                            class="w-full pl-12 pr-4 py-2 border-0 bg-transparent focus:ring-1 focus:ring-black rounded-md transition-colors text-2xl font-bold"
                             placeholder="0.00" step="0.01" min="0">
                     </div>
                 </div>
@@ -493,11 +486,11 @@
 
             <!-- Discrepancy Alert -->
             <div id="discrepancy-alert"
-                class="hidden mb-6 p-3 rounded-lg bg-danger-50 border border-danger-200 flex items-start">
-                <i class="fas fa-exclamation-circle text-danger-500 mt-1 mr-2"></i>
+                class="hidden mb-6 p-3 rounded-md bg-red-50 border border-red-200 flex items-start">
+                <i class="fas fa-exclamation-circle text-red-500 mt-1 mr-2"></i>
                 <div>
-                    <h4 class="font-medium text-danger-700 mb-1" id="discrepancy-title">Discrepancy Detected</h4>
-                    <p class="text-danger-600 text-sm" id="discrepancy-text"></p>
+                    <h4 class="font-medium text-red-700 mb-1" id="discrepancy-title">Discrepancy Detected</h4>
+                    <p class="text-red-600 text-sm" id="discrepancy-text"></p>
                 </div>
             </div>
 
@@ -505,24 +498,24 @@
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-medium mb-2">Closing Notes</label>
                 <textarea id="closingNotes"
-                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all shadow-sm"
+                    class="w-full p-3 border border-gray-300 rounded-md focus:ring-1 focus:ring-black focus:border-black transition-colors shadow-sm"
                     placeholder="Any notes about this session..." rows="3"></textarea>
             </div>
         </div>
 
-        <div class="bg-gray-50 px-6 py-4 rounded-b-xl flex justify-between">
+        <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-between">
             <button onclick="recountCash()"
-                class="px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-lg transition-all flex items-center btn-press">
+                class="px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-md transition-colors flex items-center">
                 <i class="fas fa-redo mr-2"></i>
                 <span>Recount Cash</span>
             </button>
             <div class="space-x-3">
                 <button onclick="hideModal('closeRegisterModal')"
-                    class="px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-lg transition-all btn-press">
+                    class="px-4 py-2.5 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
                     Cancel
                 </button>
                 <button onclick="submitCloseRegister()"
-                    class="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all flex items-center space-x-2 btn-press shadow-md hover:shadow-lg">
+                    class="px-4 py-2.5 bg-black hover:bg-gray-800 text-white rounded-md transition-colors flex items-center space-x-2 shadow-sm">
                     <i class="fas fa-lock"></i>
                     <span>Close Register</span>
                 </button>
@@ -533,8 +526,8 @@
 
 <!-- Loading Overlay -->
 <div id="global-loading-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
-    <div class="bg-white p-6 rounded-xl shadow-xl text-center max-w-xs animate-fade-in">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+    <div class="bg-white p-6 rounded-lg shadow-lg text-center max-w-xs">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
         <h3 class="text-lg font-medium text-gray-800" id="loading-message">Processing...</h3>
         <p class="text-gray-500 text-sm mt-1" id="loading-submessage">Please wait</p>
     </div>
@@ -542,6 +535,8 @@
 
 <!-- Notification Container -->
 <div id="notification-container" class="fixed top-4 right-4 space-y-2 z-50"></div>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
