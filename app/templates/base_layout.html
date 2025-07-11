@@ -4,51 +4,175 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Nawiri Enterprise - Professional POS System">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#2563eb"> <!-- Tailwind blue-600 -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{% block title %}Nawiri POS{% endblock %}</title>
-    
-    <!-- Preload Tailwind CSS -->
-    <link rel="preload" href="{{ url_for('static', filename='css/tailwind.css') }}" as="style">
-    
+    <script src="{{ url_for ('static', filename='js/tailwind.js')}}"></script>
     <!-- Favicon & PWA Assets -->
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-192x192.png') }}">
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   
     
-    <!-- Critical CSS (prevents FOUC) -->
-    <style>
-        /* Basic layout styles to prevent FOUC */
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8fafc;
-            color: #1e293b;
-        }
-        .sidebar {
-            background: linear-gradient(to bottom, #1e40af, #1e3a8a);
-            color: white;
-        }
-        /* Hide content until Tailwind loads */
-        [x-cloak] { display: none !important; }
-    </style>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Load Tailwind CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.css') }}" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.css') }}"></noscript>
+
+
+    <!-- Tailwind CSS (via CDN for prototyping) -->
+   <script src="https://cdn.tailwindcss.com"></script>
+
+ 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                    
+                        dark: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+
+
+                         primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        success: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        danger: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            200: '#fecaca',
+                            300: '#fca5a5',
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                        },
+                        warning: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        }
+
+
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                        'fade-out': 'fadeIn 0.3s ease-out reverse forwards',
+                        'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-in': 'slideIn 0.3s ease-out forwards',
+                        'slide-out': 'slideOut 0.3s ease-out forwards'
+                   },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(0)' },
+                        },
+                        slideOut: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(100%)' },
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 12px rgba(0, 0, 0, 0.05)',
+                        'soft-md': '0 6px 20px rgba(0, 0, 0, 0.08)',
+                        'soft-lg': '0 10px 25px rgba(0, 0, 0, 0.1)',
+                        'inner-sm': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)'
+                    }
+
+
+                }
+            }
+        }
+    </script>
 
     <!-- Custom Styles -->
     <style>
-        /* Custom scrollbar */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .sidebar-collapsed {
+            width: 5rem;
+        }
+        .sidebar-expanded {
+            width: 16rem;
+        }
+        .pos-transition {
+            transition: all 0.2s ease-in-out;
+        }
+        .receipt-print {
+            display: none;
+        }
+        @media print {
+            .receipt-print {
+                display: block;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+
+  /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -78,28 +202,35 @@
             transform: translateY(0);
         }
 
+
         /* Light color scheme adjustments */
-        .pos-card {
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        }
+.pos-card {
+    background-color: #f9fafb; /* gray-50 */
+    border: 1px solid #e5e7eb; /* gray-200 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+}
 
-        .pos-card:hover {
-            border-color: #93c5fd;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
+.pos-card:hover {
+    border-color: #93c5fd; /* primary-300 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+}
 
-        /* Image container */
-        .pos-card .relative.aspect-\[1\/1\] {
-            background-color: white;
-            border-bottom: 1px solid #f3f4f6;
-        }
+/* Image container */
+.pos-card .relative.aspect-\[1\/1\] {
+    background-color: white;
+    border-bottom: 1px solid #f3f4f6; /* gray-100 */
+}
         
         /* Modal backdrop */
         .modal-backdrop {
             background-color: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
+        }
+        
+        /* Custom barcode font */
+        @font-face {
+            font-family: 'Libre Barcode 39';
+            src: url('https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap');
         }
         
         /* Button press effect */
@@ -118,153 +249,61 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
-
-        /* Sidebar styles */
-        .sidebar {
-            background: linear-gradient(to bottom, #1e40af, #1e3a8a);
+        
+        /* Custom checkbox */
+        .custom-checkbox {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #cbd5e1;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .custom-checkbox:checked {
+            background-color: #0ea5e9;
+            border-color: #0ea5e9;
+        }
+        .custom-checkbox:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
             color: white;
-        }
-        .sidebar a, .sidebar button {
-            color: white;
-        }
-        .sidebar a:hover, .sidebar button:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .sidebar .active {
-            background-color: rgba(255, 255, 255, 0.2);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
         }
 
-        /* Print styles */
-        .receipt-print {
-            display: none;
-        }
-        @media print {
-            .receipt-print {
-                display: block;
-            }
-            .no-print {
-                display: none;
-            }
-        }
+
     </style>
 </head>
 
-<body class="font-sans bg-gray-50 text-gray-800 antialiased" x-data="{ sidebarOpen: window.innerWidth >= 768 }" x-cloak>
+<body class="font-sans bg-gray-50 text-gray-800 antialiased">
     <!-- App Container -->
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div class="sidebar w-16 md:w-64 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out"
-             :class="sidebarOpen ? 'w-64' : 'w-16'">
-            
-            <!-- Sidebar Header -->
-            <div class="p-4 border-b border-blue-700 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-white/10 p-2 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-store text-lg text-blue-200"></i>
-                    </div>
-                    <div class="min-w-0" :class="sidebarOpen ? 'block' : 'hidden'">
-                        <h1 class="text-lg font-semibold truncate">Nawiri POS</h1>
-                        <p class="text-blue-200 text-sm truncate">
-                            Cashier: {{ current_user.username if current_user else 'Guest' }}
-                        </p>
-                    </div>
-                </div>
-                <button @click="sidebarOpen = !sidebarOpen" class="hidden md:block text-blue-200 hover:text-white">
-                    <i class="fas" :class="sidebarOpen ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
-                </button>
-            </div>
-
-            <!-- Sidebar Navigation -->
-            <nav class="flex-1 overflow-y-auto p-4 space-y-6">
-                <!-- Register Section -->
-                <div>
-                    <h2 class="text-blue-300 uppercase text-xs font-bold mb-2 tracking-wider" :class="sidebarOpen ? 'block' : 'hidden'">
-                        Register
-                    </h2>
-                    <ul class="space-y-1">
-                        <li>
-                            <button class="w-full text-left py-2 px-3 rounded-lg hover:bg-blue-700/50 transition-all flex items-center btn-press">
-                                <i class="fas fa-cash-register text-blue-300 w-5 text-center"></i>
-                                <span class="truncate" :class="sidebarOpen ? 'ml-3 block' : 'hidden'">Open Register</span>
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- POS Section -->
-                <div>
-                    <h2 class="text-blue-300 uppercase text-xs font-bold mb-2 tracking-wider" :class="sidebarOpen ? 'block' : 'hidden'">
-                        POS
-                    </h2>
-                    <ul class="space-y-1">
-                        <li>
-                            <a href="#" class="w-full text-left py-2 px-3 rounded-lg bg-blue-700/30 flex items-center btn-press">
-                                <i class="fas fa-shopping-cart text-blue-300 w-5 text-center"></i>
-                                <span class="truncate" :class="sidebarOpen ? 'ml-3 block' : 'hidden'">New Sale</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
-            <!-- Sidebar Footer -->
-            <div class="p-4 border-t border-blue-700">
-                <a href="{{ url_for('auth.logout') }}" class="w-full text-left py-2 px-3 rounded-lg hover:bg-blue-700/50 transition-all flex items-center btn-press">
-                    <i class="fas fa-sign-out-alt text-blue-300 w-5 text-center"></i>
-                    <span class="truncate" :class="sidebarOpen ? 'ml-3 block' : 'hidden'">Logout</span>
-                </a>
-            </div>
-        </div>
+    <div class="flex h-full">
+       
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top Bar -->
-            <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 hover:text-blue-600 transition-all btn-press md:hidden">
-                        <i class="fas fa-bars text-lg"></i>
-                    </button>
-
-                    <!-- Register Status -->
-                    <div class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-gray-100 text-sm font-medium">
-                        <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-                        <span>Register Closed</span>
-                    </div>
-                </div>
-
-                <div class="flex items-center space-x-4">
-                    <!-- Notifications -->
-                    <div class="relative">
-                        <button class="text-gray-500 hover:text-blue-600 transition-all btn-press relative">
-                            <i class="fas fa-bell text-lg"></i>
-                            <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs animate-pulse">3</span>
-                        </button>
-                    </div>
-
-                    <!-- User Profile -->
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium shadow-sm">
-                            {{ current_user.username[0]|upper if current_user else 'G' }}
-                        </div>
-                        <span class="hidden md:inline text-sm font-medium">{{ current_user.username if current_user else 'Guest' }}</span>
-                    </div>
-                </div>
-            </header>
-
+           
             <!-- Main Content Area -->
             <main class="flex-1 overflow-y-auto bg-gray-50">
                 {% block content %}
                 <!-- Content will be injected here -->
                 {% endblock %}
             </main>
-        </div>
+
+            </div>
     </div>
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 right-4 space-y-2 z-50 w-80"></div>
-
-    <!-- Alpine.js for interactivity -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     <!-- Scripts -->
     <script>
@@ -365,16 +404,10 @@
             {% endwith %}
         });
 
-        // Fallback for Tailwind CSS if it fails to load
-        setTimeout(() => {
-            if (!document.querySelector('link[href*="tailwind.css"]').sheet) {
-                console.log('Tailwind CSS failed to load, loading fallback');
-                const fallback = document.createElement('link');
-                fallback.rel = 'stylesheet';
-                fallback.href = 'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css';
-                document.head.appendChild(fallback);
-            }
-        }, 1000);
+     
     </script>
+
+    <!-- Application-specific JS 
+    <script src="{{ url_for('static', filename='js/tailwind.js') }}"></script>-->
 </body>
 </html>
