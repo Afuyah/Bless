@@ -244,7 +244,7 @@ class Business(BaseModel):
             'id': self.id,
             'name': self.name,
             'display_name': self.display_name,
-            'status': self.status.value,
+            'status': self.status.value if self.status else None,
             'email': self.email,
             'phone': self.phone,
             'address': self.address,
@@ -262,12 +262,13 @@ class Business(BaseModel):
             'user_count': len(self.active_users),
             'tenant': self.tenant.username if self.tenant else None
         }
-        
+
         if include_related:
             data['shops'] = [shop.serialize() for shop in self.active_shops]
             data['users'] = [user.serialize() for user in self.active_users]
-        
+
         return data
+
 
     def before_save(self):
         """Ensure display name defaults to name"""
