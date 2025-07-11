@@ -712,7 +712,8 @@ def get_fast_moving_products(business_id):
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
     
     return db.session.query(
-        Product,
+        Product.id.label('product_id'),
+        Product.name.label('product_name'),
         func.sum(CartItem.quantity).label('total_sold')
     ).join(
         CartItem, CartItem.product_id == Product.id
