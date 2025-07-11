@@ -724,7 +724,8 @@ def get_fast_moving_products(business_id):
         Sale.is_deleted == False,
         Product.is_deleted == False
     ).group_by(
-        Product.id
+        Product.id,
+        Product.name
     ).order_by(
         func.sum(CartItem.quantity).desc()
     ).limit(5).all()
@@ -755,7 +756,8 @@ def get_slow_moving_products(business_id):
         Sale.is_deleted == False,
         Product.is_deleted == False
     ).group_by(
-        Product.id
+        Product.id,
+        Product.name
     ).order_by(
         func.sum(CartItem.quantity).asc()
     ).limit(5).all()
@@ -803,7 +805,8 @@ def get_top_performing_staff(business_id, shop_ids):
         Sale.is_deleted == False,
         User.is_deleted == False
     ).group_by(
-        User.id
+        User.id,
+        User.username
     ).order_by(
         func.sum(Sale.total).desc()
     ).limit(5).all()
@@ -828,7 +831,8 @@ def get_sales_by_staff(business_id, shop_ids):
         Sale.is_deleted == False,
         User.is_deleted == False
     ).group_by(
-        User.id
+        User.id,
+        User.username
     ).all()
 
 def get_staff_attendance_metrics(business_id):
