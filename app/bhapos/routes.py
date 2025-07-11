@@ -795,7 +795,8 @@ def get_top_performing_staff(business_id, shop_ids):
 
     return db.session.query(
         User.id.label('user_id'),
-        User.username,
+        User.username.label('username'),
+        User.role.label('role'),  # this is fine for enums
         func.count(Sale.id).label('sale_count'),
         func.sum(Sale.total).label('total_sales'),
         func.sum(Sale.profit).label('total_profit'),
@@ -812,10 +813,13 @@ def get_top_performing_staff(business_id, shop_ids):
         User.is_deleted == False
     ).group_by(
         User.id,
-        User.username
+        User.username,
+        User.role 
     ).order_by(
         func.sum(Sale.total).desc()
     ).limit(5).all()
+
+
 
 def get_sales_by_staff(business_id, shop_ids):
     """Get summarized sales performance per staff member"""
@@ -941,25 +945,35 @@ def get_sales_by_shop(business_id, shop_ids):
     """Get sales distribution by shop"""
     if not shop_ids:
         return []
-    
+
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
 
     return db.session.query(
-        Shop.id,
-        Shop.name,
+        Shop,
         func.sum(Sale.total).label('total_sales'),
         func.sum(Sale.profit).label('total_profit'),
-        (func.sum(Sale.profit) / func.nullif(func.sum(Sale.total), 0) * 100).label('profit_margin'),
+        (func.sum(Sale.profit) / func.nullif(func.sum(Sale.total), 0) * 100).label('profit_margin')
     ).join(
         Sale, Sale.shop_id == Shop.id
     ).filter(
         Shop.id.in_(shop_ids),
+        Shop.business_id == business_id,
+        Shop.is_deleted == False,
         Sale.created_at >= thirty_days_ago,
         Sale.is_deleted == False
     ).group_by(
         Shop.id,
-        Shop.name
+        Shop.name,
+        Shop.logo_url,
+        Shop.location,
+        Shop.is_deleted,
+        Shop.phone,
+        Shop.currency,
+        Shop.business_id,
+        Shop.created_at,
+        Shop.updated_at,
     ).all()
+
 
 
 

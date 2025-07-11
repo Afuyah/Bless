@@ -325,17 +325,18 @@
           </div>
         </div>
         <div class="mt-6">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Fast Moving Products</h3>
-          <div class="space-y-3">
-            {% for product in inventory_insights.fast_moving[:3] %}
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-900 dark:text-white truncate">{{ product.Product.name }}</span>
-              <span class="text-sm font-medium text-blue-600 dark:text-blue-400">{{ product.total_sold|number_format }} sold</span>
+         <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Fast Moving Products</h3>
+            <div class="space-y-3">
+              {% for product in inventory_insights.fast_moving[:3] %}
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-900 dark:text-white truncate">{{ product.product_name }}</span>
+                <span class="text-sm font-medium text-blue-600 dark:text-blue-400">{{ product.total_sold|number_format }} sold</span>
+              </div>
+              {% else %}
+              <p class="text-sm text-gray-500 dark:text-gray-400">No data available</p>
+              {% endfor %}
             </div>
-            {% else %}
-            <p class="text-sm text-gray-500 dark:text-gray-400">No data available</p>
-            {% endfor %}
-          </div>
+
         </div>
       </div>
 
@@ -346,13 +347,14 @@
               <div class="space-y-4">
                 {% for staff in staff_performance.top_performers %}
                 <div class="flex items-center space-x-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <img class="h-10 w-10 rounded-full" src="{{ staff.User.avatar_url or url_for('static', filename='images/default-avatar.png') }}" alt="{{ staff.User.username }}">
+                 
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {{ staff.User.username }}
+                      {{ staff.username }}
+
                     </p>
                     <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                      {{ staff.User.role.name|title }}
+                      {{ staff.role.name|title }}
                     </p>
                   </div>
                   <div class="text-right">
