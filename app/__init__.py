@@ -228,21 +228,32 @@ def create_app(config_class=Config):
 
     @app.context_processor
     def inject_globals():
+        from sqlalchemy.exc import SQLAlchemyError
         shops = []
         business = None
 
-        if current_user.is_authenticated:
-            if current_user.is_tenant():
-                shops = Shop.query.filter_by(business_id=current_user.business_id, is_deleted=False).all()
-                business = current_user.business  # assuming FK/relationship exists
-            elif current_user.is_admin() and current_user.shop:
-                shops = [current_user.shop]
-                business = current_user.shop.business  # again, assuming relationship exists
+        try:
+            if current_user.is_authenticated:
+                if current_user.is_tenant():
+                    shops = Shop.query.filter_by(
+                        business_id=current_user.business_id,
+                        is_deleted=False
+                    ).all()
+                    business = current_user.business
+                elif current_user.is_admin() and current_user.shop:
+                    shops = [current_user.shop]
+                    business = current_user.shop.business
+        except SQLAlchemyError as e:
+            db.session.rollback()  # ✅ this is crucial
+            shops = []
+            business = None
+            current_app.logger.error(f"inject_globals failed: {e}", exc_info=True)
 
         return {
             'shops': shops,
             'business': business
         }
+
 
 
     @app.context_processor
