@@ -1,6 +1,7 @@
 import logging
 from flask import Flask, render_template, request, g, abort, session
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import SQLAlchemyError
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
 from flask_socketio import SocketIO
