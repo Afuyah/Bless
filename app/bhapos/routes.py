@@ -948,23 +948,29 @@ def get_shop_profit_margins(business_id, shop_ids):
     """Get profit margins by shop"""
     if not shop_ids:
         return []
-    
+
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    
+
     return db.session.query(
+        Shop.id,
         Shop.name,
-        (func.sum(Sale.profit) / func.nullif(func.sum(Sale.total), 0) * 100).label('profit_margin'),
+        (func.sum(Sale.profit) / func.nullif(func.sum(Sale.total), 0) * 100).label('profit_margin')
     ).join(
         Sale, Sale.shop_id == Shop.id
+    ).join(
+        Business, Shop.business_id == Business.id  # 🔧 Ensure this join is present
     ).filter(
         Shop.id.in_(shop_ids),
+        Business.id == business_id,
         Sale.created_at >= thirty_days_ago,
         Sale.is_deleted == False
     ).group_by(
+        Shop.id,
         Shop.name
     ).order_by(
         func.sum(Sale.profit).desc()
     ).all()
+
 
 def get_shop_conversion_rates(business_id, shop_ids):
     """Get conversion rates by shop (placeholder - implement your business logic)"""
