@@ -256,8 +256,8 @@ class Business(BaseModel):
             'logo_url': self.logo_url,
             'is_approved': self.is_approved,
             'approved_at': self.approved_at.isoformat() if self.approved_at else None,
-            'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat(),
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'shop_count': len(self.active_shops),
             'user_count': len(self.active_users),
             'tenant': self.tenant.username if self.tenant else None
@@ -268,6 +268,7 @@ class Business(BaseModel):
             data['users'] = [user.serialize() for user in self.active_users]
 
         return data
+
 
 
     def before_save(self):
