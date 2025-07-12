@@ -228,6 +228,7 @@
 
         <!-- Content Area -->
             <main class="flex-1 overflow-hidden relative bg-white">
+
             <div class="h-full pl-[3rem] group-hover:pl-[16rem] transition-all duration-300">
             <!-- Register Closed State -->
             <div id="register-closed-state" class="h-full flex flex-col items-center justify-center text-center p-6">
@@ -245,65 +246,62 @@
 
 
 
-            <!-- POS Interface (Hidden by default) -->
-            <div id="pos-interface" class="h-full hidden flex flex-col lg:flex-row overflow-hidden">
-                <!-- Product Catalog (Left Panel) -->
-                <div class="flex-1 flex flex-col border-r border-gray-100 bg-white overflow-hidden">
-                    <!-- Search and Categories -->
-                    <div class="p-4 border-b border-gray-100 bg-white/95 backdrop-blur-sm sticky top-0 z-10">
-                        <div class="flex flex-col space-y-3">
-                            <!-- Search Bar -->
-                            <div class="relative">
-                                <input type="text" id="product-search" placeholder="Search products..."
-                                    class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm text-gray-700 placeholder-gray-400"
-                                    style="background-color: #fafafa;">
-                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                            </div>
+           <!-- POS Interface (Hidden by default) -->
+<div id="pos-interface" class="h-full hidden flex flex-col lg:flex-row overflow-hidden">
 
-                            <!-- Category Tabs -->
-                            <div class="flex overflow-x-auto pb-1 scrollbar-hide" id="category-tabs">
-                                <!-- Dynamically loaded -->
-                            </div>
-                        </div>
-                    </div>
-
-
-
-
-
-                    <!-- Product Grid -->
-                    <div class="flex-1 overflow-y-auto p-4 relative">
-                        <!-- Loading State -->
-                        <div id="loading-overlay-products"
-                            class="hidden absolute inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center z-10">
-                            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mb-4"></div>
-                            <p class="text-gray-600 font-medium">Loading Inventory</p>
-                        </div>
-
-                        <!-- Product Grid -->
-                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
-                            id="product-grid">
-                            <!-- Products will be loaded here -->
-                        </div>
-
-                        <!-- Empty State -->
-                        <div id="products-empty-state" class="hidden text-center py-12">
-                            <div
-                                class="bg-gray-100 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-inner border border-gray-200">
-                                <i class="fas fa-box-open text-2xl text-gray-400"></i>
-                            </div>
-                            <h4 class="text-gray-500 font-medium mb-1">No products available</h4>
-                            <p class="text-gray-400 text-sm max-w-md mx-auto">Add products to your inventory or check your filters</p>
-                        </div>
-                    </div>
+    
+    <!-- Product Catalog (Left Panel) -->
+    <div class="flex-1 flex flex-col border-r border-gray-100 bg-white overflow-hidden">
+        <!-- Search and Categories -->
+        <div class="p-4 border-b border-gray-100 bg-white/95 backdrop-blur-sm sticky top-0 z-10">
+            <div class="flex flex-col space-y-3">
+                <!-- Search Bar -->
+                <div class="relative">
+                    <input type="text" id="product-search" placeholder="Search products..."
+                        class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm text-gray-700 placeholder-gray-400"
+                        style="background-color: #fafafa;">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                 </div>
 
+                <!-- Category Tabs -->
+                <div class="flex overflow-x-auto pb-1 scrollbar-hide" id="category-tabs">
+                    <!-- Dynamically loaded -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="flex-1 overflow-y-auto p-4 relative">
+            <!-- Loading State -->
+            <div id="loading-overlay-products"
+                class="hidden absolute inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center z-10">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mb-4"></div>
+                <p class="text-gray-600 font-medium">Loading Inventory</p>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"
+                id="product-grid">
+                <!-- Products will be loaded here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="products-empty-state" class="hidden text-center py-12">
+                <div
+                    class="bg-gray-100 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-inner border border-gray-200">
+                    <i class="fas fa-box-open text-2xl text-gray-400"></i>
+                </div>
+                <h4 class="text-gray-500 font-medium mb-1">No products available</h4>
+                <p class="text-gray-400 text-sm max-w-md mx-auto">Add products to your inventory or check your filters</p>
+            </div>
+        </div>
+    </div>
 
 
-
- <div id="cart-container"
-     class="w-full lg:w-[26rem] flex flex-col border-t lg:border-t-0 border-gray-100 bg-white shadow-2xl z-20 fixed lg:relative bottom-0 left-0 right-0 mx-auto max-w-[100vw] transform translate-y-full lg:translate-y-0 transition-transform duration-300 ease-in-out rounded-t-2xl lg:rounded-none overflow-hidden"
-     style="max-height: 88vh;">
+ <!-- Cart Container -->
+    <div id="cart-container"
+        class="w-full lg:w-[26rem] flex flex-col border-t lg:border-t-0 border-gray-100 bg-white shadow-2xl z-20 fixed lg:relative bottom-0 left-0 right-0 mx-auto max-w-[100vw] transform translate-y-full lg:translate-y-0 transition-transform duration-300 ease-in-out rounded-t-2xl lg:rounded-none overflow-hidden"
+        style="max-height: 88vh;">
     
     <!-- Header -->
     <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-3 text-white flex justify-between items-center shadow-sm">
