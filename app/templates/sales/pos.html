@@ -229,7 +229,7 @@
         <!-- Content Area -->
             <main class="flex-1 overflow-hidden relative bg-white">
 
-            <div class="h-full pl-[3rem] group-hover:pl-[16rem] transition-all duration-300">
+            <div class="h-full pl-[2.6rem] group-hover:pl-[12rem] transition-all duration-300">
             <!-- Register Closed State -->
             <div id="register-closed-state" class="h-full flex flex-col items-center justify-center text-center p-6">
                 <div class="w-28 h-28 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center mb-6 shadow-inner border border-amber-200">
@@ -249,7 +249,7 @@
            <!-- POS Interface (Hidden by default) -->
 <div id="pos-interface" class="h-full hidden flex flex-col lg:flex-row overflow-hidden">
 
-    
+
     <!-- Product Catalog (Left Panel) -->
     <div class="flex-1 flex flex-col border-r border-gray-100 bg-white overflow-hidden">
         <!-- Search and Categories -->
@@ -1073,13 +1073,16 @@ async function loadUserData() {
     }
 }
 
+// ====================
+// Load Cart (Background Sync)
+// ====================
 async function loadCart() {
     try {
-        const response = await axios.get(`${API_BASE_URL}/cart/items`);
-        state.cart = response.data.cart || [];
+        const res = await axios.get(`${API_BASE_URL}/cart/items`);
+        state.cart = res.data.cart || [];
         updateCartUI();
     } catch (error) {
-        throw new Error('Failed to load cart');
+        console.warn('Cart sync failed:', error);
     }
 }
 
@@ -1375,143 +1378,199 @@ function filterProductsByCategory(categoryId) {
 }
 
 // ====================
-// Cart Management
+// Cart Actions
 // ====================
 async function addToCart(productId) {
-    // Check if already processing this product
     if (state.pendingCartUpdates.has(productId)) return;
     state.pendingCartUpdates.add(productId);
 
-    try {
-        const product = state.products.find(p => p.id === productId);
-        if (!product) return;
+    const product = state.products.find(p => p.id === productId);
+    if (!product) return;
 
-        // Optimistic update - add to local cart immediately
-        const existingItem = state.cart.find(item => item.product_id === productId);
-        
-        if (existingItem) {
-            existingItem.quantity += 1;
+    try {
+        // Optimistic local update
+        let item = state.cart.find(i => i.product_id === productId);
+        if (item) {
+            item.quantity += 1;
         } else {
             state.cart.push({
-            product_id: productId,
-            name: product.name,
-            price: product.price,
-            discount: product.discount || 0,
-            image_url: product.image_url,
-            quantity: 1,
-            is_combo: product.is_combo || false,
-            combination_size: product.combination_size || 0,
-            combination_price: product.combination_price || null
-        });
-
+                product_id: productId,
+                name: product.name,
+                price: product.price,
+                discount: product.discount || 0,
+                image_url: product.image_url,
+                quantity: 1,
+                is_combo: product.is_combo || false,
+                combination_size: product.combination_size || 0,
+                combination_price: product.combination_price || null
+            });
         }
 
-        // Update UI immediately
         updateCartUI();
 
-        // Sync with server in background
+        // Sync server in background
         await axios.post(`${API_BASE_URL}/cart?action=add`, {
             product_id: productId,
             quantity: 1
         });
 
-        // Refresh cart silently to ensure consistency
-        const response = await axios.get(`${API_BASE_URL}/cart/items`);
-        state.cart = response.data.cart || [];
-        updateCartUI();
-
         showNotification(`${product.name} added to cart`, 'success');
-    } catch (error) {
-        // Revert optimistic update on error
-        const existingItem = state.cart.find(item => item.product_id === productId);
-        if (existingItem) {
-            if (existingItem.quantity > 1) {
-                existingItem.quantity -= 1;
-            } else {
-                state.cart = state.cart.filter(item => item.product_id !== productId);
-            }
+    } catch (err) {
+        // Revert optimistic update
+        const item = state.cart.find(i => i.product_id === productId);
+        if (item) {
+            if (item.quantity > 1) item.quantity -= 1;
+            else state.cart = state.cart.filter(i => i.product_id !== productId);
         }
         updateCartUI();
-        handleError('Failed to add item to cart', error);
+        handleError('Failed to add to cart', err);
     } finally {
         state.pendingCartUpdates.delete(productId);
+        updateCartUI(); // Reset button states
     }
 }
 
+
+async function updateCartItemQuantity(productId, delta) {
+    if (state.pendingCartUpdates.has(productId)) return;
+    state.pendingCartUpdates.add(productId);
+
+    const item = state.cart.find(i => i.product_id === productId);
+    if (!item) return;
+
+    const newQty = item.quantity + delta;
+    if (newQty < 1) return;
+
+    try {
+        item.quantity = newQty;
+        updateCartUI();
+
+        await axios.post(`${API_BASE_URL}/cart?action=update`, {
+            product_id: productId,
+            quantity: newQty
+        });
+
+    } catch (err) {
+        item.quantity -= delta;
+        updateCartUI();
+        handleError('Failed to update quantity', err);
+    } finally {
+        state.pendingCartUpdates.delete(productId);
+        updateCartUI();
+    }
+}
+
+
+async function removeFromCart(productId) {
+    if (state.pendingCartUpdates.has(productId)) return;
+    state.pendingCartUpdates.add(productId);
+
+    try {
+        state.cart = state.cart.filter(i => i.product_id !== productId);
+        updateCartUI();
+
+        await axios.post(`${API_BASE_URL}/cart?action=remove`, {
+            product_id: productId
+        });
+
+        showNotification('Item removed', 'success');
+    } catch (err) {
+        handleError('Failed to remove item', err);
+        // Optionally reload cart:
+        await syncCartFromServer();
+    } finally {
+        state.pendingCartUpdates.delete(productId);
+        updateCartUI();
+    }
+}
+
+
+async function clearCart() {
+    if (!state.cart.length) return;
+    if (!confirm('Are you sure you want to clear the cart?')) return;
+
+    try {
+        showLoading('Clearing cart');
+        await axios.post(`${API_BASE_URL}/cart?action=clear`);
+        state.cart = [];
+        updateCartUI();
+        showNotification('Cart cleared', 'success');
+    } catch (err) {
+        handleError('Failed to clear cart', err);
+    } finally {
+        hideLoading();
+    }
+}
+
+
 function updateCartUI() {
-    // Calculate totals
     const subtotal = state.cart.reduce((sum, item) => sum + calculateComboSubtotal(item), 0);
-    const tax = subtotal * 0;
+    const tax = 0; // Adjust if tax is dynamic
     const total = subtotal + tax;
 
-    // Update UI
     elements.subtotalEl.textContent = formatCurrency(subtotal);
     elements.taxEl.textContent = formatCurrency(tax);
     elements.totalEl.textContent = formatCurrency(total);
     document.getElementById('complete-sale-amount').textContent = formatCurrency(total);
 
-    // Enable/disable complete sale button
     elements.completeSaleBtn.disabled = state.cart.length === 0;
 
-    // Handle empty cart
     if (state.cart.length === 0) {
         elements.emptyCart.classList.remove('hidden');
         elements.cartItems.innerHTML = `
-                <div class="text-center py-8 text-gray-500">
-                    <i class="fas fa-shopping-cart fa-2x mb-2"></i>
-                    <p>Your cart is empty</p>
-                </div>`;
-        return;
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                <p>Your cart is empty</p>
+            </div>`;
+    } else {
+        elements.emptyCart.classList.add('hidden');
+        renderCartItems();
     }
-
-    elements.emptyCart.classList.add('hidden');
-    renderCartItems();
 }
+
+
+
+
+
 
 function renderCartItems() {
     elements.cartItems.innerHTML = state.cart.map(item => {
         const isPending = state.pendingCartUpdates.has(item.product_id);
+        const loadingClass = isPending ? 'opacity-50 pointer-events-none' : '';
         const hasImage = !!item.image_url;
 
         return `
-        <div class="cart-item bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-3 flex items-start justify-between transition-all ${isPending ? 'opacity-60' : ''}" data-id="${item.product_id}">
-            
+        <div class="cart-item ${loadingClass} bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-3 flex items-start justify-between transition-all" data-id="${item.product_id}">
             <div class="flex items-start gap-4 w-full">
 
-                <!-- Image or fallback -->
                 ${hasImage ? `
-                <div class="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden border border-gray-100 shadow-sm">
-                    <img src="${item.image_url}" alt="${item.name}" class="object-contain w-full h-full mix-blend-multiply" />
-                </div>` : `
-                <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 font-semibold text-sm uppercase shadow-sm">
-                    ${item.name.slice(0, 2)}
-                </div>`}
+                    <div class="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden border border-gray-100">
+                        <img src="${item.image_url}" alt="${item.name}" class="object-contain w-full h-full mix-blend-multiply" />
+                    </div>` : `
+                    <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 font-semibold text-sm uppercase shadow-sm">
+                        ${item.name.slice(0, 2)}
+                    </div>`}
 
-                <!-- Product details -->
                 <div class="flex-1">
                     <div class="flex justify-between items-start">
-                        <div class="text-sm font-medium text-gray-800 leading-snug">${item.name}</div>
+                        <div class="text-sm font-medium text-gray-800">${item.name}</div>
                         <button class="remove-item text-gray-400 hover:text-danger-500 transition-all ml-2 btn-press" ${isPending ? 'disabled' : ''}>
                             <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-times'} text-xs"></i>
                         </button>
                     </div>
 
-                    <!-- Price and discounts -->
-                    <div class="mt-1 flex flex-wrap gap-1 items-center text-xs text-gray-500 font-normal">
+                    <div class="mt-1 flex flex-wrap gap-1 items-center text-xs text-gray-500">
                         <span>${formatCurrency(item.price)} each</span>
-
                         ${item.discount > 0 ? `
                         <span class="bg-green-50 text-green-700 font-semibold px-1.5 py-0.5 rounded-full">
                             ${item.discount}% off
                         </span>` : ''}
-                        
                         ${item.is_combo && item.combination_size > 1 ? `
-                        <span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-semibold">
+                        <span class="bg-amber-100 text-amber-700 font-semibold px-1.5 py-0.5 rounded-full">
                             ${item.combination_size} for ${formatCurrency(item.combination_price)}
                         </span>` : ''}
                     </div>
 
-                    <!-- Quantity controls -->
                     <div class="mt-2 flex items-center gap-2">
                         <button class="decrease-quantity w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 transition-all btn-press" ${isPending ? 'disabled' : ''}>
                             <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-minus'} text-xs"></i>
@@ -1523,7 +1582,6 @@ function renderCartItems() {
                     </div>
                 </div>
 
-                <!-- Total and savings -->
                 <div class="ml-auto text-right min-w-[80px]">
                     <div class="text-sm font-semibold text-primary-600">${formatCurrency(calculateComboSubtotal(item))}</div>
                     ${item.discount > 0 ? `
@@ -1531,174 +1589,88 @@ function renderCartItems() {
                         Saved ${formatCurrency(item.price * item.quantity * item.discount / 100)}
                     </div>` : ''}
                 </div>
-
             </div>
         </div>`;
     }).join('');
 
-    // Reattach listeners
-    document.querySelectorAll('.decrease-quantity:not([disabled])').forEach(button => {
-        button.addEventListener('click', e => {
-            e.stopPropagation();
-            const productId = parseInt(button.closest('.cart-item').dataset.id);
-            updateCartItemQuantity(productId, -1);
-        });
-    });
-
-    document.querySelectorAll('.increase-quantity:not([disabled])').forEach(button => {
-        button.addEventListener('click', e => {
-            e.stopPropagation();
-            const productId = parseInt(button.closest('.cart-item').dataset.id);
+    // Attach listeners for all enabled buttons
+    document.querySelectorAll('.increase-quantity:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', e => {
+            const productId = parseInt(btn.closest('.cart-item').dataset.id);
             updateCartItemQuantity(productId, 1);
-        });
-    });
+        })
+    );
 
-    document.querySelectorAll('.remove-item:not([disabled])').forEach(button => {
-        button.addEventListener('click', e => {
-            e.stopPropagation();
-            const productId = parseInt(button.closest('.cart-item').dataset.id);
+    document.querySelectorAll('.decrease-quantity:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', e => {
+            const productId = parseInt(btn.closest('.cart-item').dataset.id);
+            updateCartItemQuantity(productId, -1);
+        })
+    );
+
+    document.querySelectorAll('.remove-item:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', e => {
+            const productId = parseInt(btn.closest('.cart-item').dataset.id);
             removeFromCart(productId);
-        });
-    });
+        })
+    );
 }
 
 
 
 
-async function updateCartItemQuantity(productId, delta) {
-    // Check if already processing this product
-    if (state.pendingCartUpdates.has(productId)) return;
-    state.pendingCartUpdates.add(productId);
-
-    try {
-        const currentItem = state.cart.find(item => item.product_id === productId);
-        if (!currentItem) return;
-
-        const newQuantity = currentItem.quantity + delta;
-        if (newQuantity < 1) return;
-
-        // Optimistic update
-        currentItem.quantity = newQuantity;
-        updateCartUI();
-
-        // Sync with server
-        await axios.post(`${API_BASE_URL}/cart?action=update`, {
-            product_id: productId,
-            quantity: newQuantity
-        });
-
-        // Refresh cart silently to ensure consistency
-        const response = await axios.get(`${API_BASE_URL}/cart/items`);
-        state.cart = response.data.cart || [];
-        updateCartUI();
-    } catch (error) {
-        // Revert optimistic update on error
-        const currentItem = state.cart.find(item => item.product_id === productId);
-        if (currentItem) {
-            currentItem.quantity -= delta;
-            updateCartUI();
-        }
-        handleError('Failed to update quantity', error);
-    } finally {
-        state.pendingCartUpdates.delete(productId);
-    }
-}
-
-async function removeFromCart(productId) {
-    // Check if already processing this product
-    if (state.pendingCartUpdates.has(productId)) return;
-    state.pendingCartUpdates.add(productId);
-
-    try {
-        // Optimistic update
-        state.cart = state.cart.filter(item => item.product_id !== productId);
-        updateCartUI();
-
-        // Sync with server
-        await axios.post(`${API_BASE_URL}/cart?action=remove`, {
-            product_id: productId
-        });
-
-        // Refresh cart silently to ensure consistency
-        const response = await axios.get(`${API_BASE_URL}/cart/items`);
-        state.cart = response.data.cart || [];
-        updateCartUI();
-
-        showNotification('Item removed from cart', 'success');
-    } catch (error) {
-        // Revert optimistic update on error
-        const response = await axios.get(`${API_BASE_URL}/cart/items`);
-        state.cart = response.data.cart || [];
-        updateCartUI();
-        handleError('Failed to remove item', error);
-    } finally {
-        state.pendingCartUpdates.delete(productId);
-    }
-}
-
-async function clearCart() {
-    if (state.cart.length === 0) return;
-
-    // Confirm before clearing
-    const confirmation = confirm('Are you sure you want to clear the cart?');
-    if (!confirmation) return;
-
-    try {
-        showLoading('Clearing cart');
-
-        await axios.post(`${API_BASE_URL}/cart?action=clear`);
-        state.cart = [];
-        updateCartUI();
-
-        showNotification('Cart cleared', 'success');
-    } catch (error) {
-        handleError('Failed to clear cart', error);
-    } finally {
-        hideLoading();
-    }
-}
 
 // ====================
-// Checkout Process
+// Sale Completion
 // ====================
 async function completeSale() {
-    if (state.cart.length === 0) {
-        showNotification('Please add items to cart before completing sale', 'error');
+    if (!state.cart.length) {
+        showNotification('Cart is empty', 'error');
         return;
     }
 
     try {
         showLoading('Processing sale', 'Generating receipt...');
 
-        const customerName = elements.customerNameInput.value;
-
-        const cart_items = state.cart.map(item => ({
-            product_id: item.product_id,
-            quantity: item.quantity
+        const cart_items = state.cart.map(i => ({
+            product_id: i.product_id,
+            quantity: i.quantity
         }));
 
-        const response = await axios.post(`${API_BASE_URL}/transactions`, {
+        const res = await axios.post(`${API_BASE_URL}/transactions`, {
             cart_items,
             payment_method: state.selectedPaymentMethod,
-            customer_name: customerName
+            customer_name: elements.customerNameInput.value || ''
         });
 
-        showNotification('Sale completed successfully!', 'success');
+        const receipt = await axios.get(`${API_BASE_URL}/receipts?sale_id=${res.data.sale_id}`);
+        handleReceipt(receipt.data);
 
-        // Generate receipt
-        const receiptResponse = await axios.get(`${API_BASE_URL}/receipts?sale_id=${response.data.sale_id}`);
-        handleReceipt(receiptResponse.data);
-
-        // Reset cart
         state.cart = [];
         updateCartUI();
         elements.customerNameInput.value = '';
-    } catch (error) {
-        handleError('Failed to complete sale', error);
+        showNotification('Sale completed!', 'success');
+    } catch (err) {
+        handleError('Failed to complete sale', err);
     } finally {
         hideLoading();
     }
 }
+
+
+// ====================
+// Optional Background Sync
+// ====================
+async function syncCartFromServer() {
+    try {
+        const res = await axios.get(`${API_BASE_URL}/cart/items`);
+        state.cart = res.data.cart || [];
+        updateCartUI();
+    } catch (err) {
+        console.warn('Cart sync failed', err);
+    }
+}
+
 
 function handleReceipt(receiptData) {
     if (!receiptData || typeof receiptData !== 'object') {
