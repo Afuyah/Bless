@@ -43,18 +43,9 @@ class ProductRepository:
         shop_id: int, 
         query: str, 
         category_id: Optional[int] = None,
-        in_stock_only: bool = True
+        in_stock_only: bool = True,
+        limit: Optional[int] = None
     ) -> List[Product]:
-        """
-        Search available products by name, barcode or SKU
-        Args:
-            shop_id: ID of the shop
-            query: Search term
-            category_id: Optional category filter
-            in_stock_only: Whether to only return in-stock items
-        Returns:
-            List of matching Product objects
-        """
         base_filters = [
             Category.shop_id == shop_id,
             Product.is_active == True,
@@ -65,17 +56,25 @@ class ProductRepository:
                 Product.sku.ilike(f'%{query}%')
             )
         ]
-        
+
         if in_stock_only:
             base_filters.append(Product.stock > 0)
-            
+
+        # Apply filters and ordering first
         search_query = db.session.query(Product).join(Category).filter(
-            and_(*base_filters))
-        
+            and_(*base_filters)
+        ).order_by(Product.name)
+
         if category_id:
             search_query = search_query.filter(Product.category_id == category_id)
-            
-        return search_query.order_by(Product.name).all()
+
+        # Only apply limit after order_by
+        if limit:
+            search_query = search_query.limit(limit)
+
+        return search_query.all()
+
+
 
     @staticmethod
     def get_featured_products(shop_id: int, limit: int = 12) -> List[Product]:

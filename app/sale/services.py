@@ -400,15 +400,16 @@ class ReceiptService:
 
 class ProductService:
     @staticmethod
-    def search(shop_id: int, query: str, category_id: Optional[int] = None) -> List[Dict]:
+    def search(shop_id: int, query: str, category_id: Optional[int] = None, limit: Optional[int] = None) -> List[Dict]:
         """
-        Search products with comprehensive error handling and result formatting
+        Search products with optional limit, error handling, and result formatting.
         """
         try:
             results = ProductRepository.search_available(
                 shop_id=shop_id,
                 query=query,
-                category_id=category_id
+                category_id=category_id,
+                limit=limit  # 👈 pass to repository layer
             )
 
             return [{
@@ -423,13 +424,11 @@ class ProductService:
                 'is_combo': bool(p.combination_size and p.combination_size > 1),
                 'combination_price': float(p.combination_price) if p.combination_price and p.combination_size and p.combination_size > 1 else None,
                 'combination_size': p.combination_size if p.combination_size and p.combination_size > 1 else None,
-
             } for p in results]
 
         except Exception as e:
             logger.error(f"Product search failed for shop {shop_id}: {str(e)}")
             return []
-
 
     @staticmethod
     def get_available_for_sale(shop_id: int) -> List[Dict]:

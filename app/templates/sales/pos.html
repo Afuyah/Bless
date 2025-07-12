@@ -56,7 +56,17 @@
                         </div>
                         <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Open</span>
                     </button>
+
+                    <!-- Inline spinner (initially hidden) -->
+                    <div id="register-status-spinner" class="hidden">
+                        <i class="fas fa-spinner fa-spin text-primary-500 text-sm ml-2"></i>
+                    </div>
+
+
                 </li>
+
+
+
                 <li>
                     <button id="sales-summary-btn"
                         class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start hidden"
@@ -668,7 +678,8 @@ const elements = {
     salesSummaryBtn: document.getElementById('sales-summary-btn'),
     openRegisterBtn: document.getElementById('open-register-btn'),
     openRegisterMainBtn: document.getElementById('open-register-main-btn'),
-    closeRegisterBtn: document.getElementById('close-register-btn')
+    closeRegisterBtn: document.getElementById('close-register-btn'),
+    registerStatusSpinner: document.getElementById('register-status-spinner'),
 };
 
 // ====================
@@ -811,43 +822,52 @@ function calculateComboSubtotal(item) {
 
 
 // ====================
-// Register Management
+// Optimized Register Management 
 // ====================
 async function checkRegisterStatus() {
+    // Show minimal loading in the UI part only (not global block)
+    elements.registerStatusSpinner.classList.remove('hidden'); // e.g. small inline spinner
+
     try {
-        showLoading('Checking register status...');
-        const res = await axios.get(`${API_BASE_URL}/register/info`);
+        const res = await axios.get(`${API_BASE_URL}/register/info?t=${Date.now()}`);
         const data = res.data;
 
-        if (data.is_open) {
-            state.currentRegisterSession = data;
-            updateRegisterUI(true);
+        const isOpen = data.is_open === true;
+
+        state.currentRegisterSession = isOpen ? data : null;
+        state.lastRegisterSession = !isOpen && data.last_session ? data.last_session : null;
+
+        updateRegisterUI(isOpen);
+
+        if (isOpen) {
             elements.registerClosedState.classList.add('hidden');
             elements.posInterface.classList.remove('hidden');
             elements.salesSummaryBtn.classList.remove('hidden');
-            
-            // Initialize POS without blocking UI
-            initPOS().catch(err => {
-                console.error('Background initialization error:', err);
+
+            // Turbo initialize POS immediately — don't block UI
+            requestIdleCallback(() => {
+                initPOS().catch(err => {
+                    console.error('Background POS init error:', err);
+                });
             });
+
         } else {
-            state.currentRegisterSession = null;
-            updateRegisterUI(false);
             elements.registerClosedState.classList.remove('hidden');
             elements.posInterface.classList.add('hidden');
             elements.salesSummaryBtn.classList.add('hidden');
-
-            if (data.last_session) {
-                state.lastRegisterSession = data.last_session;
-                updateLastSessionInfo();
-            }
+            updateLastSessionInfo();
         }
+
     } catch (err) {
-        handleError('Failed to check register status', err);
+        console.error('Register check failed:', err);
+        showNotification('Failed to check register status', 'error');
     } finally {
-        hideLoading();
+        elements.registerStatusSpinner.classList.add('hidden');
     }
 }
+
+
+
 
 function updateRegisterUI(isOpen) {
     const dot = elements.statusDot;
@@ -997,19 +1017,20 @@ async function submitCloseRegister() {
     }
 }
 
+
 // ====================
-// POS Initialization (Turbo Mode)
+// POS Initialization 
 // ====================
 async function initPOS() {
     try {
-        // Show instant loading state (non-blocking)
+        // Show instant loading state 
         requestAnimationFrame(() => showLoading('POS Starting', 'Preparing system...'));
         
         // Fire critical requests immediately (no await)
         const shopPromise = loadShopData();
         const productsPromise = loadProducts();
         
-        // Show skeleton UI immediately (before any data loads)
+        // Show skeleton UI immediately 
         showProductSkeletons(12); // Optimistic number
         
         // Wait only for critical data (shop + products)
@@ -1041,7 +1062,7 @@ async function initPOS() {
 }
 
 // ====================
-// Turbo Data Loading
+// Data Loading
 // ====================
 async function loadShopData() {
     try {
@@ -1111,7 +1132,8 @@ function loadCategories() {
 }
 
 function loadCart() {
-    return axios.get(`${API_BASE_URL}/cart/quickload`)
+    return axios.get(`${API_BASE_URL}/cart/items`)
+
         .then(res => {
             state.cart = res.data?.items || [];
             updateCartUI();
@@ -2142,36 +2164,101 @@ function setupPaymentMethods() {
 // Product Search
 // ====================
 function setupProductSearch() {
-    let searchTimeout;
+    let debounceTimer;
+    const searchInput = elements.productSearch;
 
-    elements.productSearch.addEventListener('input', () => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            const query = elements.productSearch.value.trim();
+    if (!searchInput) return;
 
-            if (query.length === 0) {
-                loadProducts();
-                return;
+    searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+
+        debounceTimer = setTimeout(async () => {
+            const query = searchInput.value.trim();
+            const categoryId = elements.categoryFilter?.value || null;
+
+            if (!query) {
+                return loadProducts(); // Load full list on empty query
             }
 
-            searchProducts(query);
-        }, 300);
+            try {
+                // Show skeleton only if we're *about to search*
+                showSearchSkeleton();
+
+                const response = await axios.post(`${API_BASE_URL}/products/search`, {
+                    query,
+                    category_id: categoryId
+                }, {
+                    timeout: 3000
+                });
+
+                const products = response.data || [];
+
+                state.products = products;
+
+                if (products.length > 0) {
+                    renderProducts(products);
+                } else {
+                    showNotification('No matching products found.', 'info');
+                    clearProductGrid(); // Optional: show empty state
+                }
+
+            } catch (err) {
+                console.warn('Search failed, using fallback:', err);
+                showNotification('Search failed. Using fallback.', 'warning');
+                fallbackSearch(query, categoryId);
+            } finally {
+                hideSearchSkeleton();
+            }
+
+        }, 250); // debounce
     });
 }
 
-async function searchProducts(query) {
-    try {
-        showLoading('Searching products');
 
-        const response = await axios.post(`${API_BASE_URL}/products/search`, { query });
-        state.products = response.data;
-        renderProducts();
-    } catch (error) {
-        handleError('Search failed', error);
-    } finally {
-        hideLoading();
-    }
+function clearProductGrid() {
+    elements.productGrid.innerHTML = `
+        <div class="text-center text-gray-500 py-8 col-span-full">
+            <i class="fas fa-box-open text-3xl mb-2"></i>
+            <p>No products found.</p>
+        </div>
+    `;
 }
+
+
+
+function showSearchSkeleton(count = 8) {
+    const html = Array(count).fill(`
+        <div class="animate-pulse p-4 bg-white rounded shadow-sm">
+            <div class="h-24 bg-gray-200 rounded mb-2"></div>
+            <div class="h-4 bg-gray-300 w-3/4 mb-1"></div>
+            <div class="h-4 bg-gray-300 w-1/2"></div>
+        </div>
+    `).join('');
+    elements.productGrid.innerHTML = html;
+}
+
+function hideSearchSkeleton() {
+    // nothing to do; renderProducts will overwrite
+}
+
+function fallbackSearch(query, categoryId) {
+    const q = query.toLowerCase();
+    const results = state.products.filter(p => {
+        const matchName = p.name?.toLowerCase().includes(q);
+        const matchBarcode = p.barcode?.includes(query);
+        const matchSKU = p.sku?.includes(query);
+        const matchCategory = !categoryId || p.category_id == categoryId;
+
+        return (matchName || matchBarcode || matchSKU) && matchCategory;
+    });
+
+    renderProducts(results);
+}
+
+
+
+
+
 
 // ====================
 // Mobile Responsiveness

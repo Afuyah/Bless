@@ -62,20 +62,29 @@ class ProductSearchAPIController(MethodView):
 
     @role_required(Role.CASHIER, Role.ADMIN, Role.TENANT)
     def post(self, shop_id):
-        """API: Search products"""
         try:
             data = ProductSearchSchema().load(request.json)
+
+            query = (data['query'] or '').strip()[:100]
+            category_id = data.get('category_id')
+
+            if not query:
+                return jsonify([])
+
             results = ProductService.search(
                 shop_id=shop_id,
-                query=data['query'],
-                category_id=data.get('category_id')
+                query=query,
+                category_id=category_id,
+                limit=50
             )
             return jsonify(results)
-        except ValidationError as e:
-            return jsonify({'error': e.messages}), 400
+
+        except ValidationError as ve:
+            return jsonify({'error': 'Invalid input', 'details': ve.messages}), 400
         except Exception as e:
-            logger.error(f"Product search failed: {str(e)}", exc_info=True)
-            return jsonify({'error': 'Product search failed'}), 500
+            logger.exception("Product search error")
+            return jsonify({'error': 'Search failed'}), 500
+
 
 
 class CategoryAPIController(MethodView):

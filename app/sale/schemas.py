@@ -62,7 +62,7 @@ class ProductSearchSchema(Schema):
         metadata={"description": "Optional category filter"}
     )
     in_stock_only = fields.Boolean(
-        load_default=True,  # Changed from 'missing' to 'load_default'
+        load_default=True, 
         metadata={"description": "Only show products in stock"}
     )
 
