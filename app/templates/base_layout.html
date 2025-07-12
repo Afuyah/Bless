@@ -266,40 +266,36 @@
     bottom: 0;
 }
 
-
-/* Centered Quick Add Button */
+/* Quick Add FAB */
 .quick-add-btn {
-    transform: translate(-50%, -50%) scale(0.9);
-    opacity: 0;
-    transition: 
-        opacity 0.2s ease,
-        transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative; /* Reset any absolute positioning */
+    margin: 0 auto; /* Horizontal centering */
+    display: flex; /* For vertical centering */
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     border: 2px solid rgba(255, 255, 255, 0.3);
+    z-index: 10;
 }
 
 .pos-card:hover .quick-add-btn {
-    transform: translate(-50%, -50%) scale(1);
     opacity: 1;
+    transform: scale(1.05);
 }
 
 .quick-add-btn:hover {
-    transform: translate(-50%, -50%) scale(1.1) !important;
+    transform: scale(1.15) !important;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Combination Deal Styling */
-.bg-amber-50 {
-    background-color: rgba(253, 230, 138, 0.3);
-    border-color: rgba(252, 211, 77, 0.5);
-}
-
-/* Responsive Adjustments */
+/* Mobile Responsiveness */
 @media (max-width: 640px) {
     .quick-add-btn {
-        width: 8.5vw;
-        height: 8.5vw;
-        font-size: 3.5vw;
+        width: 9vw;
+        height: 9vw;
+        min-width: 32px;
+        min-height: 32px;
     }
 }
 /* Stock Indicator */

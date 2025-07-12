@@ -1071,47 +1071,40 @@ function renderProducts() {
         const isCombo = combination_size && combination_price;
         const comboPricePerUnit = combination_price / combination_size;
 
-        return `
+         return `
         <div class="pos-card bg-white rounded-lg border border-gray-100 shadow-xs hover:shadow-md transition-all duration-150 
                     hover:border-primary-300 group overflow-hidden flex flex-col h-full"
-             data-id="${id}" 
-             data-stock="${stock}"
-             data-category="${category || 'uncategorized'}"
-             data-barcode="${barcode || ''}"
-             style="view-transition-name: product-${id}">
+             data-id="${id}">
             
-            <!-- Image/Initials Container (40% of card height) -->
+            <!-- Image/Initials Container -->
             <div class="relative pt-[40%] bg-gray-50 flex items-center justify-center overflow-hidden">
                 ${hasImage ? `
                     <img src="${image_url}" 
                          alt="${name}" 
-                         class="absolute inset-0 w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-105" 
-                         loading="lazy"
-                         decoding="async" />
+                         class="absolute inset-0 w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-105" />
                 ` : `
                     <div class="absolute inset-0 flex flex-col items-center justify-center p-2 bg-gradient-to-br from-gray-50 to-gray-100">
                         <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold mb-1">
                             ${initials}
                         </div>
-                        <span class="text-xs text-gray-500 text-center px-1 line-clamp-2">${name}</span>
                     </div>
                 `}
 
-                <!-- Centered Quick Action Button -->
-                <button class="quick-add-btn absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                              bg-primary-500 text-white rounded-full w-10 h-10 flex items-center justify-center 
-                              shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200
-                              hover:bg-primary-600 active:scale-95 z-10"
-                        ${isOutOfStock ? 'disabled' : ''}
-                        aria-label="Add ${name} to cart">
-                    <i class="fas fa-plus text-sm"></i>
-                </button>
+                <!-- PERFECTLY CENTERED ADD BUTTON -->
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <button class="quick-add-btn bg-primary-500 text-white rounded-full w-10 h-10 flex items-center justify-center 
+                                  shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200
+                                  hover:bg-primary-600 active:scale-95 transform hover:scale-110"
+                            ${isOutOfStock ? 'disabled' : ''}
+                            aria-label="Add ${name} to cart">
+                        <i class="fas fa-plus text-sm"></i>
+                    </button>
+                </div>
 
                 <!-- Stock Indicator Bar -->
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 overflow-hidden">
                     <div class="h-full ${stock <= 3 ? 'bg-red-400' : stock <= 10 ? 'bg-yellow-400' : 'bg-green-400'}" 
-                         style="width: ${stockPercentage}%"
-                         aria-hidden="true"></div>
+                         style="width: ${stockPercentage}%"></div>
                 </div>
             </div>
 
