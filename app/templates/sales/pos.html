@@ -998,92 +998,169 @@ async function submitCloseRegister() {
 }
 
 // ====================
-// POS Initialization
+// POS Initialization (Turbo Mode)
 // ====================
 async function initPOS() {
     try {
-        // Show brief loading state
-        showLoading('Initializing System', 'Loading products...');
+        // Show instant loading state (non-blocking)
+        requestAnimationFrame(() => showLoading('POS Starting', 'Preparing system...'));
         
-        // Load critical data first
-        await Promise.all([
-            loadShopData(),
-            loadUserData()
-        ]);
+        // Fire critical requests immediately (no await)
+        const shopPromise = loadShopData();
+        const productsPromise = loadProducts();
         
-        // Then load products and categories
-        await Promise.all([
-            loadProducts(),
-            loadCategories()
-        ]);
+        // Show skeleton UI immediately (before any data loads)
+        showProductSkeletons(12); // Optimistic number
         
-        // Finally load cart (but don't wait for it)
-        loadCart().catch(console.error);
+        // Wait only for critical data (shop + products)
+        await Promise.all([shopPromise, productsPromise]);
+        
+        // Start non-critical loads in background
+        const nonCriticalLoads = Promise.allSettled([
+            loadCategories(),
+            loadCart()
+        ]).then(results => {
+            results.forEach((result, i) => {
+                if (result.status === 'rejected') {
+                    console.warn(`Background load ${i} failed:`, result.reason);
+                }
+            });
+        });
+        
+        // Optional: Prefetch likely next resources
+        if ('connection' in navigator && !navigator.connection.saveData) {
+            prefetchResources();
+        }
         
     } catch (error) {
-        handleError('Failed to initialize POS', error);
+        handleCriticalError(error);
     } finally {
-        hideLoading();
+        // Hide loading with slight delay to prevent flicker
+        setTimeout(hideLoading, 150);
     }
 }
 
 // ====================
-// Data Loading
+// Turbo Data Loading
 // ====================
 async function loadShopData() {
     try {
-        const response = await axios.get(`${API_BASE_URL}/shop-info`);
-        state.shopInfo = response.data;
-        document.getElementById('shop-name').textContent = state.shopInfo.name;
-        document.title = `${state.shopInfo.name} - POS System`;
+        // Cache busting for critical shop data
+        const res = await axios.get(`${API_BASE_URL}/shop-info?t=${Date.now()}`, {
+            timeout: 3000,
+            headers: { 'X-Critical-Request': 'true' }
+        });
+        
+        // Minimal DOM updates
+        state.shopInfo = res.data;
+        const shopNameEl = document.getElementById('shop-name');
+        if (shopNameEl) shopNameEl.textContent = state.shopInfo.name.substring(0, 24);
+        
     } catch (error) {
-        throw new Error('Failed to load shop data');
+        console.error('Shop load failed:', error);
+        // Fallback to localStorage if available
+        state.shopInfo = JSON.parse(localStorage.getItem('lastShopInfo')) || { name: 'Our Store' };
+        throw error;
     }
 }
 
 async function loadProducts() {
     try {
-        const response = await axios.get(`${API_BASE_URL}/products`);
-        state.products = response.data;
-        renderProducts();
-    } catch (error) {
-        throw new Error('Failed to load products');
-    }
-}
-
-async function loadCategories() {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/categories`);
-        state.categories = response.data;
-        renderCategories();
-    } catch (error) {
-        throw new Error('Failed to load categories');
-    }
-}
-
-async function loadUserData() {
-    try {
-        const response = await axios.get('/auth/api/auth/current-user');
-        const name = response?.data?.name;
-        if (name) {
-            document.getElementById('current-user').textContent = `Cashier: ${name}`;
+        // Try cache-first with network fallback
+        const cacheKey = 'products-v1';
+        const cached = localStorage.getItem(cacheKey);
+        
+        if (cached) {
+            state.products = JSON.parse(cached);
+            renderProducts();
         }
+        
+        // Always fetch fresh in background
+        const freshLoad = axios.get(`${API_BASE_URL}/products?limit=500`, {
+            timeout: 5000,
+            headers: { 'X-Request-Type': 'product-list' }
+        }).then(response => {
+            state.products = response.data;
+            localStorage.setItem(cacheKey, JSON.stringify(response.data));
+            renderProducts();
+        }).catch(console.warn);
+        
+        // Only wait if no cache
+        if (!cached) await freshLoad;
+        
     } catch (error) {
-        console.error('Failed to load user data:', error);
+        console.error('Products load failed:', error);
+        elements.productGrid.innerHTML = errorFallbackUI();
+        throw error;
     }
 }
 
 // ====================
-// Load Cart (Background Sync)
+// Background Loaders
 // ====================
-async function loadCart() {
-    try {
-        const res = await axios.get(`${API_BASE_URL}/cart/items`);
-        state.cart = res.data.cart || [];
-        updateCartUI();
-    } catch (error) {
-        console.warn('Cart sync failed:', error);
-    }
+function loadCategories() {
+    return axios.get(`${API_BASE_URL}/categories?minimal=true`)
+        .then(res => {
+            state.categories = res.data;
+            renderCategories();
+        })
+        .catch(err => {
+            console.warn('Categories failed:', err);
+            state.categories = [];
+        });
+}
+
+function loadCart() {
+    return axios.get(`${API_BASE_URL}/cart/quickload`)
+        .then(res => {
+            state.cart = res.data?.items || [];
+            updateCartUI();
+        })
+        .catch(err => {
+            console.warn('Cart sync failed:', err);
+            state.cart = [];
+        });
+}
+
+// ====================
+// Performance Helpers
+// ====================
+function prefetchResources() {
+    // Prefetch likely next requests
+    const prefetchUrls = [
+        `${API_BASE_URL}/customers/recent`,
+        `${API_BASE_URL}/payment-methods`
+    ];
+    
+    prefetchUrls.forEach(url => {
+        fetch(url, { 
+            method: 'HEAD',
+            credentials: 'include',
+            priority: 'low'
+        }).catch(() => {});
+    });
+}
+
+function showProductSkeletons(count = 8) {
+    // Ultra-fast template cloning
+    const template = document.createElement('template');
+    template.innerHTML = `
+        <div class="skeleton-item">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-line w-3/4"></div>
+            <div class="skeleton-line w-1/2"></div>
+        </div>`.repeat(count);
+    
+    elements.productGrid.replaceChildren(template.content.cloneNode(true));
+}
+
+function errorFallbackUI() {
+    return `
+    <div class="error-fallback">
+        <svg class="warning-icon">...</svg>
+        <p>Products unavailable</p>
+        <button onclick="initPOS()">Retry</button>
+    </div>`;
 }
 
 function renderProducts() {
