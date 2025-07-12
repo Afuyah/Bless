@@ -1377,9 +1377,17 @@ function filterProductsByCategory(categoryId) {
     state.products = originalProducts;
 }
 
+
+
+
 // ====================
-// Cart Actions
+// Cart State Management
 // ====================
+
+/**
+ * Adds a product to the cart with optimistic UI updates
+ * @param {number} productId - ID of product to add
+ */
 async function addToCart(productId) {
     if (state.pendingCartUpdates.has(productId)) return;
     state.pendingCartUpdates.add(productId);
@@ -1408,7 +1416,7 @@ async function addToCart(productId) {
 
         updateCartUI();
 
-        // Sync server in background
+        // Sync with server
         await axios.post(`${API_BASE_URL}/cart?action=add`, {
             product_id: productId,
             quantity: 1
@@ -1416,21 +1424,24 @@ async function addToCart(productId) {
 
         showNotification(`${product.name} added to cart`, 'success');
     } catch (err) {
-        // Revert optimistic update
+        // Revert on error
         const item = state.cart.find(i => i.product_id === productId);
         if (item) {
             if (item.quantity > 1) item.quantity -= 1;
             else state.cart = state.cart.filter(i => i.product_id !== productId);
         }
-        updateCartUI();
         handleError('Failed to add to cart', err);
     } finally {
         state.pendingCartUpdates.delete(productId);
-        updateCartUI(); // Reset button states
+        updateCartUI();
     }
 }
 
-
+/**
+ * Updates item quantity in cart
+ * @param {number} productId - ID of product to update
+ * @param {number} delta - Quantity change (+1 or -1)
+ */
 async function updateCartItemQuantity(productId, delta) {
     if (state.pendingCartUpdates.has(productId)) return;
     state.pendingCartUpdates.add(productId);
@@ -1442,6 +1453,7 @@ async function updateCartItemQuantity(productId, delta) {
     if (newQty < 1) return;
 
     try {
+        // Optimistic update
         item.quantity = newQty;
         updateCartUI();
 
@@ -1451,6 +1463,7 @@ async function updateCartItemQuantity(productId, delta) {
         });
 
     } catch (err) {
+        // Revert on error
         item.quantity -= delta;
         updateCartUI();
         handleError('Failed to update quantity', err);
@@ -1460,7 +1473,10 @@ async function updateCartItemQuantity(productId, delta) {
     }
 }
 
-
+/**
+ * Removes item from cart
+ * @param {number} productId - ID of product to remove
+ */
 async function removeFromCart(productId) {
     if (state.pendingCartUpdates.has(productId)) return;
     state.pendingCartUpdates.add(productId);
@@ -1476,15 +1492,16 @@ async function removeFromCart(productId) {
         showNotification('Item removed', 'success');
     } catch (err) {
         handleError('Failed to remove item', err);
-        // Optionally reload cart:
-        await syncCartFromServer();
+        await syncCartFromServer(); // Fallback sync
     } finally {
         state.pendingCartUpdates.delete(productId);
         updateCartUI();
     }
 }
 
-
+/**
+ * Clears entire cart after confirmation
+ */
 async function clearCart() {
     if (!state.cart.length) return;
     if (!confirm('Are you sure you want to clear the cart?')) return;
@@ -1502,123 +1519,173 @@ async function clearCart() {
     }
 }
 
+// ====================
+// Cart UI Rendering
+// ====================
 
+/**
+ * Updates all cart UI elements (totals, buttons, etc.)
+ */
 function updateCartUI() {
     const subtotal = state.cart.reduce((sum, item) => sum + calculateComboSubtotal(item), 0);
     const tax = 0; // Adjust if tax is dynamic
     const total = subtotal + tax;
 
+    // Update summary elements
     elements.subtotalEl.textContent = formatCurrency(subtotal);
     elements.taxEl.textContent = formatCurrency(tax);
     elements.totalEl.textContent = formatCurrency(total);
     document.getElementById('complete-sale-amount').textContent = formatCurrency(total);
 
+    // Toggle checkout button state
     elements.completeSaleBtn.disabled = state.cart.length === 0;
 
+    // Render appropriate cart state
     if (state.cart.length === 0) {
-        elements.emptyCart.classList.remove('hidden');
-        elements.cartItems.innerHTML = `
-            <div class="text-center py-8 text-gray-500">
-                <i class="fas fa-shopping-cart fa-2x mb-2"></i>
-                <p>Your cart is empty</p>
-            </div>`;
+        showEmptyCartState();
     } else {
-        elements.emptyCart.classList.add('hidden');
         renderCartItems();
     }
 }
 
-
-
-
-
-
-function renderCartItems() {
-    elements.cartItems.innerHTML = state.cart.map(item => {
-        const isPending = state.pendingCartUpdates.has(item.product_id);
-        const loadingClass = isPending ? 'opacity-50 pointer-events-none' : '';
-        const hasImage = !!item.image_url;
-
-        return `
-        <div class="cart-item ${loadingClass} bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-3 flex items-start justify-between transition-all" data-id="${item.product_id}">
-            <div class="flex items-start gap-4 w-full">
-
-                ${hasImage ? `
-                    <div class="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden border border-gray-100">
-                        <img src="${item.image_url}" alt="${item.name}" class="object-contain w-full h-full mix-blend-multiply" />
-                    </div>` : `
-                    <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 font-semibold text-sm uppercase shadow-sm">
-                        ${item.name.slice(0, 2)}
-                    </div>`}
-
-                <div class="flex-1">
-                    <div class="flex justify-between items-start">
-                        <div class="text-sm font-medium text-gray-800">${item.name}</div>
-                        <button class="remove-item text-gray-400 hover:text-danger-500 transition-all ml-2 btn-press" ${isPending ? 'disabled' : ''}>
-                            <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-times'} text-xs"></i>
-                        </button>
-                    </div>
-
-                    <div class="mt-1 flex flex-wrap gap-1 items-center text-xs text-gray-500">
-                        <span>${formatCurrency(item.price)} each</span>
-                        ${item.discount > 0 ? `
-                        <span class="bg-green-50 text-green-700 font-semibold px-1.5 py-0.5 rounded-full">
-                            ${item.discount}% off
-                        </span>` : ''}
-                        ${item.is_combo && item.combination_size > 1 ? `
-                        <span class="bg-amber-100 text-amber-700 font-semibold px-1.5 py-0.5 rounded-full">
-                            ${item.combination_size} for ${formatCurrency(item.combination_price)}
-                        </span>` : ''}
-                    </div>
-
-                    <div class="mt-2 flex items-center gap-2">
-                        <button class="decrease-quantity w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 transition-all btn-press" ${isPending ? 'disabled' : ''}>
-                            <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-minus'} text-xs"></i>
-                        </button>
-                        <span class="text-sm font-semibold text-gray-800 w-6 text-center">${item.quantity}</span>
-                        <button class="increase-quantity w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 transition-all btn-press" ${isPending ? 'disabled' : ''}>
-                            <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-plus'} text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="ml-auto text-right min-w-[80px]">
-                    <div class="text-sm font-semibold text-primary-600">${formatCurrency(calculateComboSubtotal(item))}</div>
-                    ${item.discount > 0 ? `
-                    <div class="text-xs text-success-600 font-medium mt-1">
-                        Saved ${formatCurrency(item.price * item.quantity * item.discount / 100)}
-                    </div>` : ''}
-                </div>
-            </div>
+/**
+ * Renders empty cart state
+ */
+function showEmptyCartState() {
+    elements.emptyCart.classList.remove('hidden');
+    elements.cartItems.innerHTML = `
+        <div class="text-center py-8 text-gray-500">
+            <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+            <p>Your cart is empty</p>
         </div>`;
-    }).join('');
-
-    // Attach listeners for all enabled buttons
-    document.querySelectorAll('.increase-quantity:not([disabled])').forEach(btn =>
-        btn.addEventListener('click', e => {
-            const productId = parseInt(btn.closest('.cart-item').dataset.id);
-            updateCartItemQuantity(productId, 1);
-        })
-    );
-
-    document.querySelectorAll('.decrease-quantity:not([disabled])').forEach(btn =>
-        btn.addEventListener('click', e => {
-            const productId = parseInt(btn.closest('.cart-item').dataset.id);
-            updateCartItemQuantity(productId, -1);
-        })
-    );
-
-    document.querySelectorAll('.remove-item:not([disabled])').forEach(btn =>
-        btn.addEventListener('click', e => {
-            const productId = parseInt(btn.closest('.cart-item').dataset.id);
-            removeFromCart(productId);
-        })
-    );
 }
 
+/**
+ * Renders all cart items with interactive controls
+ */
+function renderCartItems() {
+    elements.emptyCart.classList.add('hidden');
+    
+    elements.cartItems.innerHTML = state.cart.map(item => {
+        const isPending = state.pendingCartUpdates.has(item.product_id);
+        return generateCartItemHTML(item, isPending);
+    }).join('');
 
+    attachCartItemEventListeners();
+}
 
+/**
+ * Generates HTML for a single cart item
+ */
+function generateCartItemHTML(item, isPending) {
+    const loadingClass = isPending ? 'opacity-50 pointer-events-none' : '';
+    const hasImage = !!item.image_url;
 
+    return `
+    <div class="cart-item ${loadingClass} bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-3 flex items-start justify-between transition-all" data-id="${item.product_id}">
+        <div class="flex items-start gap-4 w-full">
+            ${hasImage ? generateItemImage(item) : generateItemInitials(item)}
+            
+            <div class="flex-1">
+                ${generateItemHeader(item, isPending)}
+                ${generateItemDetails(item)}
+                ${generateQuantityControls(item, isPending)}
+            </div>
+
+            ${generateItemPricing(item)}
+        </div>
+    </div>`;
+}
+
+// Helper generators (extracted for readability)
+function generateItemImage(item) {
+    return `
+    <div class="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden border border-gray-100">
+        <img src="${item.image_url}" alt="${item.name}" class="object-contain w-full h-full mix-blend-multiply" />
+    </div>`;
+}
+
+function generateItemInitials(item) {
+    return `
+    <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 font-semibold text-sm uppercase shadow-sm">
+        ${item.name.slice(0, 2)}
+    </div>`;
+}
+
+function generateItemHeader(item, isPending) {
+    return `
+    <div class="flex justify-between items-start">
+        <div class="text-sm font-medium text-gray-800">${item.name}</div>
+        <button class="remove-item text-gray-400 hover:text-danger-500 transition-all ml-2 btn-press" ${isPending ? 'disabled' : ''}>
+            <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-times'} text-xs"></i>
+        </button>
+    </div>`;
+}
+
+function generateItemDetails(item) {
+    return `
+    <div class="mt-1 flex flex-wrap gap-1 items-center text-xs text-gray-500">
+        <span>${formatCurrency(item.price)} each</span>
+        ${item.discount > 0 ? `
+        <span class="bg-green-50 text-green-700 font-semibold px-1.5 py-0.5 rounded-full">
+            ${item.discount}% off
+        </span>` : ''}
+        ${item.is_combo && item.combination_size > 1 ? `
+        <span class="bg-amber-100 text-amber-700 font-semibold px-1.5 py-0.5 rounded-full">
+            ${item.combination_size} for ${formatCurrency(item.combination_price)}
+        </span>` : ''}
+    </div>`;
+}
+
+function generateQuantityControls(item, isPending) {
+    return `
+    <div class="mt-2 flex items-center gap-2">
+        <button class="decrease-quantity w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 transition-all btn-press" ${isPending ? 'disabled' : ''}>
+            <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-minus'} text-xs"></i>
+        </button>
+        <span class="text-sm font-semibold text-gray-800 w-6 text-center">${item.quantity}</span>
+        <button class="increase-quantity w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 transition-all btn-press" ${isPending ? 'disabled' : ''}>
+            <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-plus'} text-xs"></i>
+        </button>
+    </div>`;
+}
+
+function generateItemPricing(item) {
+    return `
+    <div class="ml-auto text-right min-w-[80px]">
+        <div class="text-sm font-semibold text-primary-600">${formatCurrency(calculateComboSubtotal(item))}</div>
+        ${item.discount > 0 ? `
+        <div class="text-xs text-success-600 font-medium mt-1">
+            Saved ${formatCurrency(item.price * item.quantity * item.discount / 100)}
+        </div>` : ''}
+    </div>`;
+}
+
+/**
+ * Attaches event listeners to cart item controls
+ */
+function attachCartItemEventListeners() {
+    document.querySelectorAll('.increase-quantity:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const productId = parseInt(btn.closest('.cart-item').dataset.id);
+            updateCartItemQuantity(productId, 1);
+        });
+    });
+
+    document.querySelectorAll('.decrease-quantity:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const productId = parseInt(btn.closest('.cart-item').dataset.id);
+            updateCartItemQuantity(productId, -1);
+        });
+    });
+
+    document.querySelectorAll('.remove-item:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const productId = parseInt(btn.closest('.cart-item').dataset.id);
+            removeFromCart(productId);
+        });
+    });
+}
 
 // ====================
 // Sale Completion
