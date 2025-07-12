@@ -706,40 +706,40 @@ class Sale(BaseModel, ShopScopedMixin):
 
 class CartItem(BaseModel, ShopScopedMixin):
     __tablename__ = 'cart_items'
-
-    product_id = db.Column(Integer, db.ForeignKey('products.id'), nullable=False, index=True)
+    
+    product_id = db.Column(Integer, db.ForeignKey('products.id'), nullable=False)
     quantity = db.Column(Integer, nullable=False)
-    sale_id = db.Column(Integer, db.ForeignKey('sales.id'), nullable=False, index=True)
-    total_price = db.Column(db.Float, nullable=True)
-    unit_price = db.Column(db.Float, nullable=True)
+    sale_id = db.Column(Integer, db.ForeignKey('sales.id'), nullable=False)
+    total_price = db.Column(db.Float, nullable=True) 
+    unit_price = db.Column(db.Float, nullable=True)     
+     
 
-    # Relationships
-    product = relationship('Product', back_populates='sale_items', lazy='select')
+    product = relationship('Product', back_populates='sale_items', lazy='select')  
     sale = relationship('Sale', back_populates='cart_items')
 
     __table_args__ = (
-        db.Index('ix_cartitem_product_sale', 'product_id', 'sale_id'),
-        db.Index('ix_cartitem_sale_product', 'sale_id', 'product_id'),
-        db.Index('ix_cartitem_shop_product', 'shop_id', 'product_id'),
-        db.Index('ix_cartitem_shop_sale', 'shop_id', 'sale_id'),
+        db.Index('ix_product_sale', 'product_id', 'sale_id'),
     )
+
 
     @validates('quantity')
     def validate_quantity(self, key, value):
+        """Ensure the quantity is greater than zero."""
         if value <= 0:
             raise ValueError("Quantity must be greater than zero.")
         return value
 
+    
     def __repr__(self):
         return f'<CartItem product_id={self.product_id}, quantity={self.quantity}>'
 
     def serialize(self):
+        """Serialize the cart item for API response."""
         return {
             'product_name': self.product.name if self.product else 'Unknown Product',
             'quantity': self.quantity,
-            'total_price': str(self.total_price),
+            'total_price': str(self.total_price),  # Convert to string for JSON serialization
         }
-
 
 
 class Product(BaseModel, ShopScopedMixin):
