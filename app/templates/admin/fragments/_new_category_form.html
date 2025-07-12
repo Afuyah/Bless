@@ -11,9 +11,9 @@
   </div>
 
   <!-- Form -->
-  {% for shop in shops %}
+
   <form 
-    hx-post="{{ url_for('inventory.create_category',shop_id=shop.id) }}" 
+    hx-post="{{ url_for('inventory.create_category',shop_id=current_shop.id) }}" 
     hx-target="#main-content" 
     hx-swap="innerHTML"
     class="space-y-5"
@@ -43,7 +43,7 @@
     <div class="flex items-center justify-between mt-6">
       <button 
         type="button" 
-        hx-get="{{ url_for('inventory.categories', shop_id=shop.id) }}" 
+        hx-get="{{ url_for('inventory.categories', shop_id=current_shop.id) }}" 
         hx-target="#main-content" 
         hx-swap="innerHTML"
         class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition"
@@ -65,5 +65,5 @@
       </button>
     </div>
   </form>
-  {% endfor %}
+
 </div>

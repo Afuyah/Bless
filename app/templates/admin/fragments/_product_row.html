@@ -1,4 +1,4 @@
-{% for shop in shops %}
+
 <tr id="product-row-{{ product.id }}" class="hover:bg-gray-50 transition-colors duration-150">
     <td class="px-6 py-4 whitespace-nowrap">
         <div class="flex items-center">
@@ -34,12 +34,12 @@
     </td>
     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <div class="flex space-x-2 justify-end">
-            <button hx-get="{{ url_for('stock.update_stock_modal', product_id=product.id, shop_id=shop.id) }}"
+            <button hx-get="{{ url_for('stock.update_stock_modal', product_id=product.id, shop_id=current_shop.id) }}"
                     hx-target="body"
                     class="px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
                 Stock
             </button>
-            <button hx-get="{{ url_for('stock.get_price_update_modal', product_id=product.id, shop_id=shop.id) }}"
+            <button hx-get="{{ url_for('stock.get_price_update_modal', product_id=product.id, shop_id=current_shop.id) }}"
                     hx-target="body"
                     class="px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 Prices
@@ -47,4 +47,3 @@
         </div>
     </td>
 </tr>
-{% endfor %}

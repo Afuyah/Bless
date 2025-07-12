@@ -15,11 +15,11 @@
       </span>
     </div>
   </div>
-{% for shop in shops %}
+
   <!-- Form Section -->
   <form method="POST" 
-        action="{{ url_for('inventory.adjust_stock', product_id=product.id, shop_id=shop.id) }}"
-        hx-post="{{ url_for('inventory.adjust_stock', product_id=product.id, shop_id=shop.id) }}"
+        action="{{ url_for('inventory.adjust_stock', product_id=product.id, shop_id=current_shop.id) }}"
+        hx-post="{{ url_for('inventory.adjust_stock', product_id=product.id, shop_id=current_shop.id) }}"
         hx-target="#main-content"
         hx-swap="innerHTML"
         class="space-y-5">
@@ -83,7 +83,7 @@
     <!-- Form Actions -->
     <div class="flex justify-end space-x-3 pt-2">
       <button type="button"
-              hx-get="{{ url_for('inventory.products_fragment', shop_id=shop.id) }}"
+              hx-get="{{ url_for('inventory.products_fragment', shop_id=current_shop.id) }}"
               hx-target="#main-content"
               hx-swap="innerHTML"
               class="btn-secondary">

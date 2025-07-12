@@ -1,7 +1,7 @@
 <div id="product-inventory" class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden m-5">
   <!-- Header Section -->
   <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50 dark:bg-gray-800/50">
-    {% for shop in shops %}
+  
  <div class="flex items-center space-x-4">
       <div class="p-3 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -16,7 +16,7 @@
     
     <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
       <!-- Add Product Button -->
-      <button hx-get="{{ url_for('inventory.new_product_form_fragment',shop_id=shop.id) }}"
+      <button hx-get="{{ url_for('inventory.new_product_form_fragment',shop_id=current_shop.id) }}"
               hx-target="#main-content"
               hx-swap="innerHTML"
               class="flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors">
@@ -145,7 +145,7 @@
           <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end space-x-2">
               <!-- Update Stock Button -->
-              <button hx-get="{{ url_for('inventory.update_stock_form_fragment', product_id=product.id, shop_id=shop.id) }}"
+              <button hx-get="{{ url_for('inventory.update_stock_form_fragment', product_id=product.id, shop_id=current_shop.id) }}"
                       hx-target="#main-content"
                       hx-swap="innerHTML"
                       class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
@@ -157,7 +157,7 @@
               
               <!-- View Details Button -->
                 
-              <button  hx-get="{{ url_for('reports.product_report', product_id=product.id, shop_id=shop.id) }}"
+              <button  hx-get="{{ url_for('reports.product_report', product_id=product.id, shop_id=current_shop.id) }}"
                      hx-target="#main-content"
                      hx-swap="innerHTML"
                      class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md shadow-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
@@ -182,7 +182,7 @@
     <div>Page {{ pagination.page }} of {{ pagination.pages }}</div>
     <div class="flex space-x-2">
       {% if pagination.has_prev %}
-        <a hx-get="{{ url_for('inventory.products_fragment', page=pagination.prev_num, search=search_query, shop_id=shop.id) }}"
+        <a hx-get="{{ url_for('inventory.products_fragment', page=pagination.prev_num, search=search_query, shop_id=current_shop.id) }}"
            hx-target="#main-content"
            hx-swap="innerHTML"
            class="px-3 py-1 border rounded bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -190,7 +190,7 @@
         </a>
       {% endif %}
       {% if pagination.has_next %}
-        <a hx-get="{{ url_for('inventory.products_fragment', page=pagination.next_num, search=search_query, shop_id=shop.id) }}"
+        <a hx-get="{{ url_for('inventory.products_fragment', page=pagination.next_num, search=search_query, shop_id=current_shop.id) }}"
            hx-target="#main-content"
            hx-swap="innerHTML"
            class="px-3 py-1 border rounded bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -225,7 +225,7 @@
     </div>
   </div>
   {% endif %}
-{% endfor %}
+
 </div>
 
 <script>

@@ -1,5 +1,5 @@
 <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden m-5" id="price-management">
-{% for shop in shops %}
+
     <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50 dark:bg-gray-800/50">
 
     <div class="flex items-center space-x-4">
@@ -18,7 +18,7 @@
         <div class="relative flex-grow">
             <input type="text" id="productSearch" placeholder="Search products..." 
                    class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                   hx-get="{{ url_for('price.search_products', shop_id=shop.id) }}"
+                   hx-get="{{ url_for('price.search_products', shop_id=current_shop.id) }}"
                    hx-trigger="keyup changed delay:300ms"
                    hx-target="#priceTableBody"
                    hx-indicator=".search-indicator">
@@ -30,7 +30,7 @@
             </div>
         </div>
         <button id="resetSearch" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors dark:bg-gray-600 dark:hover:bg-gray-500"
-                hx-get="{{ url_for('price.price_rows_fragment', shop_id=shop.id) }}"
+                hx-get="{{ url_for('price.price_rows_fragment', shop_id=current_shop.id) }}"
                 hx-target="#priceTableBody"
                 hx-indicator=".search-indicator">
             Reset
@@ -92,4 +92,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
         
 </script>
-{% endfor %}

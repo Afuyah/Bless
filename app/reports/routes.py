@@ -166,23 +166,24 @@ def product_sales_table(shop_id, product_id):
             Sale.date.desc()
         )
 
-        paginated_sales = sales_query.paginate(page=page, per_page=per_page)
-        total_records = sales_query.count()
+        paginated_sales = sales_query.paginate(page=page, per_page=per_page, error_out=False)
+        total_records = paginated_sales.total
 
         sales_data = []
         for sale, quantity, total_price, unit_price in paginated_sales.items:
             sales_data.append({
-                'sale_date': sale.date,
+                'sale_date': sale.date.strftime('%Y-%m-%d %I:%M %p') if sale.date else '',
                 'invoice_id': sale.id,
                 'invoice_number': f"INV-{sale.id:05d}",
                 'quantity': quantity,
-                'unit_price': float(product.selling_price) if product else 0.0,
+                'unit_price': float(product.selling_price) if product and product.selling_price else 0.0,
                 'discount': 0.00,
                 'total_price': float(total_price),
                 'product_name': product.name if product else "N/A",
-                'payment_method': sale.payment_method,        # 👈 Add this
-                'customer_name': sale.customer_name or "-"    # 👈 Add this
+                'payment_method': sale.payment_method or "-",        
+                'customer_name': sale.customer_name or "-"
             })
+
 
 
 

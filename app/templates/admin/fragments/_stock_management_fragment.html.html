@@ -100,7 +100,7 @@
           <!-- Actions -->
           <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end space-x-2">
-              <button hx-get="{{ url_for('inventory.adjust_stock_fragment', product_id=product.id, shop_id=shop.id) }}"
+              <button hx-get="{{ url_for('inventory.adjust_stock_fragment', product_id=product.id, shop_id=current_shop.id) }}"
                       hx-target="#modals"
                       class="btn-action-secondary">
                 <i class="fas fa-edit mr-1"></i> Stock
@@ -123,7 +123,7 @@
         Add products to your inventory to get started.
       </p>
       <div class="mt-6">
-        <button hx-get="{{ url_for('inventory.new_product_fragment', shop_id=shop.id) }}"
+        <button hx-get="{{ url_for('inventory.new_product_fragment', shop_id=current_shop.id) }}"
                 hx-target="#modals"
                 class="btn-primary inline-flex items-center">
           <i class="fas fa-plus mr-2"></i>

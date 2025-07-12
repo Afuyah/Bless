@@ -25,6 +25,18 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
+from sqlalchemy import func, text
+
+def get_month_label_expr(date_column):
+    """Return a DB-compatible SQLAlchemy expression for 'YYYY-MM'."""
+    if 'sqlite' in str(db.engine.url):
+        return func.strftime('%Y-%m', date_column)
+    return func.to_char(date_column, text("'YYYY-MM'"))
+
+
+
+
 # Helper Functions
 def get_time_filter(time_period, date_column=Sale.date):
     """Create SQL filter for the given time period"""
@@ -270,7 +282,13 @@ from sqlalchemy import func, text, desc
 
 def get_analytics_months(product_id, limit=12):
     """Return the most recent N months where sales exist for a product."""
-    month_label = func.to_char(Sale.date, 'YYYY-MM').label('month')  # PostgreSQL compatible
+    # Determine if SQLite is being used
+    if 'sqlite' in str(db.engine.url):
+        # SQLite uses strftime
+        month_label = func.strftime('%Y-%m', Sale.date).label('month')
+    else:
+        # PostgreSQL uses to_char
+        month_label = func.to_char(Sale.date, text("'YYYY-MM'")).label('month')
 
     return [
         row[0]
@@ -288,21 +306,25 @@ def get_units_sold_by_month(product_id, months=None):
     if months is None:
         months = get_analytics_months(product_id)
 
+    month_expr = get_month_label_expr(Sale.date)
+
     results = []
     for month in months:
         total = db.session.query(
             func.sum(CartItem.quantity)
         ).join(Sale).filter(
             CartItem.product_id == product_id,
-            func.to_char(Sale.date, 'YYYY-MM') == month
+            month_expr == month
         ).scalar() or 0
         results.append(total)
 
     return results
 
+
 def get_revenue_by_month(product_id):
     """Get total revenue (quantity * unit price) per month for a product."""
     months = get_analytics_months(product_id)
+    month_expr = get_month_label_expr(Sale.date)
 
     return [
         float(
@@ -312,12 +334,13 @@ def get_revenue_by_month(product_id):
             .join(Sale)
             .filter(
                 CartItem.product_id == product_id,
-                func.to_char(Sale.date, 'YYYY-MM') == month
+                month_expr == month
             )
             .scalar() or 0
         )
         for month in months
     ]
+
 
 def get_price_history(product_id):
     """Returns historical selling prices for a product."""

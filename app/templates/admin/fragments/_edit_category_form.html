@@ -15,10 +15,10 @@
   </div>
 
   <!-- Form Section -->
-  {% for shop in shops %}
+  
   <form method="POST" 
-        action="{{ url_for('inventory.update_category', id=category.id, shop_id=shop.id) }}"
-        hx-post="{{ url_for('inventory.update_category', id=category.id, shop_id=shop.id) }}"
+        action="{{ url_for('inventory.update_category', id=category.id, shop_id=current_shop.id) }}"
+        hx-post="{{ url_for('inventory.update_category', id=category.id, shop_id=current_shop.id) }}"
         hx-target="#main-content"
         hx-swap="innerHTML"
         class="p-6 space-y-6">
@@ -44,7 +44,7 @@
     <!-- Form Actions -->
     <div class="flex justify-end space-x-3 pt-4">
       <button type="button"
-              hx-get="{{ url_for('inventory.categories', shop_id=shop.id) }}"
+              hx-get="{{ url_for('inventory.categories', shop_id=current_shop.id) }}"
               hx-target="#main-content"
               hx-swap="innerHTML"
               class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
@@ -59,5 +59,5 @@
       </button>
     </div>
   </form>
-  {% endfor %}
+
 </div>

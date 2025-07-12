@@ -1,6 +1,6 @@
 <div id="stock-logs-container" class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden m-5">
   <!-- Header with Filter Options -->
-  {% for shop in shops %}
+
   <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50 dark:bg-gray-800/50">
     <div class="flex items-center space-x-4">
       <div class="p-3 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
@@ -125,7 +125,7 @@
     
     <nav class="flex items-center gap-1">
       {% if logs.has_prev %}
-      <a hx-get="{{ url_for('inventory.stock_logs', page=logs.prev_num, shop_id=shop.id) }}"
+      <a hx-get="{{ url_for('inventory.stock_logs', page=logs.prev_num, shop_id=current_shop.id) }}"
          hx-target="#stock-logs-container" hx-swap="innerHTML"
          class="relative inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
         Previous
@@ -143,7 +143,7 @@
             {{ page_num }}
           </span>
           {% else %}
-          <a hx-get="{{ url_for('inventory.stock_logs', page=page_num, shop_id=shop.id) }}"
+          <a hx-get="{{ url_for('inventory.stock_logs', page=page_num, shop_id=current_shop.id) }}"
              hx-target="#stock-logs-container" hx-swap="innerHTML"
              class="relative inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
             {{ page_num }}
@@ -155,7 +155,7 @@
       {% endfor %}
 
       {% if logs.has_next %}
-      <a hx-get="{{ url_for('inventory.stock_logs', page=logs.next_num, shop_id=shop.id) }}"
+      <a hx-get="{{ url_for('inventory.stock_logs', page=logs.next_num, shop_id=current_shop.id) }}"
          hx-target="#stock-logs-container" hx-swap="innerHTML"
          class="relative inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
         Next
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (filter) {
     filter.addEventListener('change', function() {
       const type = this.value;
-      htmx.ajax('GET', `{{ url_for('inventory.stock_logs', shop_id=shop.id) }}?type=${type}`, {
+      htmx.ajax('GET', `{{ url_for('inventory.stock_logs', shop_id=current_shop.id) }}?type=${type}`, {
         target: '#stock-logs-container',
         swap: 'innerHTML'
       });
@@ -186,4 +186,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-  {% endfor %}

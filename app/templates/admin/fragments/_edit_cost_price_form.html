@@ -4,7 +4,7 @@
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Update Cost Price</h3>
         </div>
-        {% for shop in shops %}
+      
         <form hx-post="{{ url_for('price.update_cost_price', product_id=product.id, shop_id=shop.id) }}"
               hx-target="#product-row-{{ product.id }}"
               hx-swap="outerHTML"
@@ -38,4 +38,3 @@
         </form>
     </div>
 </div>
-{% endfor %}

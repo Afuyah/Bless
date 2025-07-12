@@ -1,10 +1,10 @@
 <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="selling-price-modal-{{ product.id }}">
-    {% for shop in shops %}
+  
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Update Selling Price</h3>
         </div>
-        <form hx-post="{{ url_for('price.update_selling_price', product_id=product.id, shop_id=shop.id) }}"
+        <form hx-post="{{ url_for('price.update_selling_price', product_id=product.id, shop_id=current_shop.id) }}"
               hx-target="#product-row-{{ product.id }}"
               hx-swap="outerHTML"
               _="on htmx:afterRequest
@@ -48,5 +48,5 @@
             </div>
         </form>
     </div>
-    {% endfor %}
+
 </div>

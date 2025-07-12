@@ -14,7 +14,7 @@
     </div>
     
     <button 
-      hx-get="{{ url_for('inventory.new_category_form_fragment', shop_id=shop.id) }}" 
+      hx-get="{{ url_for('inventory.new_category_form_fragment', shop_id=current_shop.id) }}" 
       hx-target="#main-content" 
       hx-swap="innerHTML"
       class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
@@ -60,13 +60,13 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               <button 
-                hx-get="{{ url_for('inventory.edit_category_fragment', id=category.id, shop_id=shop.id) }}"
+                hx-get="{{ url_for('inventory.edit_category_fragment', id=category.id, shop_id=current_shop.id) }}"
                 hx-target="#main-content"
                 class="text-primary-600 hover:text-primary-900 dark:hover:text-primary-400 mr-4 transition-colors">
                 Edit
               </button>
               <button 
-                hx-delete="{{ url_for('inventory.delete_category', id=category.id, shop_id=shop.id) }}"
+                hx-delete="{{ url_for('inventory.delete_category', id=category.id, shop_id=current_shop.id) }}"
                 hx-target="#category-fragment"
                 hx-confirm="Are you sure you want to delete this category?"
                 class="text-red-600 hover:text-red-900 dark:hover:text-red-400 transition-colors">
@@ -87,7 +87,7 @@
       <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new product category.</p>
       <div class="mt-6">
         <button 
-          hx-get="{{ url_for('inventory.new_category_form_fragment', shop_id=shop.id) }}" 
+          hx-get="{{ url_for('inventory.new_category_form_fragment', shop_id=current_shop.id) }}" 
           hx-target="#main-content" 
           hx-swap="innerHTML"
           class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900">
@@ -106,7 +106,7 @@
   <!-- Mobile Pagination -->
   <div class="flex-1 flex items-center justify-between sm:hidden">
     <button
-      hx-get="{{ url_for('inventory.categories', shop_id=shop.id) }}"
+      hx-get="{{ url_for('inventory.categories', shop_id=current_shop.id) }}"
       hx-target="#main-content"
       hx-push-url="true"
       hx-vals='{{ {"page": page - 1, "per_page": per_page} | tojson }}'
@@ -116,7 +116,7 @@
       Previous
     </button>
     <button
-      hx-get="{{ url_for('inventory.categories', shop_id=shop.id) }}"
+      hx-get="{{ url_for('inventory.categories', shop_id=current_shop.id) }}"
       hx-target="#main-content"
       hx-push-url="true"
       hx-vals='{{ {"page": page + 1, "per_page": per_page} | tojson }}'
@@ -142,7 +142,7 @@
         {% if page > 1 %}
         <!-- First Page -->
         <button
-          hx-get="{{ url_for('inventory.categories', shop_id=shop.id) }}"
+          hx-get="{{ url_for('inventory.categories', shop_id=current_shop.id) }}"
           hx-target="#main-content"
           hx-push-url="true"
           hx-vals='{{ {"page": 1, "per_page": per_page} | tojson }}'
@@ -154,7 +154,7 @@
 
         <!-- Previous Page -->
         <button
-          hx-get="{{ url_for('inventory.categories', shop_id=shop.id) }}"
+          hx-get="{{ url_for('inventory.categories', shop_id=current_shop.id) }}"
           hx-target="#main-content"
           hx-push-url="true"
           hx-vals='{{ {"page": page - 1, "per_page": per_page} | tojson }}'
@@ -173,7 +173,7 @@
             </button>
           {% else %}
             <button
-              hx-get="{{ url_for('inventory.categories', shop_id=shop.id) }}"
+              hx-get="{{ url_for('inventory.categories', shop_id=current_shop.id) }}"
               hx-target="#main-content"
               hx-push-url="true"
               hx-vals='{{ {"page": p, "per_page": per_page} | tojson }}'
@@ -186,7 +186,7 @@
         {% if page < total_pages %}
         <!-- Next Page -->
         <button
-          hx-get="{{ url_for('inventory.categories', shop_id=shop.id) }}"
+          hx-get="{{ url_for('inventory.categories', shop_id=current_shop.id) }}"
           hx-target="#main-content"
           hx-push-url="true"
           hx-vals='{{ {"page": page + 1, "per_page": per_page} | tojson }}'
@@ -198,7 +198,7 @@
 
         <!-- Last Page -->
         <button
-          hx-get="{{ url_for('inventory.categories', shop_id=shop.id) }}"
+          hx-get="{{ url_for('inventory.categories', shop_id=current_shop.id) }}"
           hx-target="#main-content"
           hx-push-url="true"
           hx-vals='{{ {"page": total_pages, "per_page": per_page} | tojson }}'
