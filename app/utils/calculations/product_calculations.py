@@ -137,12 +137,13 @@ def get_avg_days_between_sales(product_id, time_period='month'):
     if len(sale_dates) < 2:
         return 0.0
 
-    # Parse date strings to datetime.date objects
-    parsed_dates = [datetime.strptime(row[0], '%Y-%m-%d').date() for row in sale_dates]
+    parsed_dates = [row[0] for row in sale_dates]
+    if len(parsed_dates) < 2:
+        return 0.0
 
     deltas = [(parsed_dates[i] - parsed_dates[i - 1]).days for i in range(1, len(parsed_dates))]
-    
     return round(statistics.mean(deltas), 1)
+
 
 
 # Inventory Metrics
