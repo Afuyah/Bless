@@ -7,6 +7,7 @@ from ..models import Product, Category, Sale, CartItem, RegisterSession
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload, with_loader_criteria
 from decimal import Decimal, InvalidOperation
+
 class ProductRepository:
     @staticmethod
     def get_available_for_sale(shop_id: int) -> List[Product]:

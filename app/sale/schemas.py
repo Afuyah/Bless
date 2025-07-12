@@ -81,7 +81,7 @@ class ReceiptSchema(Schema):
         metadata={"description": "Output format for the receipt"}
     )
     include_tax_details = fields.Boolean(
-        load_default=False,  # Changed from 'missing' to 'load_default'
+        load_default=False, 
         metadata={"description": "Include detailed tax information"}
     )
 

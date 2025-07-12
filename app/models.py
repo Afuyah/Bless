@@ -706,40 +706,40 @@ class Sale(BaseModel, ShopScopedMixin):
 
 class CartItem(BaseModel, ShopScopedMixin):
     __tablename__ = 'cart_items'
-    
-    product_id = db.Column(Integer, db.ForeignKey('products.id'), nullable=False)
-    quantity = db.Column(Integer, nullable=False)
-    sale_id = db.Column(Integer, db.ForeignKey('sales.id'), nullable=False)
-    total_price = db.Column(db.Float, nullable=True) 
-    unit_price = db.Column(db.Float, nullable=True)     
-     
 
-    product = relationship('Product', back_populates='sale_items', lazy='select')  
+    product_id = db.Column(Integer, db.ForeignKey('products.id'), nullable=False, index=True)
+    quantity = db.Column(Integer, nullable=False)
+    sale_id = db.Column(Integer, db.ForeignKey('sales.id'), nullable=False, index=True)
+    total_price = db.Column(db.Float, nullable=True)
+    unit_price = db.Column(db.Float, nullable=True)
+
+    # Relationships
+    product = relationship('Product', back_populates='sale_items', lazy='select')
     sale = relationship('Sale', back_populates='cart_items')
 
     __table_args__ = (
-        db.Index('ix_product_sale', 'product_id', 'sale_id'),
+        db.Index('ix_cartitem_product_sale', 'product_id', 'sale_id'),
+        db.Index('ix_cartitem_sale_product', 'sale_id', 'product_id'),
+        db.Index('ix_cartitem_shop_product', 'shop_id', 'product_id'),
+        db.Index('ix_cartitem_shop_sale', 'shop_id', 'sale_id'),
     )
-
 
     @validates('quantity')
     def validate_quantity(self, key, value):
-        """Ensure the quantity is greater than zero."""
         if value <= 0:
             raise ValueError("Quantity must be greater than zero.")
         return value
 
-    
     def __repr__(self):
         return f'<CartItem product_id={self.product_id}, quantity={self.quantity}>'
 
     def serialize(self):
-        """Serialize the cart item for API response."""
         return {
             'product_name': self.product.name if self.product else 'Unknown Product',
             'quantity': self.quantity,
-            'total_price': str(self.total_price),  # Convert to string for JSON serialization
+            'total_price': str(self.total_price),
         }
+
 
 
 class Product(BaseModel, ShopScopedMixin):
@@ -801,6 +801,13 @@ class Product(BaseModel, ShopScopedMixin):
         return self.stock < self.low_stock_threshold
 
 
+
+    @hybrid_property
+    def is_combo(self):
+        return self.combination_size is not None and self.combination_size > 1
+        
+
+
     @hybrid_property
     def display_price(self):
         """Returns the appropriate price based on combination settings"""
@@ -827,7 +834,8 @@ class Product(BaseModel, ShopScopedMixin):
             'is_active': self.is_active,
             'is_low_stock': self.is_low_stock,
             'profit': float(self.profit),
-            'profit_margin': float(self.profit_margin)
+            'profit_margin': float(self.profit_margin),
+            'is_combo': self.is_combo  
         }
 
         if for_pos:
@@ -835,10 +843,12 @@ class Product(BaseModel, ShopScopedMixin):
                 'display_price': self.display_price,
                 'combination_size': self.combination_size,
                 'combination_price': float(self.combination_price) if self.combination_price else None,
+                'combination_unit_price': float(self.combination_unit_price) if self.combination_unit_price else None,
                 'category_name': self.category.name if self.category else None
             })
 
         return data
+
 
     def update_stock(self, quantity):
         """Safe stock update with validation"""

@@ -3,14 +3,7 @@
 class PricingUtil:
     @staticmethod
     def calculate_combination_price(product, quantity: int) -> float:
-        """
-        Calculate the optimal selling price for a given quantity using combination pricing logic.
-
-        Example:
-        - 1 egg @ 20
-        - Combo: 3 eggs @ 55
-        - Buying 7 eggs => 2 combos (110) + 1 single (20) = 130
-        """
+        
         if not product or not quantity:
             return 0.0
 

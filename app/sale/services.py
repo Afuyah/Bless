@@ -224,28 +224,37 @@ class SalesService:
 class CartService:
     @staticmethod
     def get(shop_id: int, user_id: int) -> List[Dict]:
-        """Get current cart contents with product validation"""
+        """Get current cart contents with product validation and combo pricing support"""
         cart_key = f'cart_{shop_id}_{user_id}'
         cart = session.get(cart_key, [])
 
         valid_items = []
         for item in cart:
             product = ProductRepository.get_for_sale(item['product_id'], shop_id)
-            if product:
-                valid_items.append({
-                    'product_id': product.id,
-                    'quantity': item['quantity'],
-                    'price': float(product.selling_price),
-                    'name': product.name,
-                    'image': product.image_url,
-                    'subtotal': PricingUtil.calculate_combination_price(product, item['quantity'])
-                })
+            if not product:
+                continue
 
+            is_combo = bool(product.combination_size and product.combination_size > 1)
+
+            valid_items.append({
+                'product_id': product.id,
+                'quantity': item['quantity'],
+                'price': float(product.selling_price),
+                'name': product.name,
+                'image': product.image_url,
+                'subtotal': PricingUtil.calculate_combination_price(product, item['quantity']),
+                'is_combo': is_combo,
+                'combination_size': product.combination_size if is_combo else None,
+                'combination_price': float(product.combination_price) if is_combo else None
+            })
+
+        # If any invalid items were removed, update session cart
         if len(valid_items) != len(cart):
             session[cart_key] = valid_items
             session.modified = True
 
         return valid_items
+
 
 
     @staticmethod
@@ -266,15 +275,18 @@ class CartService:
             cart.append({
                 'product_id': product_id,
                 'quantity': quantity,
-                'price': float(product.selling_price),  # keep for UI
+                'price': float(product.selling_price),
                 'name': product.name,
-                'image': product.image_url
+                'image': product.image_url,
+                'is_combo': bool(product.combination_size and product.combination_size > 1),
+                'combination_size': product.combination_size,
+                'combination_price': float(product.combination_price) if product.combination_price else None
             })
 
-        # Recalculate subtotal using combo logic
+        # Recalculate all subtotals
         for item in cart:
-            product = ProductRepository.get_for_sale(item['product_id'], shop_id)
-            item['subtotal'] = PricingUtil.calculate_combination_price(product, item['quantity'])
+            p = ProductRepository.get_for_sale(item['product_id'], shop_id)
+            item['subtotal'] = PricingUtil.calculate_combination_price(p, item['quantity'])
 
         session[cart_key] = cart
         session.modified = True
@@ -285,6 +297,7 @@ class CartService:
             'cart_count': sum(item['quantity'] for item in cart),
             'cart_total': sum(item['subtotal'] for item in cart)
         }
+
 
 
 
@@ -305,6 +318,9 @@ class CartService:
 
         product = ProductRepository.get_for_sale(product_id, shop_id)
         item['subtotal'] = PricingUtil.calculate_combination_price(product, new_quantity)
+        item['is_combo'] = bool(product.combination_size and product.combination_size > 1)
+        item['combination_size'] = product.combination_size
+        item['combination_price'] = float(product.combination_price) if product.combination_price else None
 
         session[cart_key] = cart
         session.modified = True
@@ -387,14 +403,6 @@ class ProductService:
     def search(shop_id: int, query: str, category_id: Optional[int] = None) -> List[Dict]:
         """
         Search products with comprehensive error handling and result formatting
-        
-        Args:
-            shop_id: ID of the shop to search in
-            query: Search term
-            category_id: Optional category filter
-            
-        Returns:
-            List of product dictionaries with essential fields
         """
         try:
             results = ProductRepository.search_available(
@@ -402,50 +410,53 @@ class ProductService:
                 query=query,
                 category_id=category_id
             )
-            
+
             return [{
                 'id': p.id,
                 'name': p.name,
-                'price': float(p.selling_price),  
+                'price': float(p.selling_price),
                 'image': p.image_url or '/static/images/product-placeholder.png',
                 'category': p.category.name,
                 'category_id': p.category.id,
                 'stock': p.stock,
-                'barcode': p.barcode or ''
+                'barcode': p.barcode or '',
+                'is_combo': bool(p.combination_size and p.combination_size > 1),
+                'combination_price': float(p.combination_price) if p.combination_price and p.combination_size and p.combination_size > 1 else None,
+                'combination_size': p.combination_size if p.combination_size and p.combination_size > 1 else None,
+
             } for p in results]
 
-            
         except Exception as e:
             logger.error(f"Product search failed for shop {shop_id}: {str(e)}")
             return []
+
 
     @staticmethod
     def get_available_for_sale(shop_id: int) -> List[Dict]:
         """
         Get all available products for a shop with inventory status
-        
-        Args:
-            shop_id: ID of the shop
-            
-        Returns:
-            List of product dictionaries with availability info
         """
         try:
             products = ProductRepository.get_available_for_sale(shop_id)
             return [{
                 'id': p.id,
                 'name': p.name,
-                'price': float(p.selling_price), 
+                'price': float(p.selling_price),
                 'image': p.image_url or '/static/images/product-placeholder.png',
                 'category': p.category.name,
-                'category_id': p.category.id, 
+                'category_id': p.category.id,
                 'stock': p.stock,
-                'is_low_stock': p.stock < 10
+                'is_low_stock': p.stock < 10,
+                'is_combo': bool(p.combination_size and p.combination_size > 1),
+                'combination_price': float(p.combination_price) if p.combination_price and p.combination_size and p.combination_size > 1 else None,
+                'combination_size': p.combination_size if p.combination_size and p.combination_size > 1 else None,
+
             } for p in products]
 
         except Exception as e:
             logger.error(f"Failed to get products for shop {shop_id}: {str(e)}")
             return []
+
 
 
 class CategoryService:
@@ -468,7 +479,10 @@ class CategoryService:
                         'image_url': p.image_url or '/static/images/product-placeholder.png',
                         'stock': p.stock,
                         'barcode': p.barcode,
-                        'category_id': p.category_id
+                        'category_id': p.category_id,
+                        'is_combo': bool(p.combination_size and p.combination_size > 1),
+                        'combination_price': float(p.combination_price) if p.combination_price and p.combination_size and p.combination_size > 1 else None,
+                        'combination_size': p.combination_size if p.combination_size and p.combination_size > 1 else None,
                     }
                     for p in c.products
                     if p.is_active and p.stock > 0
@@ -507,14 +521,14 @@ class TaxService:
     def calculate_tax(subtotal: float, shop_id: int) -> float:
         """Calculate tax amount based on shop location"""
         # Simplified - in reality would use shop's tax rules
-        return round(subtotal * 0.1, 2)  # 10% tax
+        return round(subtotal * 0, 2)  # 0% tax
 
     @staticmethod
     def get_rates(shop_id: int) -> List[Dict]:
         """Get applicable tax rates for display"""
         return [{
             'name': 'VAT',
-            'rate': 10.0,
+            'rate': 0.0,
             'inclusive': False
         }]
 
