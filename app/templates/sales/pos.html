@@ -1070,45 +1070,39 @@
     // ====================
     // POS Initialization 
     // ====================
-    async function initPOS() {
-        try {
-            // Show instant loading state 
-            requestAnimationFrame(() => showLoading('POS Starting', 'Preparing system...'));
+   async function initPOS() {
+    try {
+        // Show instant loading state 
+        requestAnimationFrame(() => showLoading('POS Starting', 'Preparing system...'));
 
-            // Fire critical requests immediately (no await)
-            const shopPromise = loadShopData();
-            const productsPromise = loadProducts();
+        // Fire critical requests immediately (no await)
+        const shopPromise = loadShopData();
+        const productsPromise = loadProducts();
 
-            // Show skeleton UI immediately 
-            showProductSkeletons(12); // Optimistic number
+        // Show skeleton UI immediately 
+        showProductSkeletons(12); // Optimistic number
 
-            // Wait only for critical data (shop + products)
-            await Promise.all([shopPromise, productsPromise]);
+        // Wait only for critical data
+        await Promise.all([shopPromise, productsPromise]);
 
-            // Start non-critical loads in background
-            const nonCriticalLoads = Promise.allSettled([
-                loadCategories(),
-                loadCart()
-            ]).then(results => {
-                results.forEach((result, i) => {
-                    if (result.status === 'rejected') {
-                        console.warn(`Background load ${i} failed:`, result.reason);
-                    }
-                });
-            });
+        // Sequentially load cart, then categories
+        loadCart()
+            .then(() => loadCategories())
+            .catch(err => console.warn('Background load failed:', err));
 
-            // Optional: Prefetch likely next resources
-            if ('connection' in navigator && !navigator.connection.saveData) {
-                prefetchResources();
-            }
-
-        } catch (error) {
-            handleCriticalError(error);
-        } finally {
-            // Hide loading with slight delay to prevent flicker
-            setTimeout(hideLoading, 150);
+        // Optional: Prefetch likely next resources
+        if ('connection' in navigator && !navigator.connection.saveData) {
+            prefetchResources();
         }
+
+    } catch (error) {
+        handleCriticalError(error);
+    } finally {
+        // Hide loading with slight delay to prevent flicker
+        setTimeout(hideLoading, 150);
     }
+}
+
 
     // ====================
     // Data Loading
