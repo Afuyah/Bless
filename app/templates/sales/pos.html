@@ -1,6 +1,6 @@
 {% extends 'base_layout.html' %}
 
-{% block title %} {{ current_shop.name }}  | Bhapos  {% endblock %}
+{% block title %} {{ current_shop.name }} | Bhapos {% endblock %}
 
 {% block content %}
 
@@ -9,159 +9,180 @@
 
     <!-- Premium Side Navigation -->
 
-   <div class="sidebar bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100 w-16 lg:w-16 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out shadow-2xl z-20 hover:w-64 lg:hover:w-64 group">
+    <div
+        class="sidebar bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100 w-16 lg:w-16 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out shadow-2xl z-20 hover:w-64 lg:hover:w-64 group">
 
-    <!-- Branding -->
-    <div class="p-4 border-b border-gray-700 flex items-center justify-between">
-        <div class="flex items-center space-x-3 min-w-max">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg">
-                <i class="fas fa-cash-register text-white text-sm"></i>
+        <!-- Branding -->
+        <div class="p-4 border-b border-gray-700 flex items-center justify-between">
+            <div class="flex items-center space-x-3 min-w-max">
+                <div
+                    class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg">
+                    <i class="fas fa-cash-register text-white text-sm"></i>
+                </div>
+                <h3 class="text-lg font-bold hidden group-hover:block text-white tracking-tight whitespace-nowrap">
+                    <span class="text-amber-400">{{ current_shop.name }}</span>POS
+                </h3>
             </div>
-            <h3 class="text-lg font-bold hidden group-hover:block text-white tracking-tight whitespace-nowrap">
-                <span class="text-amber-400">{{ current_shop.name }}</span>POS
-            </h3>
+            <button class="sidebar-toggle hidden group-hover:block text-gray-400 hover:text-white ml-2">
+                <i class="fas fa-chevron-left text-xs"></i>
+            </button>
         </div>
-        <button class="sidebar-toggle hidden group-hover:block text-gray-400 hover:text-white ml-2">
-            <i class="fas fa-chevron-left text-xs"></i>
-        </button>
-    </div>
 
-    <!-- User Profile -->
-    <div class="p-3 border-b border-gray-700 flex items-center justify-center group-hover:justify-start group-hover:space-x-3">
-        <div class="relative">
-            <div class="w-8 h-8 rounded-lg bg-gray-700 flex items-center justify-center text-amber-400 font-medium shadow-inner text-sm">
-                {{ current_user.username[0]|upper }}
+
+        <!-- User Profile -->
+        <div
+            class="p-3 border-b border-gray-700 flex items-center justify-center group-hover:justify-start group-hover:space-x-3">
+            <div class="relative">
+                <div
+                    class="w-8 h-8 rounded-lg bg-gray-700 flex items-center justify-center text-amber-400 font-medium shadow-inner text-sm">
+                    {{ current_user.username[0]|upper }}
+                </div>
+                <div class="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-green-400 border-2 border-gray-800">
+                </div>
             </div>
-            <div class="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-green-400 border-2 border-gray-800"></div>
-        </div>
-        <div class="hidden group-hover:block truncate">
-            <h3 class="font-medium text-white text-xs truncate">{{ current_user.username }}</h3>
-            <p class="text-[0.6rem] text-gray-400 truncate">Premium User</p>
-        </div>
-    </div>
-
-
-    <!-- Navigation -->
-    <nav class="flex-1 overflow-y-auto p-2 space-y-1">
-        <!-- Register Section -->
-        <div>
-            <h2 class="text-gray-500 uppercase text-[0.5rem] font-bold mb-1 tracking-wider hidden group-hover:block">REGISTER</h2>
-            <ul class="space-y-1">
-                <li>
-                    <button id="open-register-btn"
-                        class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start"
-                        title="Open Register">
-                        <div class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
-                            <i class="fas fa-lock-open text-xs"></i>
-                        </div>
-                        <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Open</span>
-                    </button>
-
-                    <!-- Inline spinner (initially hidden) -->
-                    <div id="register-status-spinner" class="hidden">
-                        <i class="fas fa-spinner fa-spin text-primary-500 text-sm ml-2"></i>
-                    </div>
-
-
-                </li>
-
-
-
-                <li>
-                    <button id="sales-summary-btn"
-                        class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start hidden"
-                        title="Sales Summary">
-                        <div class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
-                            <i class="fas fa-chart-pie text-xs"></i>
-                        </div>
-                        <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Summary</span>
-                    </button>
-                </li>
-                <li>
-                    <button id="close-register-btn"
-                        class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start hidden"
-                        title="Close Register">
-                        <div class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
-                            <i class="fas fa-lock text-xs"></i>
-                        </div>
-                        <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Close</span>
-                    </button>
-                </li>
-            </ul>
-        </div>
-
-
-        <!-- POS Section -->
-        <div class="pt-1">
-            <h2 class="text-gray-500 uppercase text-[0.5rem] font-bold mb-1 tracking-wider hidden group-hover:block">SALES</h2>
-            <ul class="space-y-1">
-                <li>
-                    <a href="#"
-                        class="w-full text-left py-2 px-1 rounded-lg bg-gray-700/30 flex items-center justify-center group-hover:justify-start"
-                        title="New Sale">
-                        <div class="w-7 h-7 rounded-md bg-amber-500/10 flex items-center justify-center text-amber-400">
-                            <i class="fas fa-shopping-basket text-xs"></i>
-                        </div>
-                        <span class="hidden group-hover:block ml-2 text-xs text-white truncate">New Sale</span>
-                        <span class="hidden group-hover:block ml-auto px-1 py-0.5 bg-amber-500/20 text-amber-400 text-[0.5rem] rounded">Active</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#"
-                        class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start"
-                        title="Sales History">
-                        <div class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
-                            <i class="fas fa-clock-rotate-left text-xs"></i>
-                        </div>
-                        <span class="hidden group-hover:block ml-2 text-xs text-white truncate">History</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-
-        <!-- Management Section -->
-        <div class="pt-1">
-            <h2 class="text-gray-500 uppercase text-[0.5rem] font-bold mb-1 tracking-wider hidden group-hover:block">MANAGEMENT</h2>
-            <ul class="space-y-1">
-                <li>
-                    <a href="#"
-                        class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start"
-                        title="Products">
-                        <div class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
-                            <i class="fas fa-boxes-stacked text-xs"></i>
-                        </div>
-                        <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Inventory</span>
-                    </a>
-                </li>
-                {% if current_user.is_tenant() or current_user.is_admin() %}
-                <li>
-                    <a href="{{ url_for('admin.admin_dashboard', shop_id=current_shop.id) }}"
-                        class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start"
-                        title="Manage Store">
-                        <div class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
-                            <i class="fas fa-sliders text-xs"></i>
-                        </div>
-                        <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Settings</span>
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
-        </div>
-    </nav>
-
-
-    <!-- Logout Section -->
-    <div class="p-2 border-t border-gray-700">
-        <a href="{{ url_for('auth.logout') }}"
-            class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start">
-            <div class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
-                <i class="fas fa-arrow-right-from-bracket text-xs"></i>
+            <div class="hidden group-hover:block truncate">
+                <h3 class="font-medium text-white text-xs truncate">{{ current_user.username }}</h3>
+                <p class="text-[0.6rem] text-gray-400 truncate">Premium User</p>
             </div>
-            <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Logout</span>
-        </a>
+        </div>
+
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto p-2 space-y-1">
+            <!-- Register Section -->
+            <div>
+                <h2
+                    class="text-gray-500 uppercase text-[0.5rem] font-bold mb-1 tracking-wider hidden group-hover:block">
+                    REGISTER</h2>
+                <ul class="space-y-1">
+                    <li>
+                        <button id="open-register-btn"
+                            class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start"
+                            title="Open Register">
+                            <div
+                                class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                                <i class="fas fa-lock-open text-xs"></i>
+                            </div>
+                            <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Open</span>
+                        </button>
+
+                        <!-- Inline spinner (initially hidden) -->
+                        <div id="register-status-spinner" class="hidden">
+                            <i class="fas fa-spinner fa-spin text-primary-500 text-sm ml-2"></i>
+                        </div>
+
+
+                    </li>
+
+
+
+                    <li>
+                        <button id="sales-summary-btn"
+                            class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start hidden"
+                            title="Sales Summary">
+                            <div
+                                class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                                <i class="fas fa-chart-pie text-xs"></i>
+                            </div>
+                            <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Summary</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button id="close-register-btn"
+                            class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start hidden"
+                            title="Close Register">
+                            <div
+                                class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                                <i class="fas fa-lock text-xs"></i>
+                            </div>
+                            <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Close</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+
+            <!-- POS Section -->
+            <div class="pt-1">
+                <h2
+                    class="text-gray-500 uppercase text-[0.5rem] font-bold mb-1 tracking-wider hidden group-hover:block">
+                    SALES</h2>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#"
+                            class="w-full text-left py-2 px-1 rounded-lg bg-gray-700/30 flex items-center justify-center group-hover:justify-start"
+                            title="New Sale">
+                            <div
+                                class="w-7 h-7 rounded-md bg-amber-500/10 flex items-center justify-center text-amber-400">
+                                <i class="fas fa-shopping-basket text-xs"></i>
+                            </div>
+                            <span class="hidden group-hover:block ml-2 text-xs text-white truncate">New Sale</span>
+                            <span
+                                class="hidden group-hover:block ml-auto px-1 py-0.5 bg-amber-500/20 text-amber-400 text-[0.5rem] rounded">Active</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#"
+                            class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start"
+                            title="Sales History">
+                            <div
+                                class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                                <i class="fas fa-clock-rotate-left text-xs"></i>
+                            </div>
+                            <span class="hidden group-hover:block ml-2 text-xs text-white truncate">History</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+
+            <!-- Management Section -->
+            <div class="pt-1">
+                <h2
+                    class="text-gray-500 uppercase text-[0.5rem] font-bold mb-1 tracking-wider hidden group-hover:block">
+                    MANAGEMENT</h2>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#"
+                            class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start"
+                            title="Products">
+                            <div
+                                class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                                <i class="fas fa-boxes-stacked text-xs"></i>
+                            </div>
+                            <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Inventory</span>
+                        </a>
+                    </li>
+                    {% if current_user.is_tenant() or current_user.is_admin() %}
+                    <li>
+                        <a href="{{ url_for('admin.admin_dashboard', shop_id=current_shop.id) }}"
+                            class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start"
+                            title="Manage Store">
+                            <div
+                                class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                                <i class="fas fa-sliders text-xs"></i>
+                            </div>
+                            <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Settings</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+
+
+        <!-- Logout Section -->
+        <div class="p-2 border-t border-gray-700">
+            <a href="{{ url_for('auth.logout') }}"
+                class="w-full text-left py-2 px-1 rounded-lg hover:bg-gray-700/50 transition-all flex items-center justify-center group-hover:justify-start">
+                <div
+                    class="w-7 h-7 rounded-md bg-gray-700/70 hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition-colors">
+                    <i class="fas fa-arrow-right-from-bracket text-xs"></i>
+                </div>
+                <span class="hidden group-hover:block ml-2 text-xs text-white truncate">Logout</span>
+            </a>
+        </div>
     </div>
-</div>
 
 
 
@@ -169,248 +190,274 @@
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col overflow-hidden bg-gray-50">
         <!-- Premium Top Bar -->
-      <header class="bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between shadow-sm">
+        <header class="bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between shadow-sm">
 
-    <!-- Left Section -->
-    <div class="flex items-center space-x-3">
-        <!-- Mobile Menu Toggle -->
-        <button id="menu-toggle" class="text-gray-500 hover:text-primary-600 transition-colors p-1.5 rounded-full hover:bg-gray-100 lg:hidden">
-            <i class="fas fa-bars text-lg"></i>
-        </button>
+            <!-- Left Section -->
+            <div class="flex items-center space-x-3">
+                <!-- Mobile Menu Toggle -->
+                <button id="menu-toggle"
+                    class="text-gray-500 hover:text-primary-600 transition-colors p-1.5 rounded-full hover:bg-gray-100 lg:hidden">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
 
-        <!-- Shop Info -->
-        <div class="flex items-center space-x-2.5">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-md">
-                <i class="fas fa-store text-white text-xs"></i>
-            </div>
-            <div class="hidden sm:block">
-                <h2 class="font-semibold text-gray-800 text-sm leading-tight truncate max-w-[160px]" id="shop-name">{{ current_shop.name }}</h2>
-                <div class="flex items-center space-x-1.5">
-                    <span class="status-dot w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                    <span class="status-text text-xs text-gray-500 font-medium">Closed</span>
+                <!-- Shop Info -->
+                <div class="flex items-center space-x-2.5">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-md">
+                        <i class="fas fa-store text-white text-xs"></i>
+                    </div>
+                    <div class="hidden sm:block">
+                        <h2 class="font-semibold text-gray-800 text-sm leading-tight truncate max-w-[160px]"
+                            id="shop-name">{{ current_shop.name }}</h2>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="status-dot w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            <span class="status-text text-xs text-gray-500 font-medium">Closed</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
 
-    <!-- Right Section -->
-    <div class="flex items-center space-x-3">
-        <!-- Notifications -->
-        <div class="relative">
-            <button class="notification-btn p-1.5 rounded-full hover:bg-gray-100 transition-colors relative">
-                <i class="fas fa-bell text-gray-600 text-lg"></i>
-                <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[0.6rem] font-bold shadow-sm">3</span>
-            </button>
-            <!-- Notification Dropdown (Hidden by default) -->
-            <div class="notification-dropdown hidden absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-40">
-                <div class="p-3 border-b border-gray-100 flex justify-between items-center">
-                    <h3 class="font-medium text-gray-800">Notifications (3)</h3>
-                    <button class="text-xs text-primary-600 hover:text-primary-800">Mark all as read</button>
+            <!-- Right Section -->
+            <div class="flex items-center space-x-3">
+                <!-- Notifications -->
+                <div class="relative">
+                    <button class="notification-btn p-1.5 rounded-full hover:bg-gray-100 transition-colors relative">
+                        <i class="fas fa-bell text-gray-600 text-lg"></i>
+                        <span
+                            class="absolute -top-0.5 -right-0.5 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[0.6rem] font-bold shadow-sm">3</span>
+                    </button>
+                    <!-- Notification Dropdown (Hidden by default) -->
+                    <div
+                        class="notification-dropdown hidden absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-40">
+                        <div class="p-3 border-b border-gray-100 flex justify-between items-center">
+                            <h3 class="font-medium text-gray-800">Notifications (3)</h3>
+                            <button class="text-xs text-primary-600 hover:text-primary-800">Mark all as read</button>
+                        </div>
+                        <!-- Notification items would go here -->
+                    </div>
                 </div>
-                <!-- Notification items would go here -->
-            </div>
-        </div>
 
-        <!-- Quick Actions -->
-        <div class="hidden md:flex items-center space-x-1">
-            <button class="action-btn w-8 h-8 rounded-lg flex items-center justify-center text-gray-600 hover:text-primary-600 hover:bg-gray-50 transition-colors" title="Print">
-                <i class="fas fa-print text-sm"></i>
-            </button>
-            <button class="action-btn w-8 h-8 rounded-lg flex items-center justify-center text-gray-600 hover:text-primary-600 hover:bg-gray-50 transition-colors" title="Help">
-                <i class="fas fa-question text-sm"></i>
-            </button>
-            <button class="action-btn w-8 h-8 rounded-lg flex items-center justify-center text-gray-600 hover:text-primary-600 hover:bg-gray-50 transition-colors" title="Refresh">
-                <i class="fas fa-sync-alt text-sm"></i>
-            </button>
-        </div>
+                <!-- Quick Actions -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <button
+                        class="action-btn w-8 h-8 rounded-lg flex items-center justify-center text-gray-600 hover:text-primary-600 hover:bg-gray-50 transition-colors"
+                        title="Print">
+                        <i class="fas fa-print text-sm"></i>
+                    </button>
+                    <button
+                        class="action-btn w-8 h-8 rounded-lg flex items-center justify-center text-gray-600 hover:text-primary-600 hover:bg-gray-50 transition-colors"
+                        title="Help">
+                        <i class="fas fa-question text-sm"></i>
+                    </button>
+                    <button
+                        class="action-btn w-8 h-8 rounded-lg flex items-center justify-center text-gray-600 hover:text-primary-600 hover:bg-gray-50 transition-colors"
+                        title="Refresh">
+                        <i class="fas fa-sync-alt text-sm"></i>
+                    </button>
+                </div>
 
-        <!-- User Profile (Optional) -->
-        <div class="hidden md:block ml-2">
-            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-medium text-sm cursor-pointer hover:bg-gray-300 transition-colors">
-                {{ current_user.username[0]|upper }}
+                <!-- User Profile (Optional) -->
+                <div class="hidden md:block ml-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-medium text-sm cursor-pointer hover:bg-gray-300 transition-colors">
+                        {{ current_user.username[0]|upper }}
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</header>
+        </header>
 
 
 
         <!-- Content Area -->
-            <main class="flex-1 overflow-hidden relative bg-white">
+        <main class="flex-1 overflow-hidden relative bg-white">
 
             <div class="h-full pl-[2.6rem] group-hover:pl-[12rem] transition-all duration-300">
-            <!-- Register Closed State -->
-            <div id="register-closed-state" class="h-full flex flex-col items-center justify-center text-center p-6">
-                <div class="w-28 h-28 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center mb-6 shadow-inner border border-amber-200">
-                    <i class="fas fa-cash-register text-4xl text-amber-500"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Register Session Required</h3>
-                <p class="text-gray-500 max-w-md mb-6">Open a new register session to begin processing transactions</p>
-                <button id="open-register-main-btn"
-                    class="bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3 rounded-lg font-medium transition-all flex items-center shadow-md hover:shadow-lg">
-                    <i class="fas fa-lock-open mr-2"></i>
-                    Start New Session
-                </button>
-            </div>
-
-
-
-           <!-- POS Interface (Hidden by default) -->
-<div id="pos-interface" class="h-full hidden flex flex-col lg:flex-row overflow-hidden">
-
-
-    <!-- Product Catalog (Left Panel) -->
-    <div class="flex-1 flex flex-col border-r border-gray-100 bg-white overflow-hidden">
-        <!-- Search and Categories -->
-        <div class="p-4 border-b border-gray-100 bg-white/95 backdrop-blur-sm sticky top-0 z-10">
-            <div class="flex flex-col space-y-3">
-                <!-- Search Bar -->
-                <div class="relative">
-                    <input type="text" id="product-search" placeholder="Search products..."
-                        class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm text-gray-700 placeholder-gray-400"
-                        style="background-color: #fafafa;">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                <!-- Register Closed State -->
+                <div id="register-closed-state"
+                    class="h-full flex flex-col items-center justify-center text-center p-6">
+                    <div
+                        class="w-28 h-28 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center mb-6 shadow-inner border border-amber-200">
+                        <i class="fas fa-cash-register text-4xl text-amber-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Register Session Required</h3>
+                    <p class="text-gray-500 max-w-md mb-6">Open a new register session to begin processing transactions
+                    </p>
+                    <button id="open-register-main-btn"
+                        class="bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3 rounded-lg font-medium transition-all flex items-center shadow-md hover:shadow-lg">
+                        <i class="fas fa-lock-open mr-2"></i>
+                        Start New Session
+                    </button>
                 </div>
 
-                <!-- Category Tabs -->
-                <div class="flex overflow-x-auto pb-1 scrollbar-hide" id="category-tabs">
-                    <!-- Dynamically loaded -->
+
+
+                <!-- POS Interface (Hidden by default) -->
+                <div id="pos-interface" class="h-full hidden flex flex-col lg:flex-row overflow-hidden">
+
+
+                    <!-- Product Catalog (Left Panel) -->
+                    <div class="flex-1 flex flex-col border-r border-gray-100 bg-white overflow-hidden">
+                        <!-- Search and Categories -->
+                        <div class="p-4 border-b border-gray-100 bg-white/95 backdrop-blur-sm sticky top-0 z-10">
+                            <div class="flex flex-col space-y-3">
+                                <!-- Search Bar -->
+                                <div class="relative">
+                                    <input type="text" id="product-search" placeholder="Search products..."
+                                        class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm text-gray-700 placeholder-gray-400"
+                                        style="background-color: #fafafa;">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+
+                                <!-- Category Tabs -->
+                                <div class="flex overflow-x-auto pb-1 scrollbar-hide" id="category-tabs">
+                                    <!-- Dynamically loaded -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Grid -->
+                        <div class="flex-1 overflow-y-auto p-4 relative">
+                            <!-- Loading State -->
+                            <div id="loading-overlay-products"
+                                class="hidden absolute inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center z-10">
+                                <div
+                                    class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mb-4">
+                                </div>
+                                <p class="text-gray-600 font-medium">Loading Inventory</p>
+                            </div>
+
+                            <!-- Product Grid -->
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"
+                                id="product-grid">
+                                <!-- Products will be loaded here -->
+                            </div>
+
+                            <!-- Empty State -->
+                            <div id="products-empty-state" class="hidden text-center py-12">
+                                <div
+                                    class="bg-gray-100 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-inner border border-gray-200">
+                                    <i class="fas fa-box-open text-2xl text-gray-400"></i>
+                                </div>
+                                <h4 class="text-gray-500 font-medium mb-1">No products available</h4>
+                                <p class="text-gray-400 text-sm max-w-md mx-auto">Add products to your inventory or
+                                    check your filters</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Cart Container -->
+                    <div id="cart-container"
+                        class="w-full lg:w-[26rem] flex flex-col border-t lg:border-t-0 border-gray-100 bg-white shadow-2xl z-20 fixed lg:relative bottom-0 left-0 right-0 mx-auto max-w-[100vw] transform translate-y-full lg:translate-y-0 transition-transform duration-300 ease-in-out rounded-t-2xl lg:rounded-none overflow-hidden"
+                        style="max-height: 88vh;">
+
+                        <!-- Header -->
+                        <div
+                            class="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-3 text-white flex justify-between items-center shadow-sm">
+                            <div class="flex items-center space-x-3">
+                                <button id="cart-toggle" class="lg:hidden text-white text-sm">
+                                    <i class="fas fa-chevron-up"></i>
+                                </button>
+                                <h3 class="text-base font-semibold flex items-center gap-2">
+                                    <i class="fas fa-shopping-basket"></i> Current Cart
+                                </h3>
+                            </div>
+                            <button id="clear-cart"
+                                class="text-amber-300 hover:text-white transition-colors text-xs flex items-center font-medium">
+                                <i class="fas fa-trash-alt mr-1"></i> <span class="hidden sm:inline">Clear</span>
+                            </button>
+                        </div>
+
+                        <!-- Cart Items -->
+                        <div class="flex-1 overflow-y-auto px-4 py-3 bg-gray-50"
+                            style="max-height: calc(88vh - 290px);">
+                            <div id="cart-items" class="space-y-3">
+                                <div id="empty-cart"
+                                    class="h-full flex flex-col items-center justify-center py-10 text-center">
+                                    <div
+                                        class="bg-gray-200 w-16 h-16 rounded-xl flex items-center justify-center mb-4 shadow-inner border border-gray-300">
+                                        <i class="fas fa-shopping-basket text-2xl text-gray-500"></i>
+                                    </div>
+                                    <h4 class="font-semibold text-gray-600 mb-1">Your cart is empty</h4>
+                                    <p class="text-gray-400 text-sm">Begin by adding products</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="border-t border-gray-100 px-5 py-4 bg-white">
+                            <!-- Price Breakdown -->
+                            <div class="space-y-2 mb-4 text-sm">
+                                <div class="flex justify-between text-gray-600">
+                                    <span>Subtotal:</span>
+                                    <span class="font-medium" id="subtotal">Ksh 0.00</span>
+                                </div>
+                                <div class="flex justify-between text-gray-600">
+                                    <span>Tax (0%):</span>
+                                    <span class="font-medium" id="tax">Ksh 0.00</span>
+                                </div>
+                                <div class="flex justify-between text-gray-600">
+                                    <span>Discount:</span>
+                                    <span class="text-green-500 font-medium" id="discount">- Ksh 0.00</span>
+                                </div>
+                            </div>
+
+                            <!-- Total -->
+                            <div class="border-t border-gray-100 pt-2 mb-2 text-base font-bold">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-700">Total:</span>
+                                    <span class="text-gray-900" id="total">Ksh 0.00</span>
+                                </div>
+                            </div>
+
+                            <!-- Customer -->
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-xs font-semibold mb-1">Customer( optional
+                                    )</label>
+                                <div class="relative">
+                                    <input type="text" id="customer-name" placeholder="Enter name"
+                                        class="w-full pl-3 pr-8 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm text-sm bg-gray-50">
+                                    <button class="absolute right-2 top-2.5 text-gray-400 hover:text-amber-500">
+                                        <i class="fas fa-user-plus text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Payment -->
+                            <div class="mb-3">
+                                <label class="block text-gray-700 text-xs font-semibold mb-1">Payment</label>
+                                <div class="grid grid-cols-3 gap-1.5" id="payment-methods">
+                                    <button
+                                        class="payment-method flex flex-col items-center justify-center py-1.5 border rounded-lg hover:border-amber-400 transition-all active border-amber-500 bg-amber-50"
+                                        data-method="cash">
+                                        <i class="fas fa-money-bill-wave text-amber-600 text-sm mb-0.5"></i>
+                                        <span class="text-[0.65rem] font-medium">Cash</span>
+                                    </button>
+                                    <button
+                                        class="payment-method flex flex-col items-center justify-center py-1.5 border rounded-lg hover:border-amber-400 border-gray-200 bg-white"
+                                        data-method="card">
+                                        <i class="fas fa-credit-card text-amber-600 text-sm mb-0.5"></i>
+                                        <span class="text-[0.65rem] font-medium">Card</span>
+                                    </button>
+                                    <button
+                                        class="payment-method flex flex-col items-center justify-center py-1.5 border rounded-lg hover:border-amber-400 border-gray-200 bg-white"
+                                        data-method="mobile">
+                                        <i class="fas fa-mobile-screen-button text-amber-600 text-sm mb-0.5"></i>
+                                        <span class="text-[0.65rem] font-medium">M-Pesa</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Checkout -->
+                            <button id="complete-sale"
+                                class="w-full bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 rounded-lg font-medium flex items-center justify-center shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                Complete Sale (<span id="complete-sale-amount">Ksh 0.00</span>)
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Product Grid -->
-        <div class="flex-1 overflow-y-auto p-4 relative">
-            <!-- Loading State -->
-            <div id="loading-overlay-products"
-                class="hidden absolute inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center z-10">
-                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mb-4"></div>
-                <p class="text-gray-600 font-medium">Loading Inventory</p>
-            </div>
-
-            <!-- Product Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"
-                id="product-grid">
-                <!-- Products will be loaded here -->
-            </div>
-
-            <!-- Empty State -->
-            <div id="products-empty-state" class="hidden text-center py-12">
-                <div
-                    class="bg-gray-100 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-inner border border-gray-200">
-                    <i class="fas fa-box-open text-2xl text-gray-400"></i>
-                </div>
-                <h4 class="text-gray-500 font-medium mb-1">No products available</h4>
-                <p class="text-gray-400 text-sm max-w-md mx-auto">Add products to your inventory or check your filters</p>
-            </div>
-        </div>
-    </div>
-
-
- <!-- Cart Container -->
-    <div id="cart-container"
-        class="w-full lg:w-[26rem] flex flex-col border-t lg:border-t-0 border-gray-100 bg-white shadow-2xl z-20 fixed lg:relative bottom-0 left-0 right-0 mx-auto max-w-[100vw] transform translate-y-full lg:translate-y-0 transition-transform duration-300 ease-in-out rounded-t-2xl lg:rounded-none overflow-hidden"
-        style="max-height: 88vh;">
-    
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-3 text-white flex justify-between items-center shadow-sm">
-        <div class="flex items-center space-x-3">
-            <button id="cart-toggle" class="lg:hidden text-white text-sm">
-                <i class="fas fa-chevron-up"></i>
-            </button>
-            <h3 class="text-base font-semibold flex items-center gap-2">
-                <i class="fas fa-shopping-basket"></i> Current Cart
-            </h3>
-        </div>
-        <button id="clear-cart" class="text-amber-300 hover:text-white transition-colors text-xs flex items-center font-medium">
-            <i class="fas fa-trash-alt mr-1"></i> <span class="hidden sm:inline">Clear</span>
-        </button>
-    </div>
-
-    <!-- Cart Items -->
-    <div class="flex-1 overflow-y-auto px-4 py-3 bg-gray-50" style="max-height: calc(88vh - 290px);">
-        <div id="cart-items" class="space-y-3">
-            <div id="empty-cart"
-                 class="h-full flex flex-col items-center justify-center py-10 text-center">
-                <div class="bg-gray-200 w-16 h-16 rounded-xl flex items-center justify-center mb-4 shadow-inner border border-gray-300">
-                    <i class="fas fa-shopping-basket text-2xl text-gray-500"></i>
-                </div>
-                <h4 class="font-semibold text-gray-600 mb-1">Your cart is empty</h4>
-                <p class="text-gray-400 text-sm">Begin by adding products</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Summary -->
-    <div class="border-t border-gray-100 px-5 py-4 bg-white">
-        <!-- Price Breakdown -->
-        <div class="space-y-2 mb-4 text-sm">
-            <div class="flex justify-between text-gray-600">
-                <span>Subtotal:</span>
-                <span class="font-medium" id="subtotal">Ksh 0.00</span>
-            </div>
-            <div class="flex justify-between text-gray-600">
-                <span>Tax (0%):</span>
-                <span class="font-medium" id="tax">Ksh 0.00</span>
-            </div>
-            <div class="flex justify-between text-gray-600">
-                <span>Discount:</span>
-                <span class="text-green-500 font-medium" id="discount">- Ksh 0.00</span>
-            </div>
-        </div>
-
-        <!-- Total -->
-        <div class="border-t border-gray-100 pt-2 mb-2 text-base font-bold">
-            <div class="flex justify-between">
-                <span class="text-gray-700">Total:</span>
-                <span class="text-gray-900" id="total">Ksh 0.00</span>
-            </div>
-        </div>
-
-        <!-- Customer -->
-        <div class="mb-4">
-            <label class="block text-gray-700 text-xs font-semibold mb-1">Customer( optional )</label>
-            <div class="relative">
-                <input type="text" id="customer-name" placeholder="Enter name"
-                       class="w-full pl-3 pr-8 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-sm text-sm bg-gray-50">
-                <button class="absolute right-2 top-2.5 text-gray-400 hover:text-amber-500">
-                    <i class="fas fa-user-plus text-xs"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Payment -->
-        <div class="mb-3">
-            <label class="block text-gray-700 text-xs font-semibold mb-1">Payment</label>
-            <div class="grid grid-cols-3 gap-1.5" id="payment-methods">
-                <button class="payment-method flex flex-col items-center justify-center py-1.5 border rounded-lg hover:border-amber-400 transition-all active border-amber-500 bg-amber-50"
-                        data-method="cash">
-                    <i class="fas fa-money-bill-wave text-amber-600 text-sm mb-0.5"></i>
-                    <span class="text-[0.65rem] font-medium">Cash</span>
-                </button>
-                <button class="payment-method flex flex-col items-center justify-center py-1.5 border rounded-lg hover:border-amber-400 border-gray-200 bg-white"
-                        data-method="card">
-                    <i class="fas fa-credit-card text-amber-600 text-sm mb-0.5"></i>
-                    <span class="text-[0.65rem] font-medium">Card</span>
-                </button>
-                <button class="payment-method flex flex-col items-center justify-center py-1.5 border rounded-lg hover:border-amber-400 border-gray-200 bg-white"
-                        data-method="mobile">
-                    <i class="fas fa-mobile-screen-button text-amber-600 text-sm mb-0.5"></i>
-                    <span class="text-[0.65rem] font-medium">M-Pesa</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Checkout -->
-        <button id="complete-sale"
-                class="w-full bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 rounded-lg font-medium flex items-center justify-center shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm">
-            <i class="fas fa-check-circle mr-2"></i>
-            Complete Sale (<span id="complete-sale-amount">Ksh 0.00</span>)
-        </button>
-    </div>
-</div>
-</div>
             </div>
         </main>
     </div>
@@ -502,7 +549,8 @@
             <div class="mb-6">
                 <label class="block text-gray-700 text-sm font-medium mb-3">Opening Cash Amount</label>
                 <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 font-medium">
+                    <div
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 font-medium">
                         Ksh
                     </div>
                     <input type="number" id="openingCash"
@@ -608,7 +656,8 @@
 </div>
 
 <!-- Premium Loading Overlay -->
-<div id="global-loading-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
+<div id="global-loading-overlay"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
     <div class="bg-white p-6 rounded-xl shadow-xl text-center max-w-xs">
         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mx-auto mb-4"></div>
         <h3 class="text-base font-medium text-gray-800" id="loading-message">Processing</h3>
@@ -624,575 +673,575 @@
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-// ====================
-// POS System Constants
-// ====================
-const API_BASE_URL = `/api/shops/${extractShopIdFromPath()}`;
-const currencyFormatter = new Intl.NumberFormat('en-KE', {
-    style: 'currency',
-    currency: 'KES',
-    minimumFractionDigits: 2
-});
+    // ====================
+    // POS System Constants
+    // ====================
+    const API_BASE_URL = `/api/shops/${extractShopIdFromPath()}`;
+    const currencyFormatter = new Intl.NumberFormat('en-KE', {
+        style: 'currency',
+        currency: 'KES',
+        minimumFractionDigits: 2
+    });
 
-// ====================
-// DOM Elements
-// ====================
-const elements = {
-    // Main UI
-    registerClosedState: document.getElementById('register-closed-state'),
-    posInterface: document.getElementById('pos-interface'),
-    registerStatus: document.getElementById('register-status'),
-    statusDot: document.querySelector('.status-dot'),
-    statusText: document.querySelector('.status-text'),
+    // ====================
+    // DOM Elements
+    // ====================
+    const elements = {
+        // Main UI
+        registerClosedState: document.getElementById('register-closed-state'),
+        posInterface: document.getElementById('pos-interface'),
+        registerStatus: document.getElementById('register-status'),
+        statusDot: document.querySelector('.status-dot'),
+        statusText: document.querySelector('.status-text'),
 
-    // Product Grid
-    productGrid: document.getElementById('product-grid'),
-    productsEmptyState: document.getElementById('products-empty-state'),
-    categoryTabs: document.getElementById('category-tabs'),
-    productSearch: document.getElementById('product-search'),
+        // Product Grid
+        productGrid: document.getElementById('product-grid'),
+        productsEmptyState: document.getElementById('products-empty-state'),
+        categoryTabs: document.getElementById('category-tabs'),
+        productSearch: document.getElementById('product-search'),
 
-    // Cart
-    cartItems: document.getElementById('cart-items'),
-    subtotalEl: document.getElementById('subtotal'),
-    taxEl: document.getElementById('tax'),
-    totalEl: document.getElementById('total'),
-    completeSaleBtn: document.getElementById('complete-sale'),
-    clearCartBtn: document.getElementById('clear-cart'),
-    emptyCart: document.getElementById('empty-cart'),
+        // Cart
+        cartItems: document.getElementById('cart-items'),
+        subtotalEl: document.getElementById('subtotal'),
+        taxEl: document.getElementById('tax'),
+        totalEl: document.getElementById('total'),
+        completeSaleBtn: document.getElementById('complete-sale'),
+        clearCartBtn: document.getElementById('clear-cart'),
+        emptyCart: document.getElementById('empty-cart'),
 
-    // Customer/Payment
-    customerNameInput: document.getElementById('customer-name'),
-    paymentMethods: document.getElementById('payment-methods'),
+        // Customer/Payment
+        customerNameInput: document.getElementById('customer-name'),
+        paymentMethods: document.getElementById('payment-methods'),
 
-    // Modals
-    openRegisterModal: document.getElementById('openRegisterModal'),
-    closeRegisterModal: document.getElementById('closeRegisterModal'),
-    salesSummary: document.getElementById('salesSummary'),
+        // Modals
+        openRegisterModal: document.getElementById('openRegisterModal'),
+        closeRegisterModal: document.getElementById('closeRegisterModal'),
+        salesSummary: document.getElementById('salesSummary'),
 
-    // Loading
-    globalLoadingOverlay: document.getElementById('global-loading-overlay'),
-    loadingMessage: document.getElementById('loading-message'),
-    loadingSubmessage: document.getElementById('loading-submessage'),
+        // Loading
+        globalLoadingOverlay: document.getElementById('global-loading-overlay'),
+        loadingMessage: document.getElementById('loading-message'),
+        loadingSubmessage: document.getElementById('loading-submessage'),
 
-    // Buttons
-    salesSummaryBtn: document.getElementById('sales-summary-btn'),
-    openRegisterBtn: document.getElementById('open-register-btn'),
-    openRegisterMainBtn: document.getElementById('open-register-main-btn'),
-    closeRegisterBtn: document.getElementById('close-register-btn'),
-    registerStatusSpinner: document.getElementById('register-status-spinner'),
-};
-
-// ====================
-// State Management
-// ====================
-const state = {
-    cart: [],
-    products: [],
-    categories: [],
-    selectedPaymentMethod: 'cash',
-    currentRegisterSession: null,
-    lastRegisterSession: null,
-    pendingCartUpdates: new Set(), // Track pending cart operations
-    shopInfo: null
-};
-
-// ====================
-// Utility Functions
-// ====================
-function extractShopIdFromPath(expectedPrefix = '/shops') {
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const shopIndex = pathParts.indexOf(expectedPrefix.replace('/', ''));
-    if (shopIndex === -1 || !pathParts[shopIndex + 1]) {
-        console.error('Could not locate shop segment in URL');
-        throw new Error('Invalid shop path');
-    }
-    return parseInt(pathParts[shopIndex + 1]);
-}
-
-function formatCurrency(amount) {
-    return currencyFormatter.format(amount || 0);
-}
-
-function formatDate(dateString) {
-    if (!dateString) return '--';
-    const options = {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        // Buttons
+        salesSummaryBtn: document.getElementById('sales-summary-btn'),
+        openRegisterBtn: document.getElementById('open-register-btn'),
+        openRegisterMainBtn: document.getElementById('open-register-main-btn'),
+        closeRegisterBtn: document.getElementById('close-register-btn'),
+        registerStatusSpinner: document.getElementById('register-status-spinner'),
     };
-    return new Date(dateString).toLocaleDateString('en-KE', options);
-}
 
-function formatTime(dateString) {
-    if (!dateString) return '--';
-    const options = { hour: '2-digit', minute: '2-digit' };
-    return new Date(dateString).toLocaleTimeString('en-KE', options);
-}
+    // ====================
+    // State Management
+    // ====================
+    const state = {
+        cart: [],
+        products: [],
+        categories: [],
+        selectedPaymentMethod: 'cash',
+        currentRegisterSession: null,
+        lastRegisterSession: null,
+        pendingCartUpdates: new Set(), // Track pending cart operations
+        shopInfo: null
+    };
 
-// ====================
-// UI Helper Functions
-// ====================
-function showLoading(message = 'Processing...', submessage = 'Please wait') {
-    elements.loadingMessage.textContent = message;
-    elements.loadingSubmessage.textContent = submessage;
-    elements.globalLoadingOverlay.classList.remove('hidden');
-}
+    // ====================
+    // Utility Functions
+    // ====================
+    function extractShopIdFromPath(expectedPrefix = '/shops') {
+        const pathParts = window.location.pathname.split('/').filter(Boolean);
+        const shopIndex = pathParts.indexOf(expectedPrefix.replace('/', ''));
+        if (shopIndex === -1 || !pathParts[shopIndex + 1]) {
+            console.error('Could not locate shop segment in URL');
+            throw new Error('Invalid shop path');
+        }
+        return parseInt(pathParts[shopIndex + 1]);
+    }
 
-function hideLoading() {
-    elements.globalLoadingOverlay.classList.add('hidden');
-}
+    function formatCurrency(amount) {
+        return currencyFormatter.format(amount || 0);
+    }
 
-function showModal(modalId) {
-    document.getElementById(modalId).classList.remove('hidden');
-    setTimeout(() => {
-        document.getElementById(modalId).classList.add('flex');
-    }, 10);
-}
+    function formatDate(dateString) {
+        if (!dateString) return '--';
+        const options = {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        return new Date(dateString).toLocaleDateString('en-KE', options);
+    }
 
-function hideModal(modalId) {
-    document.getElementById(modalId).classList.remove('flex');
-    setTimeout(() => {
-        document.getElementById(modalId).classList.add('hidden');
-    }, 300);
-}
+    function formatTime(dateString) {
+        if (!dateString) return '--';
+        const options = { hour: '2-digit', minute: '2-digit' };
+        return new Date(dateString).toLocaleTimeString('en-KE', options);
+    }
 
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `px-4 py-3 rounded-lg shadow-lg text-white animate-fade-in flex items-start ${type === 'success' ? 'bg-success-500' :
+    // ====================
+    // UI Helper Functions
+    // ====================
+    function showLoading(message = 'Processing...', submessage = 'Please wait') {
+        elements.loadingMessage.textContent = message;
+        elements.loadingSubmessage.textContent = submessage;
+        elements.globalLoadingOverlay.classList.remove('hidden');
+    }
+
+    function hideLoading() {
+        elements.globalLoadingOverlay.classList.add('hidden');
+    }
+
+    function showModal(modalId) {
+        document.getElementById(modalId).classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById(modalId).classList.add('flex');
+        }, 10);
+    }
+
+    function hideModal(modalId) {
+        document.getElementById(modalId).classList.remove('flex');
+        setTimeout(() => {
+            document.getElementById(modalId).classList.add('hidden');
+        }, 300);
+    }
+
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `px-4 py-3 rounded-lg shadow-lg text-white animate-fade-in flex items-start ${type === 'success' ? 'bg-success-500' :
             type === 'error' ? 'bg-danger-500' :
                 type === 'warning' ? 'bg-warning-500' : 'bg-primary-500'
-        }`;
+            }`;
 
-    notification.innerHTML = `
+        notification.innerHTML = `
             <i class="fas ${type === 'success' ? 'fa-check-circle' :
-            type === 'error' ? 'fa-exclamation-circle' :
-                type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'
-        } mr-2 mt-0.5"></i> 
+                type === 'error' ? 'fa-exclamation-circle' :
+                    type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'
+            } mr-2 mt-0.5"></i> 
             <span>${message}</span>
         `;
 
-    document.getElementById('notification-container').appendChild(notification);
+        document.getElementById('notification-container').appendChild(notification);
 
-    setTimeout(() => {
-        notification.classList.add('animate-fade-out');
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
-
-function handleError(context, error) {
-    console.error(`${context}:`, error);
-
-    let message = context;
-    if (error.response) {
-        if (error.response.status === 401) {
-            message = 'Session expired. Please login again.';
-            setTimeout(() => window.location.href = '/auth/login', 2000);
-        } else if (error.response.status === 403) {
-            message = 'You don\'t have permission for this action';
-        } else if (error.response.data?.message) {
-            message = error.response.data.message;
-        }
+        setTimeout(() => {
+            notification.classList.add('animate-fade-out');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 
-    showNotification(message, 'error');
-}
+    function handleError(context, error) {
+        console.error(`${context}:`, error);
 
-
-
-function calculateComboSubtotal(item) {
-    const quantity = item.quantity;
-
-    if (item.is_combo && item.combination_size > 1 && item.combination_price) {
-        const groupCount = Math.floor(quantity / item.combination_size);
-        const remaining = quantity % item.combination_size;
-
-        return (
-            groupCount * item.combination_price +
-            remaining * item.price
-        );
-    } else {
-        return quantity * item.price;
-    }
-}
-
-
-
-
-
-// ====================
-// Optimized Register Management 
-// ====================
-async function checkRegisterStatus() {
-    // Show minimal loading in the UI part only (not global block)
-    elements.registerStatusSpinner.classList.remove('hidden'); // e.g. small inline spinner
-
-    try {
-        const res = await axios.get(`${API_BASE_URL}/register/info?t=${Date.now()}`);
-        const data = res.data;
-
-        const isOpen = data.is_open === true;
-
-        state.currentRegisterSession = isOpen ? data : null;
-        state.lastRegisterSession = !isOpen && data.last_session ? data.last_session : null;
-
-        updateRegisterUI(isOpen);
-
-        if (isOpen) {
-            elements.registerClosedState.classList.add('hidden');
-            elements.posInterface.classList.remove('hidden');
-            elements.salesSummaryBtn.classList.remove('hidden');
-
-            // Turbo initialize POS immediately — don't block UI
-            requestIdleCallback(() => {
-                initPOS().catch(err => {
-                    console.error('Background POS init error:', err);
-                });
-            });
-
-        } else {
-            elements.registerClosedState.classList.remove('hidden');
-            elements.posInterface.classList.add('hidden');
-            elements.salesSummaryBtn.classList.add('hidden');
-            updateLastSessionInfo();
-        }
-
-    } catch (err) {
-        console.error('Register check failed:', err);
-        showNotification('Failed to check register status', 'error');
-    } finally {
-        elements.registerStatusSpinner.classList.add('hidden');
-    }
-}
-
-
-
-
-function updateRegisterUI(isOpen) {
-    const dot = elements.statusDot;
-    const text = elements.statusText;
-
-    if (isOpen) {
-        dot.classList.replace('bg-danger-500', 'bg-success-500');
-        text.textContent = `Session #${state.currentRegisterSession.session_id} (Open)`;
-        elements.openRegisterBtn.classList.add('hidden');
-        elements.closeRegisterBtn.classList.remove('hidden');
-        elements.openRegisterMainBtn.classList.add('hidden');
-    } else {
-        dot.classList.replace('bg-success-500', 'bg-danger-500');
-        text.textContent = 'Register Closed';
-        elements.openRegisterBtn.classList.remove('hidden');
-        elements.closeRegisterBtn.classList.add('hidden');
-        elements.openRegisterMainBtn.classList.remove('hidden');
-    }
-}
-
-function updateLastSessionInfo() {
-    const last = state.lastRegisterSession;
-    if (!last) return;
-    document.getElementById('last-session-date').textContent = formatDate(last.closed_at);
-    document.getElementById('last-session-balance').textContent = formatCurrency(last.closing_cash);
-}
-
-async function openRegisterModal() {
-    try {
-        if (!state.lastRegisterSession) {
-            const res = await axios.get(`${API_BASE_URL}/register/history`);
-            const sessions = res.data.sessions;
-
-            if (sessions && sessions.length > 0) {
-                state.lastRegisterSession = sessions[0];
-                updateLastSessionInfo();
+        let message = context;
+        if (error.response) {
+            if (error.response.status === 401) {
+                message = 'Session expired. Please login again.';
+                setTimeout(() => window.location.href = '/auth/login', 2000);
+            } else if (error.response.status === 403) {
+                message = 'You don\'t have permission for this action';
+            } else if (error.response.data?.message) {
+                message = error.response.data.message;
             }
         }
 
-        document.getElementById('openingCash').value = '';
-        showModal('openRegisterModal');
-    } catch (err) {
-        console.warn('Failed to fetch last session:', err);
-        showModal('openRegisterModal');
-    }
-}
-
-async function submitOpenRegister() {
-    const amount = parseFloat(document.getElementById('openingCash').value);
-
-    if (isNaN(amount) || amount < 0) {
-        return showNotification('Enter a valid opening cash amount.', 'error');
+        showNotification(message, 'error');
     }
 
-    try {
-        showLoading('Opening register...');
-        const res = await axios.post(`${API_BASE_URL}/register/open`, { opening_cash: amount });
-        showNotification('Register session started.', 'success');
-        hideModal('openRegisterModal');
-        await checkRegisterStatus();
-    } catch (err) {
-        handleError('Failed to open register.', err);
-    } finally {
-        hideLoading();
-    }
-}
 
-async function closeRegisterModal() {
-    if (!state.currentRegisterSession) {
-        return showNotification('No open register session.', 'error');
-    }
 
-    try {
-        showLoading('Fetching summary...');
-        const res = await axios.get(`${API_BASE_URL}/register/summary`);
+    function calculateComboSubtotal(item) {
+        const quantity = item.quantity;
 
-        const summary = res.data.summary;
+        if (item.is_combo && item.combination_size > 1 && item.combination_price) {
+            const groupCount = Math.floor(quantity / item.combination_size);
+            const remaining = quantity % item.combination_size;
 
-        // Defensive check
-        if (!summary) {
-            showNotification('No session summary returned.', 'error');
-            return;
+            return (
+                groupCount * item.combination_price +
+                remaining * item.price
+            );
+        } else {
+            return quantity * item.price;
         }
-
-        // Populate the modal
-        document.getElementById('current-session-id').textContent = summary.session_id;
-        document.getElementById('session-opened-at').textContent = formatDate(summary.opened_at);
-        document.getElementById('session-opened-by').textContent = summary.opened_by || 'Unknown';
-        document.getElementById('session-opening-cash').textContent = formatCurrency(summary.opening_cash);
-        document.getElementById('session-total-sales').textContent = formatCurrency(summary.total_sales);
-        document.getElementById('session-expected-cash').textContent = summary.expected_cash.toFixed(2);
-
-        // Clear previous inputs and alerts
-        document.getElementById('closingCash').value = '';
-        document.getElementById('closingNotes').value = '';
-        document.getElementById('discrepancy-alert').classList.add('hidden');
-
-        showModal('closeRegisterModal');
-    } catch (err) {
-        handleError('Could not fetch session summary.', err);
-    } finally {
-        hideLoading();
-    }
-}
-
-async function submitCloseRegister() {
-    const closingCash = parseFloat(document.getElementById('closingCash').value);
-    const expectedCash = parseFloat(document.getElementById('session-expected-cash').textContent);
-    const notes = document.getElementById('closingNotes').value;
-
-    if (isNaN(closingCash)) {
-        return showNotification('Enter a valid closing cash amount.', 'error');
     }
 
-    const discrepancy = closingCash - expectedCash;
-    const alertBox = document.getElementById('discrepancy-alert');
 
-    if (Math.abs(discrepancy) > 0.01) {
-        document.getElementById('discrepancy-title').textContent = discrepancy > 0 ? 'Overage Detected' : 'Shortage Detected';
-        document.getElementById('discrepancy-text').textContent =
-            `Expected: ${formatCurrency(expectedCash)} • Counted: ${formatCurrency(closingCash)} • Difference: ${formatCurrency(discrepancy)}`;
 
-        alertBox.classList.remove('hidden');
-        alertBox.classList.toggle('bg-warning-50', discrepancy > 0);
-        alertBox.classList.toggle('border-warning-200', discrepancy > 0);
-        alertBox.classList.toggle('bg-danger-50', discrepancy < 0);
-        alertBox.classList.toggle('border-danger-200', discrepancy < 0);
 
-        showNotification('Discrepancy noted. Proceeding with closure.', 'warning');
+
+    // ====================
+    // Optimized Register Management 
+    // ====================
+    async function checkRegisterStatus() {
+        // Show minimal loading in the UI part only (not global block)
+        elements.registerStatusSpinner.classList.remove('hidden'); // e.g. small inline spinner
+
+        try {
+            const res = await axios.get(`${API_BASE_URL}/register/info?t=${Date.now()}`);
+            const data = res.data;
+
+            const isOpen = data.is_open === true;
+
+            state.currentRegisterSession = isOpen ? data : null;
+            state.lastRegisterSession = !isOpen && data.last_session ? data.last_session : null;
+
+            updateRegisterUI(isOpen);
+
+            if (isOpen) {
+                elements.registerClosedState.classList.add('hidden');
+                elements.posInterface.classList.remove('hidden');
+                elements.salesSummaryBtn.classList.remove('hidden');
+
+                // Turbo initialize POS immediately — don't block UI
+                requestIdleCallback(() => {
+                    initPOS().catch(err => {
+                        console.error('Background POS init error:', err);
+                    });
+                });
+
+            } else {
+                elements.registerClosedState.classList.remove('hidden');
+                elements.posInterface.classList.add('hidden');
+                elements.salesSummaryBtn.classList.add('hidden');
+                updateLastSessionInfo();
+            }
+
+        } catch (err) {
+            console.error('Register check failed:', err);
+            showNotification('Failed to check register status', 'error');
+        } finally {
+            elements.registerStatusSpinner.classList.add('hidden');
+        }
     }
 
-    try {
-        showLoading('Closing register...');
-        await axios.put(`${API_BASE_URL}/register/close`, {
-            session_id: state.currentRegisterSession.session_id,
-            closing_cash: closingCash,
-            notes: notes
-        });
 
-        showNotification('Register closed successfully.', 'success');
-        hideModal('closeRegisterModal');
-        await checkRegisterStatus();
-    } catch (err) {
-        handleError('Failed to close register.', err);
-    } finally {
-        hideLoading();
+
+
+    function updateRegisterUI(isOpen) {
+        const dot = elements.statusDot;
+        const text = elements.statusText;
+
+        if (isOpen) {
+            dot.classList.replace('bg-danger-500', 'bg-success-500');
+            text.textContent = `Session #${state.currentRegisterSession.session_id} (Open)`;
+            elements.openRegisterBtn.classList.add('hidden');
+            elements.closeRegisterBtn.classList.remove('hidden');
+            elements.openRegisterMainBtn.classList.add('hidden');
+        } else {
+            dot.classList.replace('bg-success-500', 'bg-danger-500');
+            text.textContent = 'Register Closed';
+            elements.openRegisterBtn.classList.remove('hidden');
+            elements.closeRegisterBtn.classList.add('hidden');
+            elements.openRegisterMainBtn.classList.remove('hidden');
+        }
     }
-}
 
+    function updateLastSessionInfo() {
+        const last = state.lastRegisterSession;
+        if (!last) return;
+        document.getElementById('last-session-date').textContent = formatDate(last.closed_at);
+        document.getElementById('last-session-balance').textContent = formatCurrency(last.closing_cash);
+    }
 
-// ====================
-// POS Initialization 
-// ====================
-async function initPOS() {
-    try {
-        // Show instant loading state 
-        requestAnimationFrame(() => showLoading('POS Starting', 'Preparing system...'));
-        
-        // Fire critical requests immediately (no await)
-        const shopPromise = loadShopData();
-        const productsPromise = loadProducts();
-        
-        // Show skeleton UI immediately 
-        showProductSkeletons(12); // Optimistic number
-        
-        // Wait only for critical data (shop + products)
-        await Promise.all([shopPromise, productsPromise]);
-        
-        // Start non-critical loads in background
-        const nonCriticalLoads = Promise.allSettled([
-            loadCategories(),
-            loadCart()
-        ]).then(results => {
-            results.forEach((result, i) => {
-                if (result.status === 'rejected') {
-                    console.warn(`Background load ${i} failed:`, result.reason);
+    async function openRegisterModal() {
+        try {
+            if (!state.lastRegisterSession) {
+                const res = await axios.get(`${API_BASE_URL}/register/history`);
+                const sessions = res.data.sessions;
+
+                if (sessions && sessions.length > 0) {
+                    state.lastRegisterSession = sessions[0];
+                    updateLastSessionInfo();
                 }
+            }
+
+            document.getElementById('openingCash').value = '';
+            showModal('openRegisterModal');
+        } catch (err) {
+            console.warn('Failed to fetch last session:', err);
+            showModal('openRegisterModal');
+        }
+    }
+
+    async function submitOpenRegister() {
+        const amount = parseFloat(document.getElementById('openingCash').value);
+
+        if (isNaN(amount) || amount < 0) {
+            return showNotification('Enter a valid opening cash amount.', 'error');
+        }
+
+        try {
+            showLoading('Opening register...');
+            const res = await axios.post(`${API_BASE_URL}/register/open`, { opening_cash: amount });
+            showNotification('Register session started.', 'success');
+            hideModal('openRegisterModal');
+            await checkRegisterStatus();
+        } catch (err) {
+            handleError('Failed to open register.', err);
+        } finally {
+            hideLoading();
+        }
+    }
+
+    async function closeRegisterModal() {
+        if (!state.currentRegisterSession) {
+            return showNotification('No open register session.', 'error');
+        }
+
+        try {
+            showLoading('Fetching summary...');
+            const res = await axios.get(`${API_BASE_URL}/register/summary`);
+
+            const summary = res.data.summary;
+
+            // Defensive check
+            if (!summary) {
+                showNotification('No session summary returned.', 'error');
+                return;
+            }
+
+            // Populate the modal
+            document.getElementById('current-session-id').textContent = summary.session_id;
+            document.getElementById('session-opened-at').textContent = formatDate(summary.opened_at);
+            document.getElementById('session-opened-by').textContent = summary.opened_by || 'Unknown';
+            document.getElementById('session-opening-cash').textContent = formatCurrency(summary.opening_cash);
+            document.getElementById('session-total-sales').textContent = formatCurrency(summary.total_sales);
+            document.getElementById('session-expected-cash').textContent = summary.expected_cash.toFixed(2);
+
+            // Clear previous inputs and alerts
+            document.getElementById('closingCash').value = '';
+            document.getElementById('closingNotes').value = '';
+            document.getElementById('discrepancy-alert').classList.add('hidden');
+
+            showModal('closeRegisterModal');
+        } catch (err) {
+            handleError('Could not fetch session summary.', err);
+        } finally {
+            hideLoading();
+        }
+    }
+
+    async function submitCloseRegister() {
+        const closingCash = parseFloat(document.getElementById('closingCash').value);
+        const expectedCash = parseFloat(document.getElementById('session-expected-cash').textContent);
+        const notes = document.getElementById('closingNotes').value;
+
+        if (isNaN(closingCash)) {
+            return showNotification('Enter a valid closing cash amount.', 'error');
+        }
+
+        const discrepancy = closingCash - expectedCash;
+        const alertBox = document.getElementById('discrepancy-alert');
+
+        if (Math.abs(discrepancy) > 0.01) {
+            document.getElementById('discrepancy-title').textContent = discrepancy > 0 ? 'Overage Detected' : 'Shortage Detected';
+            document.getElementById('discrepancy-text').textContent =
+                `Expected: ${formatCurrency(expectedCash)} • Counted: ${formatCurrency(closingCash)} • Difference: ${formatCurrency(discrepancy)}`;
+
+            alertBox.classList.remove('hidden');
+            alertBox.classList.toggle('bg-warning-50', discrepancy > 0);
+            alertBox.classList.toggle('border-warning-200', discrepancy > 0);
+            alertBox.classList.toggle('bg-danger-50', discrepancy < 0);
+            alertBox.classList.toggle('border-danger-200', discrepancy < 0);
+
+            showNotification('Discrepancy noted. Proceeding with closure.', 'warning');
+        }
+
+        try {
+            showLoading('Closing register...');
+            await axios.put(`${API_BASE_URL}/register/close`, {
+                session_id: state.currentRegisterSession.session_id,
+                closing_cash: closingCash,
+                notes: notes
             });
-        });
-        
-        // Optional: Prefetch likely next resources
-        if ('connection' in navigator && !navigator.connection.saveData) {
-            prefetchResources();
+
+            showNotification('Register closed successfully.', 'success');
+            hideModal('closeRegisterModal');
+            await checkRegisterStatus();
+        } catch (err) {
+            handleError('Failed to close register.', err);
+        } finally {
+            hideLoading();
         }
-        
-    } catch (error) {
-        handleCriticalError(error);
-    } finally {
-        // Hide loading with slight delay to prevent flicker
-        setTimeout(hideLoading, 150);
     }
-}
 
-// ====================
-// Data Loading
-// ====================
-async function loadShopData() {
-    try {
-        // Cache busting for critical shop data
-        const res = await axios.get(`${API_BASE_URL}/shop-info?t=${Date.now()}`, {
-            timeout: 3000,
-            headers: { 'X-Critical-Request': 'true' }
-        });
-        
-        // Minimal DOM updates
-        state.shopInfo = res.data;
-        const shopNameEl = document.getElementById('shop-name');
-        if (shopNameEl) shopNameEl.textContent = state.shopInfo.name.substring(0, 24);
-        
-    } catch (error) {
-        console.error('Shop load failed:', error);
-        // Fallback to localStorage if available
-        state.shopInfo = JSON.parse(localStorage.getItem('lastShopInfo')) || { name: 'Our Store' };
-        throw error;
-    }
-}
 
-async function loadProducts() {
-    try {
-        // Try cache-first with network fallback
-        const cacheKey = 'products-v1';
-        const cached = localStorage.getItem(cacheKey);
-        
-        if (cached) {
-            state.products = JSON.parse(cached);
-            renderProducts();
+    // ====================
+    // POS Initialization 
+    // ====================
+    async function initPOS() {
+        try {
+            // Show instant loading state 
+            requestAnimationFrame(() => showLoading('POS Starting', 'Preparing system...'));
+
+            // Fire critical requests immediately (no await)
+            const shopPromise = loadShopData();
+            const productsPromise = loadProducts();
+
+            // Show skeleton UI immediately 
+            showProductSkeletons(12); // Optimistic number
+
+            // Wait only for critical data (shop + products)
+            await Promise.all([shopPromise, productsPromise]);
+
+            // Start non-critical loads in background
+            const nonCriticalLoads = Promise.allSettled([
+                loadCategories(),
+                loadCart()
+            ]).then(results => {
+                results.forEach((result, i) => {
+                    if (result.status === 'rejected') {
+                        console.warn(`Background load ${i} failed:`, result.reason);
+                    }
+                });
+            });
+
+            // Optional: Prefetch likely next resources
+            if ('connection' in navigator && !navigator.connection.saveData) {
+                prefetchResources();
+            }
+
+        } catch (error) {
+            handleCriticalError(error);
+        } finally {
+            // Hide loading with slight delay to prevent flicker
+            setTimeout(hideLoading, 150);
         }
-        
-        // Always fetch fresh in background
-        const freshLoad = axios.get(`${API_BASE_URL}/products?limit=500`, {
-            timeout: 5000,
-            headers: { 'X-Request-Type': 'product-list' }
-        }).then(response => {
-            state.products = response.data;
-            localStorage.setItem(cacheKey, JSON.stringify(response.data));
-            renderProducts();
-        }).catch(console.warn);
-        
-        // Only wait if no cache
-        if (!cached) await freshLoad;
-        
-    } catch (error) {
-        console.error('Products load failed:', error);
-        elements.productGrid.innerHTML = errorFallbackUI();
-        throw error;
     }
-}
 
-// ====================
-// Background Loaders
-// ====================
-function loadCategories() {
-    return axios.get(`${API_BASE_URL}/categories?minimal=true`)
-        .then(res => {
-            state.categories = res.data;
-            renderCategories();
-        })
-        .catch(err => {
-            console.warn('Categories failed:', err);
-            state.categories = [];
+    // ====================
+    // Data Loading
+    // ====================
+    async function loadShopData() {
+        try {
+            // Cache busting for critical shop data
+            const res = await axios.get(`${API_BASE_URL}/shop-info?t=${Date.now()}`, {
+                timeout: 3000,
+                headers: { 'X-Critical-Request': 'true' }
+            });
+
+            // Minimal DOM updates
+            state.shopInfo = res.data;
+            const shopNameEl = document.getElementById('shop-name');
+            if (shopNameEl) shopNameEl.textContent = state.shopInfo.name.substring(0, 24);
+
+        } catch (error) {
+            console.error('Shop load failed:', error);
+            // Fallback to localStorage if available
+            state.shopInfo = JSON.parse(localStorage.getItem('lastShopInfo')) || { name: 'Our Store' };
+            throw error;
+        }
+    }
+
+    async function loadProducts() {
+        try {
+            // Try cache-first with network fallback
+            const cacheKey = 'products-v1';
+            const cached = localStorage.getItem(cacheKey);
+
+            if (cached) {
+                state.products = JSON.parse(cached);
+                renderProducts();
+            }
+
+            // Always fetch fresh in background
+            const freshLoad = axios.get(`${API_BASE_URL}/products?limit=500`, {
+                timeout: 5000,
+                headers: { 'X-Request-Type': 'product-list' }
+            }).then(response => {
+                state.products = response.data;
+                localStorage.setItem(cacheKey, JSON.stringify(response.data));
+                renderProducts();
+            }).catch(console.warn);
+
+            // Only wait if no cache
+            if (!cached) await freshLoad;
+
+        } catch (error) {
+            console.error('Products load failed:', error);
+            elements.productGrid.innerHTML = errorFallbackUI();
+            throw error;
+        }
+    }
+
+    // ====================
+    // Background Loaders
+    // ====================
+    function loadCategories() {
+        return axios.get(`${API_BASE_URL}/categories?minimal=true`)
+            .then(res => {
+                state.categories = res.data;
+                renderCategories();
+            })
+            .catch(err => {
+                console.warn('Categories failed:', err);
+                state.categories = [];
+            });
+    }
+
+    function loadCart() {
+        return axios.get(`${API_BASE_URL}/cart/items`)
+
+            .then(res => {
+                state.cart = res.data?.items || [];
+                updateCartUI();
+            })
+            .catch(err => {
+                console.warn('Cart sync failed:', err);
+                state.cart = [];
+            });
+    }
+
+    // ====================
+    // Performance Helpers
+    // ====================
+    function prefetchResources() {
+        // Prefetch likely next requests
+        const prefetchUrls = [
+            `${API_BASE_URL}/customers/recent`,
+            `${API_BASE_URL}/payment-methods`
+        ];
+
+        prefetchUrls.forEach(url => {
+            fetch(url, {
+                method: 'HEAD',
+                credentials: 'include',
+                priority: 'low'
+            }).catch(() => { });
         });
-}
+    }
 
-function loadCart() {
-    return axios.get(`${API_BASE_URL}/cart/items`)
-
-        .then(res => {
-            state.cart = res.data?.items || [];
-            updateCartUI();
-        })
-        .catch(err => {
-            console.warn('Cart sync failed:', err);
-            state.cart = [];
-        });
-}
-
-// ====================
-// Performance Helpers
-// ====================
-function prefetchResources() {
-    // Prefetch likely next requests
-    const prefetchUrls = [
-        `${API_BASE_URL}/customers/recent`,
-        `${API_BASE_URL}/payment-methods`
-    ];
-    
-    prefetchUrls.forEach(url => {
-        fetch(url, { 
-            method: 'HEAD',
-            credentials: 'include',
-            priority: 'low'
-        }).catch(() => {});
-    });
-}
-
-function showProductSkeletons(count = 8) {
-    // Ultra-fast template cloning
-    const template = document.createElement('template');
-    template.innerHTML = `
+    function showProductSkeletons(count = 8) {
+        // Ultra-fast template cloning
+        const template = document.createElement('template');
+        template.innerHTML = `
         <div class="skeleton-item">
             <div class="skeleton-image"></div>
             <div class="skeleton-line w-3/4"></div>
             <div class="skeleton-line w-1/2"></div>
         </div>`.repeat(count);
-    
-    elements.productGrid.replaceChildren(template.content.cloneNode(true));
-}
 
-function errorFallbackUI() {
-    return `
+        elements.productGrid.replaceChildren(template.content.cloneNode(true));
+    }
+
+    function errorFallbackUI() {
+        return `
     <div class="error-fallback">
         <svg class="warning-icon">...</svg>
         <p>Products unavailable</p>
         <button onclick="initPOS()">Retry</button>
     </div>`;
-}
+    }
 
-function renderProducts() {
-    const grid = elements.productGrid;
-    const empty = elements.productsEmptyState;
+    function renderProducts() {
+        const grid = elements.productGrid;
+        const empty = elements.productsEmptyState;
 
-    if (state.products.length === 0) {
-        grid.classList.add('hidden');
-        empty.classList.remove('hidden');
-        empty.innerHTML = `
+        if (state.products.length === 0) {
+            grid.classList.add('hidden');
+            empty.classList.remove('hidden');
+            empty.innerHTML = `
             <div class="text-center p-6">
                 <div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
                     <i class="fas fa-box-open text-gray-400 text-xl"></i>
@@ -1201,28 +1250,28 @@ function renderProducts() {
                 <p class="text-gray-400 text-sm">Try adjusting your search or filters</p>
             </div>
         `;
-        return;
-    }
+            return;
+        }
 
-    grid.classList.remove('hidden');
-    empty.classList.add('hidden');
+        grid.classList.remove('hidden');
+        empty.classList.add('hidden');
 
-    // Use document fragment for better performance
-    const fragment = document.createDocumentFragment();
-    const cardTemplate = document.createElement('div');
-    cardTemplate.className = 'contents'; // CSS containment
+        // Use document fragment for better performance
+        const fragment = document.createDocumentFragment();
+        const cardTemplate = document.createElement('div');
+        cardTemplate.className = 'contents'; // CSS containment
 
-    cardTemplate.innerHTML = state.products.map(product => {
-        const { id, name, price, stock, discount = 0, image_url, category, barcode, combination_size, combination_price } = product;
-        const isOutOfStock = stock <= 0;
-        const finalPrice = discount > 0 ? price * (1 - discount / 100) : price;
-        const hasImage = Boolean(image_url);
-        const initials = name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
-        const stockPercentage = Math.min(100, (stock / 20) * 100);
-        const isCombo = combination_size && combination_price;
-        const comboPricePerUnit = combination_price / combination_size;
+        cardTemplate.innerHTML = state.products.map(product => {
+            const { id, name, price, stock, discount = 0, image_url, category, barcode, combination_size, combination_price } = product;
+            const isOutOfStock = stock <= 0;
+            const finalPrice = discount > 0 ? price * (1 - discount / 100) : price;
+            const hasImage = Boolean(image_url);
+            const initials = name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+            const stockPercentage = Math.min(100, (stock / 20) * 100);
+            const isCombo = combination_size && combination_price;
+            const comboPricePerUnit = combination_price / combination_size;
 
-         return `
+            return `
         <div class="pos-card bg-white rounded-lg border border-gray-100 shadow-xs hover:shadow-md transition-all duration-150 
                     hover:border-primary-300 group overflow-hidden flex flex-col h-full"
              data-id="${id}">
@@ -1268,7 +1317,7 @@ function renderProducts() {
                         <span class="discount-badge text-[0.65rem] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                             -${discount}%
                         </span>` : ''
-                    }
+                }
                 </div>
 
                 <!-- Combination Deal -->
@@ -1293,57 +1342,57 @@ function renderProducts() {
                         <span class="text-sm font-bold text-primary-600 leading-none">${formatCurrency(finalPrice)}</span>
                         ${discount > 0 ? `
                             <span class="text-[0.65rem] text-gray-400 line-through">${formatCurrency(price)}</span>` : ''
-                        }
+                }
                     </div>
                     
                     <!-- Stock Status -->
                     <div class="text-[0.65rem] font-medium px-1.5 py-0.5 rounded-full 
-                              ${isOutOfStock ? 'bg-red-100 text-red-800' : 
-                                stock <= 3 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'}">
+                              ${isOutOfStock ? 'bg-red-100 text-red-800' :
+                    stock <= 3 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'}">
                         ${isOutOfStock ? 'Out' : stock <= 3 ? 'Low' : stock}
                     </div>
                 </div>
             </div>
         </div>
         `;
-    }).join('');
+        }).join('');
 
-    fragment.appendChild(cardTemplate);
-    grid.innerHTML = '';
-    grid.appendChild(fragment);
+        fragment.appendChild(cardTemplate);
+        grid.innerHTML = '';
+        grid.appendChild(fragment);
 
-    // Event delegation for better performance
-    grid.addEventListener('click', (e) => {
-        const addBtn = e.target.closest('.quick-add-btn');
-        if (!addBtn) return;
-        
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const card = addBtn.closest('.pos-card');
-        const productId = parseInt(card.dataset.id);
-        const icon = addBtn.querySelector('i');
-        
-        // Visual feedback
-        if (icon) {
-            icon.className = 'fas fa-check animate-pulse';
-            setTimeout(() => {
-                icon.className = 'fas fa-plus';
-            }, 800);
-        }
-        
-        // Optimistic UI update
-        addToCart(productId).catch(() => {
-            // Error handling would revert optimistic changes
+        // Event delegation for better performance
+        grid.addEventListener('click', (e) => {
+            const addBtn = e.target.closest('.quick-add-btn');
+            if (!addBtn) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const card = addBtn.closest('.pos-card');
+            const productId = parseInt(card.dataset.id);
+            const icon = addBtn.querySelector('i');
+
+            // Visual feedback
+            if (icon) {
+                icon.className = 'fas fa-check animate-pulse';
+                setTimeout(() => {
+                    icon.className = 'fas fa-plus';
+                }, 800);
+            }
+
+            // Optimistic UI update
+            addToCart(productId).catch(() => {
+                // Error handling would revert optimistic changes
+            });
         });
-    });
-}
+    }
 
 
-function renderCategories() {
-    if (state.categories.length > 0) {
-        // Create a more elegant category tabs container
-        elements.categoryTabs.innerHTML = `
+    function renderCategories() {
+        if (state.categories.length > 0) {
+            // Create a more elegant category tabs container
+            elements.categoryTabs.innerHTML = `
             <div class="category-tabs-container relative">
                 <div class="category-tabs-scroll flex space-x-2 pb-2 overflow-x-auto scrollbar-hide">
                     <!-- All Products Tab -->
@@ -1374,313 +1423,313 @@ function renderCategories() {
             </div>
         `;
 
-        // Add event listeners with enhanced animations
-        document.querySelectorAll('.category-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const categoryId = tab.dataset.id;
-                
-                // Smooth transition animation
-                tab.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    tab.style.transform = '';
-                }, 150);
-                
-                // Filter products with a slight delay for better UX
-                setTimeout(() => {
-                    filterProductsByCategory(categoryId);
-                }, 50);
-                
-                // Update active tab styling
-                document.querySelectorAll('.category-tab').forEach(t => {
-                    t.classList.remove(
-                        'bg-gradient-to-r', 'from-primary-500', 'to-primary-600', 
-                        'text-white', 'shadow-md',
-                        'border-primary-300', 'bg-primary-50', 'text-primary-600'
-                    );
-                    t.classList.add(
-                        'bg-white/90', 'text-gray-700', 'border-gray-200/80'
-                    );
-                    
-                    // Reset indicators
-                    const indicator = t.querySelector('.active-indicator');
-                    if (indicator) {
-                        indicator.classList.remove('opacity-100', 'bg-white');
-                        indicator.classList.add('opacity-0', 'bg-primary-500');
+            // Add event listeners with enhanced animations
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const categoryId = tab.dataset.id;
+
+                    // Smooth transition animation
+                    tab.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        tab.style.transform = '';
+                    }, 150);
+
+                    // Filter products with a slight delay for better UX
+                    setTimeout(() => {
+                        filterProductsByCategory(categoryId);
+                    }, 50);
+
+                    // Update active tab styling
+                    document.querySelectorAll('.category-tab').forEach(t => {
+                        t.classList.remove(
+                            'bg-gradient-to-r', 'from-primary-500', 'to-primary-600',
+                            'text-white', 'shadow-md',
+                            'border-primary-300', 'bg-primary-50', 'text-primary-600'
+                        );
+                        t.classList.add(
+                            'bg-white/90', 'text-gray-700', 'border-gray-200/80'
+                        );
+
+                        // Reset indicators
+                        const indicator = t.querySelector('.active-indicator');
+                        if (indicator) {
+                            indicator.classList.remove('opacity-100', 'bg-white');
+                            indicator.classList.add('opacity-0', 'bg-primary-500');
+                        }
+                    });
+
+                    // Style active tab
+                    if (categoryId === 'all') {
+                        tab.classList.remove('bg-white/90', 'text-gray-700', 'border-gray-200/80');
+                        tab.classList.add('bg-gradient-to-r', 'from-primary-500', 'to-primary-600', 'text-white', 'shadow-md');
+
+                        const indicator = tab.querySelector('.active-indicator');
+                        if (indicator) {
+                            indicator.classList.remove('opacity-0', 'bg-primary-500');
+                            indicator.classList.add('opacity-100', 'bg-white');
+                        }
+                    } else {
+                        tab.classList.remove('bg-white/90', 'text-gray-700', 'border-gray-200/80');
+                        tab.classList.add('border-primary-300', 'bg-primary-50', 'text-primary-600');
+
+                        const indicator = tab.querySelector('.active-indicator');
+                        if (indicator) {
+                            indicator.classList.remove('opacity-0');
+                            indicator.classList.add('opacity-100');
+                        }
                     }
                 });
-                
-                // Style active tab
-                if (categoryId === 'all') {
-                    tab.classList.remove('bg-white/90', 'text-gray-700', 'border-gray-200/80');
-                    tab.classList.add('bg-gradient-to-r', 'from-primary-500', 'to-primary-600', 'text-white', 'shadow-md');
-                    
-                    const indicator = tab.querySelector('.active-indicator');
-                    if (indicator) {
-                        indicator.classList.remove('opacity-0', 'bg-primary-500');
-                        indicator.classList.add('opacity-100', 'bg-white');
-                    }
+            });
+
+            // Add scroll indicators when tabs overflow
+            const checkScroll = () => {
+                const container = elements.categoryTabs.querySelector('.category-tabs-scroll');
+                const fadeRight = elements.categoryTabs.querySelector('.scroll-fade-right');
+
+                if (container.scrollWidth > container.clientWidth) {
+                    fadeRight.classList.remove('hidden');
                 } else {
-                    tab.classList.remove('bg-white/90', 'text-gray-700', 'border-gray-200/80');
-                    tab.classList.add('border-primary-300', 'bg-primary-50', 'text-primary-600');
-                    
-                    const indicator = tab.querySelector('.active-indicator');
-                    if (indicator) {
-                        indicator.classList.remove('opacity-0');
-                        indicator.classList.add('opacity-100');
-                    }
+                    fadeRight.classList.add('hidden');
                 }
-            });
-        });
-        
-        // Add scroll indicators when tabs overflow
-        const checkScroll = () => {
-            const container = elements.categoryTabs.querySelector('.category-tabs-scroll');
-            const fadeRight = elements.categoryTabs.querySelector('.scroll-fade-right');
-            
-            if (container.scrollWidth > container.clientWidth) {
-                fadeRight.classList.remove('hidden');
-            } else {
-                fadeRight.classList.add('hidden');
-            }
-        };
-        
-        // Initial check and on resize
-        checkScroll();
-        window.addEventListener('resize', checkScroll);
-    }
-}
+            };
 
-
-function filterProductsByCategory(categoryId) {
-    let filteredProducts = [];
-
-    if (categoryId === 'all') {
-        filteredProducts = state.products;
-    } else {
-        filteredProducts = state.products.filter(p => p.category_id == categoryId);
+            // Initial check and on resize
+            checkScroll();
+            window.addEventListener('resize', checkScroll);
+        }
     }
 
-    if (filteredProducts.length === 0) {
-        elements.productGrid.classList.add('hidden');
-        elements.productsEmptyState.classList.remove('hidden');
-        return;
-    }
 
-    elements.productGrid.classList.remove('hidden');
-    elements.productsEmptyState.classList.add('hidden');
+    function filterProductsByCategory(categoryId) {
+        let filteredProducts = [];
 
-    // Temporary swap to render filtered products
-    const originalProducts = state.products;
-    state.products = filteredProducts;
-    renderProducts();
-    state.products = originalProducts;
-}
-
-
-
-
-// ====================
-// Cart State Management
-// ====================
-
-/**
- * Adds a product to the cart with optimistic UI updates
- * @param {number} productId - ID of product to add
- */
-async function addToCart(productId) {
-    if (state.pendingCartUpdates.has(productId)) return;
-    state.pendingCartUpdates.add(productId);
-
-    const product = state.products.find(p => p.id === productId);
-    if (!product) return;
-
-    try {
-        // Optimistic local update
-        let item = state.cart.find(i => i.product_id === productId);
-        if (item) {
-            item.quantity += 1;
+        if (categoryId === 'all') {
+            filteredProducts = state.products;
         } else {
-            state.cart.push({
+            filteredProducts = state.products.filter(p => p.category_id == categoryId);
+        }
+
+        if (filteredProducts.length === 0) {
+            elements.productGrid.classList.add('hidden');
+            elements.productsEmptyState.classList.remove('hidden');
+            return;
+        }
+
+        elements.productGrid.classList.remove('hidden');
+        elements.productsEmptyState.classList.add('hidden');
+
+        // Temporary swap to render filtered products
+        const originalProducts = state.products;
+        state.products = filteredProducts;
+        renderProducts();
+        state.products = originalProducts;
+    }
+
+
+
+
+    // ====================
+    // Cart State Management
+    // ====================
+
+    /**
+     * Adds a product to the cart with optimistic UI updates
+     * @param {number} productId - ID of product to add
+     */
+    async function addToCart(productId) {
+        if (state.pendingCartUpdates.has(productId)) return;
+        state.pendingCartUpdates.add(productId);
+
+        const product = state.products.find(p => p.id === productId);
+        if (!product) return;
+
+        try {
+            // Optimistic local update
+            let item = state.cart.find(i => i.product_id === productId);
+            if (item) {
+                item.quantity += 1;
+            } else {
+                state.cart.push({
+                    product_id: productId,
+                    name: product.name,
+                    price: product.price,
+                    discount: product.discount || 0,
+                    image_url: product.image_url,
+                    quantity: 1,
+                    is_combo: product.is_combo || false,
+                    combination_size: product.combination_size || 0,
+                    combination_price: product.combination_price || null
+                });
+            }
+
+            updateCartUI();
+
+            // Sync with server
+            await axios.post(`${API_BASE_URL}/cart?action=add`, {
                 product_id: productId,
-                name: product.name,
-                price: product.price,
-                discount: product.discount || 0,
-                image_url: product.image_url,
-                quantity: 1,
-                is_combo: product.is_combo || false,
-                combination_size: product.combination_size || 0,
-                combination_price: product.combination_price || null
+                quantity: 1
             });
+
+            showNotification(`${product.name} added to cart`, 'success');
+        } catch (err) {
+            // Revert on error
+            const item = state.cart.find(i => i.product_id === productId);
+            if (item) {
+                if (item.quantity > 1) item.quantity -= 1;
+                else state.cart = state.cart.filter(i => i.product_id !== productId);
+            }
+            handleError('Failed to add to cart', err);
+        } finally {
+            state.pendingCartUpdates.delete(productId);
+            updateCartUI();
         }
+    }
 
-        updateCartUI();
+    /**
+     * Updates item quantity in cart
+     * @param {number} productId - ID of product to update
+     * @param {number} delta - Quantity change (+1 or -1)
+     */
+    async function updateCartItemQuantity(productId, delta) {
+        if (state.pendingCartUpdates.has(productId)) return;
+        state.pendingCartUpdates.add(productId);
 
-        // Sync with server
-        await axios.post(`${API_BASE_URL}/cart?action=add`, {
-            product_id: productId,
-            quantity: 1
-        });
-
-        showNotification(`${product.name} added to cart`, 'success');
-    } catch (err) {
-        // Revert on error
         const item = state.cart.find(i => i.product_id === productId);
-        if (item) {
-            if (item.quantity > 1) item.quantity -= 1;
-            else state.cart = state.cart.filter(i => i.product_id !== productId);
+        if (!item) return;
+
+        const newQty = item.quantity + delta;
+        if (newQty < 1) return;
+
+        try {
+            // Optimistic update
+            item.quantity = newQty;
+            updateCartUI();
+
+            await axios.post(`${API_BASE_URL}/cart?action=update`, {
+                product_id: productId,
+                quantity: newQty
+            });
+
+        } catch (err) {
+            // Revert on error
+            item.quantity -= delta;
+            updateCartUI();
+            handleError('Failed to update quantity', err);
+        } finally {
+            state.pendingCartUpdates.delete(productId);
+            updateCartUI();
         }
-        handleError('Failed to add to cart', err);
-    } finally {
-        state.pendingCartUpdates.delete(productId);
-        updateCartUI();
     }
-}
 
-/**
- * Updates item quantity in cart
- * @param {number} productId - ID of product to update
- * @param {number} delta - Quantity change (+1 or -1)
- */
-async function updateCartItemQuantity(productId, delta) {
-    if (state.pendingCartUpdates.has(productId)) return;
-    state.pendingCartUpdates.add(productId);
+    /**
+     * Removes item from cart
+     * @param {number} productId - ID of product to remove
+     */
+    async function removeFromCart(productId) {
+        if (state.pendingCartUpdates.has(productId)) return;
+        state.pendingCartUpdates.add(productId);
 
-    const item = state.cart.find(i => i.product_id === productId);
-    if (!item) return;
+        try {
+            state.cart = state.cart.filter(i => i.product_id !== productId);
+            updateCartUI();
 
-    const newQty = item.quantity + delta;
-    if (newQty < 1) return;
+            await axios.post(`${API_BASE_URL}/cart?action=remove`, {
+                product_id: productId
+            });
 
-    try {
-        // Optimistic update
-        item.quantity = newQty;
-        updateCartUI();
-
-        await axios.post(`${API_BASE_URL}/cart?action=update`, {
-            product_id: productId,
-            quantity: newQty
-        });
-
-    } catch (err) {
-        // Revert on error
-        item.quantity -= delta;
-        updateCartUI();
-        handleError('Failed to update quantity', err);
-    } finally {
-        state.pendingCartUpdates.delete(productId);
-        updateCartUI();
+            showNotification('Item removed', 'success');
+        } catch (err) {
+            handleError('Failed to remove item', err);
+            await syncCartFromServer(); // Fallback sync
+        } finally {
+            state.pendingCartUpdates.delete(productId);
+            updateCartUI();
+        }
     }
-}
 
-/**
- * Removes item from cart
- * @param {number} productId - ID of product to remove
- */
-async function removeFromCart(productId) {
-    if (state.pendingCartUpdates.has(productId)) return;
-    state.pendingCartUpdates.add(productId);
+    /**
+     * Clears entire cart after confirmation
+     */
+    async function clearCart() {
+        if (!state.cart.length) return;
+        if (!confirm('Are you sure you want to clear the cart?')) return;
 
-    try {
-        state.cart = state.cart.filter(i => i.product_id !== productId);
-        updateCartUI();
-
-        await axios.post(`${API_BASE_URL}/cart?action=remove`, {
-            product_id: productId
-        });
-
-        showNotification('Item removed', 'success');
-    } catch (err) {
-        handleError('Failed to remove item', err);
-        await syncCartFromServer(); // Fallback sync
-    } finally {
-        state.pendingCartUpdates.delete(productId);
-        updateCartUI();
+        try {
+            showLoading('Clearing cart');
+            await axios.post(`${API_BASE_URL}/cart?action=clear`);
+            state.cart = [];
+            updateCartUI();
+            showNotification('Cart cleared', 'success');
+        } catch (err) {
+            handleError('Failed to clear cart', err);
+        } finally {
+            hideLoading();
+        }
     }
-}
 
-/**
- * Clears entire cart after confirmation
- */
-async function clearCart() {
-    if (!state.cart.length) return;
-    if (!confirm('Are you sure you want to clear the cart?')) return;
+    // ====================
+    // Cart UI Rendering
+    // ====================
 
-    try {
-        showLoading('Clearing cart');
-        await axios.post(`${API_BASE_URL}/cart?action=clear`);
-        state.cart = [];
-        updateCartUI();
-        showNotification('Cart cleared', 'success');
-    } catch (err) {
-        handleError('Failed to clear cart', err);
-    } finally {
-        hideLoading();
+    /**
+     * Updates all cart UI elements (totals, buttons, etc.)
+     */
+    function updateCartUI() {
+        const subtotal = state.cart.reduce((sum, item) => sum + calculateComboSubtotal(item), 0);
+        const tax = 0; // Adjust if tax is dynamic
+        const total = subtotal + tax;
+
+        // Update summary elements
+        elements.subtotalEl.textContent = formatCurrency(subtotal);
+        elements.taxEl.textContent = formatCurrency(tax);
+        elements.totalEl.textContent = formatCurrency(total);
+        document.getElementById('complete-sale-amount').textContent = formatCurrency(total);
+
+        // Toggle checkout button state
+        elements.completeSaleBtn.disabled = state.cart.length === 0;
+
+        // Render appropriate cart state
+        if (state.cart.length === 0) {
+            showEmptyCartState();
+        } else {
+            renderCartItems();
+        }
     }
-}
 
-// ====================
-// Cart UI Rendering
-// ====================
-
-/**
- * Updates all cart UI elements (totals, buttons, etc.)
- */
-function updateCartUI() {
-    const subtotal = state.cart.reduce((sum, item) => sum + calculateComboSubtotal(item), 0);
-    const tax = 0; // Adjust if tax is dynamic
-    const total = subtotal + tax;
-
-    // Update summary elements
-    elements.subtotalEl.textContent = formatCurrency(subtotal);
-    elements.taxEl.textContent = formatCurrency(tax);
-    elements.totalEl.textContent = formatCurrency(total);
-    document.getElementById('complete-sale-amount').textContent = formatCurrency(total);
-
-    // Toggle checkout button state
-    elements.completeSaleBtn.disabled = state.cart.length === 0;
-
-    // Render appropriate cart state
-    if (state.cart.length === 0) {
-        showEmptyCartState();
-    } else {
-        renderCartItems();
-    }
-}
-
-/**
- * Renders empty cart state
- */
-function showEmptyCartState() {
-    elements.emptyCart.classList.remove('hidden');
-    elements.cartItems.innerHTML = `
+    /**
+     * Renders empty cart state
+     */
+    function showEmptyCartState() {
+        elements.emptyCart.classList.remove('hidden');
+        elements.cartItems.innerHTML = `
         <div class="text-center py-8 text-gray-500">
             <i class="fas fa-shopping-cart fa-2x mb-2"></i>
             <p>Your cart is empty</p>
         </div>`;
-}
+    }
 
-/**
- * Renders all cart items with interactive controls
- */
-function renderCartItems() {
-    elements.emptyCart.classList.add('hidden');
-    
-    elements.cartItems.innerHTML = state.cart.map(item => {
-        const isPending = state.pendingCartUpdates.has(item.product_id);
-        return generateCartItemHTML(item, isPending);
-    }).join('');
+    /**
+     * Renders all cart items with interactive controls
+     */
+    function renderCartItems() {
+        elements.emptyCart.classList.add('hidden');
 
-    attachCartItemEventListeners();
-}
+        elements.cartItems.innerHTML = state.cart.map(item => {
+            const isPending = state.pendingCartUpdates.has(item.product_id);
+            return generateCartItemHTML(item, isPending);
+        }).join('');
 
-/**
- * Generates HTML for a single cart item
- */
-function generateCartItemHTML(item, isPending) {
-    const loadingClass = isPending ? 'opacity-50 pointer-events-none' : '';
-    const hasImage = !!item.image_url;
+        attachCartItemEventListeners();
+    }
 
-    return `
+    /**
+     * Generates HTML for a single cart item
+     */
+    function generateCartItemHTML(item, isPending) {
+        const loadingClass = isPending ? 'opacity-50 pointer-events-none' : '';
+        const hasImage = !!item.image_url;
+
+        return `
     <div class="cart-item ${loadingClass} bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-3 flex items-start justify-between transition-all" data-id="${item.product_id}">
         <div class="flex items-start gap-4 w-full">
             ${hasImage ? generateItemImage(item) : generateItemInitials(item)}
@@ -1694,35 +1743,35 @@ function generateCartItemHTML(item, isPending) {
             ${generateItemPricing(item)}
         </div>
     </div>`;
-}
+    }
 
-// Helper generators (extracted for readability)
-function generateItemImage(item) {
-    return `
+    // Helper generators (extracted for readability)
+    function generateItemImage(item) {
+        return `
     <div class="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden border border-gray-100">
         <img src="${item.image_url}" alt="${item.name}" class="object-contain w-full h-full mix-blend-multiply" />
     </div>`;
-}
+    }
 
-function generateItemInitials(item) {
-    return `
+    function generateItemInitials(item) {
+        return `
     <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 font-semibold text-sm uppercase shadow-sm">
         ${item.name.slice(0, 2)}
     </div>`;
-}
+    }
 
-function generateItemHeader(item, isPending) {
-    return `
+    function generateItemHeader(item, isPending) {
+        return `
     <div class="flex justify-between items-start">
         <div class="text-sm font-medium text-gray-800">${item.name}</div>
         <button class="remove-item text-gray-400 hover:text-danger-500 transition-all ml-2 btn-press" ${isPending ? 'disabled' : ''}>
             <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-times'} text-xs"></i>
         </button>
     </div>`;
-}
+    }
 
-function generateItemDetails(item) {
-    return `
+    function generateItemDetails(item) {
+        return `
     <div class="mt-1 flex flex-wrap gap-1 items-center text-xs text-gray-500">
         <span>${formatCurrency(item.price)} each</span>
         ${item.discount > 0 ? `
@@ -1734,10 +1783,10 @@ function generateItemDetails(item) {
             ${item.combination_size} for ${formatCurrency(item.combination_price)}
         </span>` : ''}
     </div>`;
-}
+    }
 
-function generateQuantityControls(item, isPending) {
-    return `
+    function generateQuantityControls(item, isPending) {
+        return `
     <div class="mt-2 flex items-center gap-2">
         <button class="decrease-quantity w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 transition-all btn-press" ${isPending ? 'disabled' : ''}>
             <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-minus'} text-xs"></i>
@@ -1747,10 +1796,10 @@ function generateQuantityControls(item, isPending) {
             <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-plus'} text-xs"></i>
         </button>
     </div>`;
-}
+    }
 
-function generateItemPricing(item) {
-    return `
+    function generateItemPricing(item) {
+        return `
     <div class="ml-auto text-right min-w-[80px]">
         <div class="text-sm font-semibold text-primary-600">${formatCurrency(calculateComboSubtotal(item))}</div>
         ${item.discount > 0 ? `
@@ -1758,95 +1807,95 @@ function generateItemPricing(item) {
             Saved ${formatCurrency(item.price * item.quantity * item.discount / 100)}
         </div>` : ''}
     </div>`;
-}
-
-/**
- * Attaches event listeners to cart item controls
- */
-function attachCartItemEventListeners() {
-    document.querySelectorAll('.increase-quantity:not([disabled])').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const productId = parseInt(btn.closest('.cart-item').dataset.id);
-            updateCartItemQuantity(productId, 1);
-        });
-    });
-
-    document.querySelectorAll('.decrease-quantity:not([disabled])').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const productId = parseInt(btn.closest('.cart-item').dataset.id);
-            updateCartItemQuantity(productId, -1);
-        });
-    });
-
-    document.querySelectorAll('.remove-item:not([disabled])').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const productId = parseInt(btn.closest('.cart-item').dataset.id);
-            removeFromCart(productId);
-        });
-    });
-}
-
-// ====================
-// Sale Completion
-// ====================
-async function completeSale() {
-    if (!state.cart.length) {
-        showNotification('Cart is empty', 'error');
-        return;
     }
 
-    try {
-        showLoading('Processing sale', 'Generating receipt...');
-
-        const cart_items = state.cart.map(i => ({
-            product_id: i.product_id,
-            quantity: i.quantity
-        }));
-
-        const res = await axios.post(`${API_BASE_URL}/transactions`, {
-            cart_items,
-            payment_method: state.selectedPaymentMethod,
-            customer_name: elements.customerNameInput.value || ''
+    /**
+     * Attaches event listeners to cart item controls
+     */
+    function attachCartItemEventListeners() {
+        document.querySelectorAll('.increase-quantity:not([disabled])').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const productId = parseInt(btn.closest('.cart-item').dataset.id);
+                updateCartItemQuantity(productId, 1);
+            });
         });
 
-        const receipt = await axios.get(`${API_BASE_URL}/receipts?sale_id=${res.data.sale_id}`);
-        handleReceipt(receipt.data);
+        document.querySelectorAll('.decrease-quantity:not([disabled])').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const productId = parseInt(btn.closest('.cart-item').dataset.id);
+                updateCartItemQuantity(productId, -1);
+            });
+        });
 
-        state.cart = [];
-        updateCartUI();
-        elements.customerNameInput.value = '';
-        showNotification('Sale completed!', 'success');
-    } catch (err) {
-        handleError('Failed to complete sale', err);
-    } finally {
-        hideLoading();
-    }
-}
-
-
-// ====================
-// Optional Background Sync
-// ====================
-async function syncCartFromServer() {
-    try {
-        const res = await axios.get(`${API_BASE_URL}/cart/items`);
-        state.cart = res.data.cart || [];
-        updateCartUI();
-    } catch (err) {
-        console.warn('Cart sync failed', err);
-    }
-}
-
-
-function handleReceipt(receiptData) {
-    if (!receiptData || typeof receiptData !== 'object') {
-        console.error('Invalid receipt data:', receiptData);
-        alert('Unable to generate receipt. Please try again.');
-        return;
+        document.querySelectorAll('.remove-item:not([disabled])').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const productId = parseInt(btn.closest('.cart-item').dataset.id);
+                removeFromCart(productId);
+            });
+        });
     }
 
-    const receiptWindow = window.open('', '_blank', 'width=340,height=600');
-    receiptWindow.document.write(`
+    // ====================
+    // Sale Completion
+    // ====================
+    async function completeSale() {
+        if (!state.cart.length) {
+            showNotification('Cart is empty', 'error');
+            return;
+        }
+
+        try {
+            showLoading('Processing sale', 'Generating receipt...');
+
+            const cart_items = state.cart.map(i => ({
+                product_id: i.product_id,
+                quantity: i.quantity
+            }));
+
+            const res = await axios.post(`${API_BASE_URL}/transactions`, {
+                cart_items,
+                payment_method: state.selectedPaymentMethod,
+                customer_name: elements.customerNameInput.value || ''
+            });
+
+            const receipt = await axios.get(`${API_BASE_URL}/receipts?sale_id=${res.data.sale_id}`);
+            handleReceipt(receipt.data);
+
+            state.cart = [];
+            updateCartUI();
+            elements.customerNameInput.value = '';
+            showNotification('Sale completed!', 'success');
+        } catch (err) {
+            handleError('Failed to complete sale', err);
+        } finally {
+            hideLoading();
+        }
+    }
+
+
+    // ====================
+    // Optional Background Sync
+    // ====================
+    async function syncCartFromServer() {
+        try {
+            const res = await axios.get(`${API_BASE_URL}/cart/items`);
+            state.cart = res.data.cart || [];
+            updateCartUI();
+        } catch (err) {
+            console.warn('Cart sync failed', err);
+        }
+    }
+
+
+    function handleReceipt(receiptData) {
+        if (!receiptData || typeof receiptData !== 'object') {
+            console.error('Invalid receipt data:', receiptData);
+            alert('Unable to generate receipt. Please try again.');
+            return;
+        }
+
+        const receiptWindow = window.open('', '_blank', 'width=340,height=600');
+        receiptWindow.document.write(`
             <html>
             <head>
                 <title>Receipt #${receiptData.id}</title>
@@ -2040,37 +2089,37 @@ function handleReceipt(receiptData) {
             </body>
             </html>
         `);
-    receiptWindow.document.close();
+        receiptWindow.document.close();
 
-    // Auto-print receipt
-    setTimeout(() => {
-        receiptWindow.print();
-        receiptWindow.close();
-    }, 500);
-}
-
-// ====================
-// Sales Summary
-// ====================
-async function loadSalesSummary() {
-    if (!state.currentRegisterSession) {
-        return showNotification('Register is closed. No summary available.', 'error');
+        // Auto-print receipt
+        setTimeout(() => {
+            receiptWindow.print();
+            receiptWindow.close();
+        }, 500);
     }
 
-    try {
-        showLoading('Loading sales summary');
-
-        const response = await axios.get(`${API_BASE_URL}/sales/summary`);
-        const data = response.data;
-
-        if (!data.success) {
-            return handleError(data.error || 'Could not load sales summary');
+    // ====================
+    // Sales Summary
+    // ====================
+    async function loadSalesSummary() {
+        if (!state.currentRegisterSession) {
+            return showNotification('Register is closed. No summary available.', 'error');
         }
 
-        const summary = data.summary;
+        try {
+            showLoading('Loading sales summary');
 
-        // Update summary data
-        document.getElementById('summaryData').innerHTML = `
+            const response = await axios.get(`${API_BASE_URL}/sales/summary`);
+            const data = response.data;
+
+            if (!data.success) {
+                return handleError(data.error || 'Could not load sales summary');
+            }
+
+            const summary = data.summary;
+
+            // Update summary data
+            document.getElementById('summaryData').innerHTML = `
             <div class="flex justify-between py-2 border-b border-gray-200">
                 <span>Opened By:</span>
                 <strong>${summary.opened_by}</strong>
@@ -2101,26 +2150,26 @@ async function loadSalesSummary() {
             </div>
         `;
 
-        // Update payment methods
-        const paymentSummary = document.getElementById('paymentSummary');
-        paymentSummary.innerHTML = '';
+            // Update payment methods
+            const paymentSummary = document.getElementById('paymentSummary');
+            paymentSummary.innerHTML = '';
 
-        if (summary.payment_methods && Object.keys(summary.payment_methods).length > 0) {
-            Object.entries(summary.payment_methods).forEach(([method, amount]) => {
-                const row = document.createElement('div');
-                row.className = 'flex justify-between py-1 border-b border-gray-100';
-                row.innerHTML = `
+            if (summary.payment_methods && Object.keys(summary.payment_methods).length > 0) {
+                Object.entries(summary.payment_methods).forEach(([method, amount]) => {
+                    const row = document.createElement('div');
+                    row.className = 'flex justify-between py-1 border-b border-gray-100';
+                    row.innerHTML = `
                     <span class="text-gray-600">${method}</span>
                     <span class="font-semibold">${formatCurrency(amount)}</span>
                 `;
-                paymentSummary.appendChild(row);
-            });
-        } else {
-            paymentSummary.innerHTML = `<p class="text-sm text-gray-500">No payment data available.</p>`;
-        }
+                    paymentSummary.appendChild(row);
+                });
+            } else {
+                paymentSummary.innerHTML = `<p class="text-sm text-gray-500">No payment data available.</p>`;
+            }
 
-        // Update recent sales
-        document.getElementById('recentSales').innerHTML = data.recent_sales.map(sale => `
+            // Update recent sales
+            document.getElementById('recentSales').innerHTML = data.recent_sales.map(sale => `
             <li class="flex justify-between items-center py-2 border-b border-gray-100">
                 <div>
                     <span class="font-medium">#${sale.id}</span>
@@ -2133,233 +2182,233 @@ async function loadSalesSummary() {
             </li>
         `).join('');
 
-        // Show modal
-        showModal('salesSummary');
+            // Show modal
+            showModal('salesSummary');
 
-    } catch (error) {
-        handleError('Failed to load sales summary', error);
-    } finally {
-        hideLoading();
+        } catch (error) {
+            handleError('Failed to load sales summary', error);
+        } finally {
+            hideLoading();
+        }
     }
-}
 
-// ====================
-// Payment Method Selection
-// ====================
-function setupPaymentMethods() {
-    elements.paymentMethods.addEventListener('click', (e) => {
-        const button = e.target.closest('.payment-method');
-        if (!button) return;
+    // ====================
+    // Payment Method Selection
+    // ====================
+    function setupPaymentMethods() {
+        elements.paymentMethods.addEventListener('click', (e) => {
+            const button = e.target.closest('.payment-method');
+            if (!button) return;
 
-        document.querySelectorAll('.payment-method').forEach(btn => {
-            btn.classList.remove('active', 'border-primary-500', 'bg-primary-50');
+            document.querySelectorAll('.payment-method').forEach(btn => {
+                btn.classList.remove('active', 'border-primary-500', 'bg-primary-50');
+            });
+
+            button.classList.add('active', 'border-primary-500', 'bg-primary-50');
+            state.selectedPaymentMethod = button.dataset.method;
         });
+    }
 
-        button.classList.add('active', 'border-primary-500', 'bg-primary-50');
-        state.selectedPaymentMethod = button.dataset.method;
-    });
-}
+    // ====================
+    // Product Search
+    // ====================
+    function setupProductSearch() {
+        let debounceTimer;
+        const searchInput = elements.productSearch;
 
-// ====================
-// Product Search
-// ====================
-function setupProductSearch() {
-    let debounceTimer;
-    const searchInput = elements.productSearch;
+        if (!searchInput) return;
 
-    if (!searchInput) return;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
 
-    searchInput.addEventListener('input', () => {
-        clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(async () => {
+                const query = searchInput.value.trim();
+                const categoryId = elements.categoryFilter?.value || null;
 
-        debounceTimer = setTimeout(async () => {
-            const query = searchInput.value.trim();
-            const categoryId = elements.categoryFilter?.value || null;
-
-            if (!query) {
-                return loadProducts(); // Load full list on empty query
-            }
-
-            try {
-                // Show skeleton only if we're *about to search*
-                showSearchSkeleton();
-
-                const response = await axios.post(`${API_BASE_URL}/products/search`, {
-                    query,
-                    category_id: categoryId
-                }, {
-                    timeout: 3000
-                });
-
-                const products = response.data || [];
-
-                state.products = products;
-
-                if (products.length > 0) {
-                    renderProducts(products);
-                } else {
-                    showNotification('No matching products found.', 'info');
-                    clearProductGrid(); // Optional: show empty state
+                if (!query) {
+                    return loadProducts(); // Load full list on empty query
                 }
 
-            } catch (err) {
-                console.warn('Search failed, using fallback:', err);
-                showNotification('Search failed. Using fallback.', 'warning');
-                fallbackSearch(query, categoryId);
-            } finally {
-                hideSearchSkeleton();
-            }
+                try {
+                    // Show skeleton only if we're *about to search*
+                    showSearchSkeleton();
 
-        }, 250); // debounce
-    });
-}
+                    const response = await axios.post(`${API_BASE_URL}/products/search`, {
+                        query,
+                        category_id: categoryId
+                    }, {
+                        timeout: 3000
+                    });
+
+                    const products = response.data || [];
+
+                    state.products = products;
+
+                    if (products.length > 0) {
+                        renderProducts(products);
+                    } else {
+                        showNotification('No matching products found.', 'info');
+                        clearProductGrid(); // Optional: show empty state
+                    }
+
+                } catch (err) {
+                    console.warn('Search failed, using fallback:', err);
+                    showNotification('Search failed. Using fallback.', 'warning');
+                    fallbackSearch(query, categoryId);
+                } finally {
+                    hideSearchSkeleton();
+                }
+
+            }, 250); // debounce
+        });
+    }
 
 
-function clearProductGrid() {
-    elements.productGrid.innerHTML = `
+    function clearProductGrid() {
+        elements.productGrid.innerHTML = `
         <div class="text-center text-gray-500 py-8 col-span-full">
             <i class="fas fa-box-open text-3xl mb-2"></i>
             <p>No products found.</p>
         </div>
     `;
-}
+    }
 
 
 
-function showSearchSkeleton(count = 8) {
-    const html = Array(count).fill(`
+    function showSearchSkeleton(count = 8) {
+        const html = Array(count).fill(`
         <div class="animate-pulse p-4 bg-white rounded shadow-sm">
             <div class="h-24 bg-gray-200 rounded mb-2"></div>
             <div class="h-4 bg-gray-300 w-3/4 mb-1"></div>
             <div class="h-4 bg-gray-300 w-1/2"></div>
         </div>
     `).join('');
-    elements.productGrid.innerHTML = html;
-}
-
-function hideSearchSkeleton() {
-    // nothing to do; renderProducts will overwrite
-}
-
-function fallbackSearch(query, categoryId) {
-    const q = query.toLowerCase();
-    const results = state.products.filter(p => {
-        const matchName = p.name?.toLowerCase().includes(q);
-        const matchBarcode = p.barcode?.includes(query);
-        const matchSKU = p.sku?.includes(query);
-        const matchCategory = !categoryId || p.category_id == categoryId;
-
-        return (matchName || matchBarcode || matchSKU) && matchCategory;
-    });
-
-    renderProducts(results);
-}
-
-
-
-
-
-
-// ====================
-// Mobile Responsiveness
-// ====================
-function setupMobileUI() {
-    // Toggle sidebar on mobile
-    document.getElementById('menu-toggle').addEventListener('click', function() {
-        document.querySelector('.sidebar').classList.toggle('w-16');
-        document.querySelector('.sidebar').classList.toggle('w-64');
-        
-        // Toggle icons-only mode
-        const sidebarItems = document.querySelectorAll('.sidebar span, .sidebar h2');
-        sidebarItems.forEach(item => {
-            item.classList.toggle('hidden');
-            item.classList.toggle('md:block');
-        });
-    });
-
-    // Toggle cart visibility on mobile
-    let cartVisible = false;
-    const cartContainer = document.getElementById('cart-container');
-    const cartToggle = document.getElementById('cart-toggle');
-    
-    cartToggle.addEventListener('click', function() {
-        cartVisible = !cartVisible;
-        if (cartVisible) {
-            cartContainer.classList.remove('translate-y-full');
-            cartToggle.innerHTML = '<i class="fas fa-chevron-down"></i>';
-        } else {
-            cartContainer.classList.add('translate-y-full');
-            cartToggle.innerHTML = '<i class="fas fa-chevron-up"></i>';
-        }
-    });
-
-    // Auto-show cart when items are added on mobile
-    function showCartOnMobile() {
-        if (window.innerWidth < 768 && !cartVisible) {
-            cartVisible = true;
-            cartContainer.classList.remove('translate-y-full');
-            cartToggle.innerHTML = '<i class="fas fa-chevron-down"></i>';
-        }
+        elements.productGrid.innerHTML = html;
     }
 
-    // Watch for cart changes to auto-show on mobile
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList') {
-                showCartOnMobile();
+    function hideSearchSkeleton() {
+        // nothing to do; renderProducts will overwrite
+    }
+
+    function fallbackSearch(query, categoryId) {
+        const q = query.toLowerCase();
+        const results = state.products.filter(p => {
+            const matchName = p.name?.toLowerCase().includes(q);
+            const matchBarcode = p.barcode?.includes(query);
+            const matchSKU = p.sku?.includes(query);
+            const matchCategory = !categoryId || p.category_id == categoryId;
+
+            return (matchName || matchBarcode || matchSKU) && matchCategory;
+        });
+
+        renderProducts(results);
+    }
+
+
+
+
+
+
+    // ====================
+    // Mobile Responsiveness
+    // ====================
+    function setupMobileUI() {
+        // Toggle sidebar on mobile
+        document.getElementById('menu-toggle').addEventListener('click', function () {
+            document.querySelector('.sidebar').classList.toggle('w-16');
+            document.querySelector('.sidebar').classList.toggle('w-64');
+
+            // Toggle icons-only mode
+            const sidebarItems = document.querySelectorAll('.sidebar span, .sidebar h2');
+            sidebarItems.forEach(item => {
+                item.classList.toggle('hidden');
+                item.classList.toggle('md:block');
+            });
+        });
+
+        // Toggle cart visibility on mobile
+        let cartVisible = false;
+        const cartContainer = document.getElementById('cart-container');
+        const cartToggle = document.getElementById('cart-toggle');
+
+        cartToggle.addEventListener('click', function () {
+            cartVisible = !cartVisible;
+            if (cartVisible) {
+                cartContainer.classList.remove('translate-y-full');
+                cartToggle.innerHTML = '<i class="fas fa-chevron-down"></i>';
+            } else {
+                cartContainer.classList.add('translate-y-full');
+                cartToggle.innerHTML = '<i class="fas fa-chevron-up"></i>';
             }
         });
-    });
 
-    observer.observe(document.getElementById('cart-items'), {
-        childList: true,
-        subtree: true
-    });
-}
+        // Auto-show cart when items are added on mobile
+        function showCartOnMobile() {
+            if (window.innerWidth < 768 && !cartVisible) {
+                cartVisible = true;
+                cartContainer.classList.remove('translate-y-full');
+                cartToggle.innerHTML = '<i class="fas fa-chevron-down"></i>';
+            }
+        }
 
-// ====================
-// Event Listeners
-// ====================
-function setupEventListeners() {
-    // Register buttons
-    elements.openRegisterBtn.addEventListener('click', openRegisterModal);
-    elements.openRegisterMainBtn.addEventListener('click', openRegisterModal);
-    elements.closeRegisterBtn.addEventListener('click', closeRegisterModal);
-    elements.salesSummaryBtn.addEventListener('click', loadSalesSummary);
-
-    // Cart buttons
-    elements.clearCartBtn.addEventListener('click', clearCart);
-    elements.completeSaleBtn.addEventListener('click', completeSale);
-
-    // Payment methods
-    setupPaymentMethods();
-
-    // Product search
-    setupProductSearch();
-
-    // Mobile UI
-    setupMobileUI();
-
-    // Close modals when clicking outside
-    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-        backdrop.addEventListener('click', (e) => {
-            if (e.target === backdrop) {
-                const modal = backdrop.closest('.hidden');
-                if (modal) {
-                    hideModal(modal.id);
+        // Watch for cart changes to auto-show on mobile
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.type === 'childList') {
+                    showCartOnMobile();
                 }
-            }
+            });
         });
-    });
-}
 
-// ====================
-// Initialize POS System
-// ====================
-document.addEventListener('DOMContentLoaded', () => {
-    setupEventListeners();
-    checkRegisterStatus();
-});
+        observer.observe(document.getElementById('cart-items'), {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    // ====================
+    // Event Listeners
+    // ====================
+    function setupEventListeners() {
+        // Register buttons
+        elements.openRegisterBtn.addEventListener('click', openRegisterModal);
+        elements.openRegisterMainBtn.addEventListener('click', openRegisterModal);
+        elements.closeRegisterBtn.addEventListener('click', closeRegisterModal);
+        elements.salesSummaryBtn.addEventListener('click', loadSalesSummary);
+
+        // Cart buttons
+        elements.clearCartBtn.addEventListener('click', clearCart);
+        elements.completeSaleBtn.addEventListener('click', completeSale);
+
+        // Payment methods
+        setupPaymentMethods();
+
+        // Product search
+        setupProductSearch();
+
+        // Mobile UI
+        setupMobileUI();
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+            backdrop.addEventListener('click', (e) => {
+                if (e.target === backdrop) {
+                    const modal = backdrop.closest('.hidden');
+                    if (modal) {
+                        hideModal(modal.id);
+                    }
+                }
+            });
+        });
+    }
+
+    // ====================
+    // Initialize POS System
+    // ====================
+    document.addEventListener('DOMContentLoaded', () => {
+        setupEventListeners();
+        checkRegisterStatus();
+    });
 </script>
 
 {% endblock %}

@@ -230,23 +230,29 @@
 </head>
 
 <body class="h-full bg-gray-50 dark:bg-gray-900 flex flex-col" hx-boost="true">
-    <!-- Enhanced Page Preloader -->
-    <div id="page-preloader">
-        <div class="preloader-logo">
-            <div class="preloader-logo-inner"></div>
-            <div class="preloader-logo-inner"></div>
-            <div class="preloader-logo-inner"></div>
-        </div>
-        <div class="preloader-text">Loading Bhapos</div>
-        <div class="preloader-progress">
-            <div class="preloader-progress-bar" id="preloader-progress"></div>
-        </div>
+  <!-- Enhanced Page Preloader -->
+<div id="page-preloader"
+     class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-gray-900 text-center transition-opacity duration-500">
+    
+    <!-- Logo Animation -->
+    <div class="flex space-x-2 mb-6 animate-pulse">
+        <div class="h-4 w-4 bg-blue-600 dark:bg-blue-400 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
+        <div class="h-4 w-4 bg-blue-600 dark:bg-blue-400 rounded-full animate-bounce"></div>
+        <div class="h-4 w-4 bg-blue-600 dark:bg-blue-400 rounded-full animate-bounce [animation-delay:0.2s]"></div>
     </div>
 
-    <!-- Loading Indicator (for HTMX requests) -->
-    <div id="loading-indicator" class="hidden fixed top-4 right-4 z-50">
-        <div class="loader"></div> 
+    <!-- Preloader Text -->
+    <div class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4 tracking-wide">Loading <span class="text-blue-600 dark:text-blue-400">Bhapos</span></div>
+
+    <!-- Progress Bar Container -->
+    <div class="w-60 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+        <div id="preloader-progress"
+             class="h-full bg-blue-500 dark:bg-blue-400 transition-all duration-500 ease-in-out rounded-full"
+             style="width: 0%;">
+        </div>
     </div>
+</div>
+
     
     {% include 'admin/partials/header.html'%}
     
@@ -287,49 +293,54 @@
         }
     });
 
-    // Simulate progress for the preloader
-    function simulateProgress() {
-        const progressBar = document.getElementById('preloader-progress');
-        let progress = 0;
-        const interval = setInterval(() => {
-            progress += Math.random() * 10;
-            if (progress >= 100) {
-                progress = 100;
-                clearInterval(interval);
-            }
-            progressBar.style.width = progress + '%';
-        }, 200);
-    }
+      // Simulate progressive loading with smoother acceleration and fallback
+  function simulateProgress() {
+    const progressBar = document.getElementById('preloader-progress');
+    let progress = 0;
 
-    // Hide preloader when everything is loaded
-    window.addEventListener('load', function() {
-        const preloader = document.getElementById('page-preloader');
-        if (preloader) {
-            // Ensure progress bar reaches 100%
-            document.getElementById('preloader-progress').style.width = '100%';
-            
-            // Fade out preloader
-            setTimeout(() => {
-                preloader.style.opacity = '0';
-                preloader.style.visibility = 'hidden';
-                document.body.style.overflow = '';
-            }, 500);
-        }
-    });
+    const step = () => {
+      // Accelerate quickly, slow down near the end
+      const increment = (100 - progress) * 0.05 + Math.random() * 2;
+      progress = Math.min(progress + increment, 99); // Stop at 99%, wait for real load
+      progressBar.style.width = progress + '%';
 
-    // Start progress simulation immediately
+      if (progress < 99) {
+        requestAnimationFrame(step);
+      }
+    };
+
+    requestAnimationFrame(step);
+  }
+
+  // Hide the preloader smoothly
+  function hidePreloader() {
+    const preloader = document.getElementById('page-preloader');
+    const progressBar = document.getElementById('preloader-progress');
+    if (!preloader) return;
+
+    // Complete progress
+    progressBar.style.width = '100%';
+
+    // Fade out with delay to allow final animation
+    setTimeout(() => {
+      preloader.classList.add('opacity-0');
+      preloader.classList.add('pointer-events-none');
+      document.body.style.overflow = ''; // restore scroll
+    }, 400); // optional smooth fade-out
+  }
+
+  // Handle window load
+  window.addEventListener('load', hidePreloader);
+
+  // Fallback for stuck pages (e.g. 3rd party blockers or errors)
+  setTimeout(hidePreloader, 8000); // 8s max
+
+  // Start simulation early
+  document.addEventListener('DOMContentLoaded', () => {
     simulateProgress();
-
-    // Fallback in case load event doesn't fire
-    setTimeout(function() {
-        const preloader = document.getElementById('page-preloader');
-        if (preloader && preloader.style.visibility !== 'hidden') {
-            document.getElementById('preloader-progress').style.width = '100%';
-            preloader.style.opacity = '0';
-            preloader.style.visibility = 'hidden';
-            document.body.style.overflow = '';
-        }
-    }, 5000); // 5 seconds max
+    // prevent scroll while loading
+    document.body.style.overflow = 'hidden';
+  });
 
     // Rest of your existing JavaScript...
     document.addEventListener('DOMContentLoaded', function() {

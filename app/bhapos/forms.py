@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SelectField, SubmitField, HiddenField, EmailField, TelField, validators, TextAreaField
+from wtforms import StringField, PasswordField, SelectField, SubmitField, HiddenField, EmailField, TelField, validators, TextAreaField, FileField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, Email, Regexp, Optional
 from app.models import User, Role  
 import re
@@ -142,10 +142,46 @@ class CreateTenantForm(FlaskForm):
                 raise ValidationError('That email is already registered.')
 
 
+
+
 class CreateShopForm(FlaskForm):
-    name = StringField('Shop Name', validators=[DataRequired()])
-    location = StringField('Location', validators=[DataRequired()])
+    name = StringField('Shop Name', validators=[
+        DataRequired(),
+        Length(min=2, max=150),
+        Regexp(r'^[\w\s\-\.\']+$', message="Only letters, numbers, spaces, and -.' allowed")
+    ])
+    
+    location = StringField('Location', validators=[
+        DataRequired(),
+        Length(max=255),
+        Regexp(r'^[\w\s\-\.\,]+$', message="Invalid location characters")
+    ])
+    
+    phone = StringField('Phone Number', validators=[
+        DataRequired(),
+        Length(min=10, max=20)
+    ])
+    
+    email = EmailField('Email (Optional)', validators=[
+        Optional(),
+        Email(),
+        Length(max=120)
+    ])
+    
+    currency = SelectField('Currency', choices=[
+        ('KES', 'KES (Kenyan Shilling)'),
+        ('USD', 'USD (US Dollar)'), 
+        ('EUR', 'EUR (Euro)')
+    ], default='KES')
+    
     submit = SubmitField('Create Shop')
+    
+    def validate_phone(self, field):
+        phone = field.data.strip()
+        if not re.match(r'^\+?[\d\s-]{10,20}$', phone):
+            raise ValidationError('Invalid phone format. Use +XXX... or local digits')
+
+
 
 class CreateUserForm(FlaskForm):
     username = StringField('Username', validators=[

@@ -1092,30 +1092,71 @@ def format_sales_metrics(result):
     }
 
 
-
-
 @bhapos_bp.route('/business/<int:business_id>/create-shop', methods=['GET', 'POST'])
 @login_required
 def create_shop(business_id):
     business = Business.query.get_or_404(business_id)
 
-    if not current_user.is_tenant() or current_user.business_id != business.id:
-        flash("Unauthorized", "danger")
+    if not current_user.is_tenant():
+        flash("Only business owners can create shops", "danger")
+        return redirect(url_for('bhapos.tenant_dashboard'))
+
+    if current_user.business_id != business.id:
+        flash("You can only create shops for your own business", "danger")
         return redirect(url_for('bhapos.tenant_dashboard'))
 
     form = CreateShopForm()
+
     if form.validate_on_submit():
-        shop = Shop(
-            name=form.name.data,
-            location=form.location.data,
-            business=business
-        )
-        db.session.add(shop)
-        db.session.commit()
-        flash('Shop created successfully.', 'success')
-        return redirect(url_for('bhapos.tenant_dashboard'))
+        phone = form.phone.data.strip()
+        if not re.match(r'^\+?[\d\s-]{10,20}$', phone):
+            flash("Invalid phone number format. Use international format (+XXX...) or local digits", "danger")
+            return render_template('bhapos/tenants/create_shop.html', form=form, business=business)
+
+        try:
+            with db.session.begin_nested():
+                shop = Shop(
+                    name=form.name.data.strip(),
+                    location=form.location.data.strip(),
+                    phone=phone,
+                    email=form.email.data.strip().lower() if form.email.data else None,
+                    currency=form.currency.data,
+                    business_id=business.id,
+                    is_active=True,
+                    type=None  # Will be set in setup wizard
+                )
+                db.session.add(shop)
+                db.session.flush()  # Get shop.id
+
+                register_session = RegisterSession(
+                    shop_id=shop.id,
+                    opened_by_id=current_user.id,
+                    opening_cash=0.00
+                )
+                db.session.add(register_session)
+
+            db.session.commit()
+            flash("Shop created successfully!", "success")
+            return redirect(url_for('bhapos.tenant_dashboard'))
+
+        except IntegrityError as e:
+            db.session.rollback()
+            error_str = str(e).lower()
+            if "email" in error_str:
+                flash("A shop with this email already exists.", "danger")
+            elif "phone" in error_str:
+                flash("A shop with this phone number already exists.", "danger")
+            else:
+                current_app.logger.error(f"Integrity error creating shop: {e}")
+                flash("A database error occurred. Please try again.", "danger")
+
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"Unexpected error creating shop: {str(e)}", exc_info=True)
+            flash("An unexpected error occurred. Our team has been notified.", "danger")
 
     return render_template('bhapos/tenants/create_shop.html', form=form, business=business)
+
 
 @bhapos_bp.route('/tenant/<int:business_id>/create-user', methods=['GET', 'POST'])
 @login_required

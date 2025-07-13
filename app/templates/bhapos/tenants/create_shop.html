@@ -1,38 +1,206 @@
 {% extends 'bhapos/base.html' %}
 
 {% block content %}
-<div class="max-w-xl mx-auto px-4 py-8">
+<div class="max-w-md mx-auto px-4 py-8">
   <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-    <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
-      <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Create Shop for <span class="text-green-600 dark:text-green-400">{{ business.name }}</span></h2>
-      <p class="text-sm text-gray-500 dark:text-gray-400">Fill in the shop details below.</p>
+    <!-- Header Section -->
+    <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900">
+      <h2 class="text-xl font-semibold text-white">Create New Shop</h2>
+      <p class="text-sm text-blue-100 dark:text-blue-200">Step 1: Basic Information</p>
     </div>
+    
+   
 
-    <form method="POST" class="px-6 py-5 space-y-5">
+    <form method="POST" class="px-6 py-4 space-y-4">
       {{ form.hidden_tag() }}
-
-      <div>
-        {{ form.name.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
-        {{ form.name(class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm") }}
+      
+      <!-- Shop Name Field -->
+      <div class="form-group">
+        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {{ form.name.label }} <span class="text-red-500">*</span>
+        </label>
+        <div class="relative">
+          {{ form.name(
+            id="name",
+            class="form-input pl-10 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" + 
+            (" border-red-500" if form.name.errors else "")
+          ) }}
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-store text-gray-400"></i>
+          </div>
+        </div>
         {% if form.name.errors %}
-          <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.name.errors[0] }}</p>
+          <div class="mt-1 text-sm text-red-600 dark:text-red-400 flex items-start">
+            <i class="fas fa-exclamation-circle mt-0.5 mr-1.5"></i>
+            <span>{{ form.name.errors[0] }}</span>
+          </div>
         {% endif %}
       </div>
 
-      <div>
-        {{ form.location.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
-        {{ form.location(class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm") }}
+      <!-- Location Field -->
+      <div class="form-group">
+        <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {{ form.location.label }} <span class="text-red-500">*</span>
+        </label>
+        <div class="relative">
+          {{ form.location(
+            id="location",
+            class="form-input pl-10 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" + 
+            (" border-red-500" if form.location.errors else "")
+          ) }}
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-map-marker-alt text-gray-400"></i>
+          </div>
+        </div>
         {% if form.location.errors %}
-          <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.location.errors[0] }}</p>
+          <div class="mt-1 text-sm text-red-600 dark:text-red-400 flex items-start">
+            <i class="fas fa-exclamation-circle mt-0.5 mr-1.5"></i>
+            <span>{{ form.location.errors[0] }}</span>
+          </div>
         {% endif %}
       </div>
 
-      <div class="pt-3">
-        <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md shadow-sm transition">
-          <i class="fas fa-save mr-2"></i> {{ form.submit.label.text or 'Save' }}
+      <!-- Phone Field -->
+      <div class="form-group">
+        <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {{ form.phone.label }} <span class="text-red-500">*</span>
+        </label>
+        <div class="relative">
+          {{ form.phone(
+            id="phone",
+            class="form-input pl-10 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" + 
+            (" border-red-500" if form.phone.errors else "")
+          ) }}
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-phone text-gray-400"></i>
+          </div>
+        </div>
+        {% if form.phone.errors %}
+          <div class="mt-1 text-sm text-red-600 dark:text-red-400 flex items-start">
+            <i class="fas fa-exclamation-circle mt-0.5 mr-1.5"></i>
+            <span>{{ form.phone.errors[0] }}</span>
+          </div>
+        {% endif %}
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Format: +254712345678 or 0712345678</p>
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {{ form.email.label }}
+        </label>
+        <div class="relative">
+          {{ form.email(
+            id="email",
+            class="form-input pl-10 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" + 
+            (" border-red-500" if form.email.errors else "")
+          ) }}
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-envelope text-gray-400"></i>
+          </div>
+        </div>
+        {% if form.email.errors %}
+          <div class="mt-1 text-sm text-red-600 dark:text-red-400 flex items-start">
+            <i class="fas fa-exclamation-circle mt-0.5 mr-1.5"></i>
+            <span>{{ form.email.errors[0] }}</span>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Currency Field -->
+      <div class="form-group">
+        <label for="currency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {{ form.currency.label }} <span class="text-red-500">*</span>
+        </label>
+        <div class="relative">
+          {{ form.currency(
+            id="currency",
+            class="form-select pl-10 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          ) }}
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-money-bill-wave text-gray-400"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="pt-4 flex justify-between items-center">
+        <a href="{{ url_for('bhapos.tenant_dashboard') }}" 
+           class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+          <i class="fas fa-arrow-left mr-2"></i> Back
+        </a>
+        <button type="submit" 
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+          <i class="fas fa-save mr-2"></i> Create Shop
         </button>
       </div>
     </form>
   </div>
 </div>
+
+<!-- Enhanced Client-side Validation -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const phoneInput = document.getElementById('phone');
+    
+    // Real-time phone validation
+    phoneInput.addEventListener('input', function() {
+        const phone = phoneInput.value.trim();
+        const isValid = /^\+?[\d\s-]{10,20}$/.test(phone);
+        
+        if (phone && !isValid) {
+            phoneInput.classList.add('border-red-500');
+        } else {
+            phoneInput.classList.remove('border-red-500');
+            const errorDiv = phoneInput.parentElement.querySelector('.error-message');
+            if (errorDiv) errorDiv.remove();
+        }
+    });
+    
+    // Form submission validation
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Validate required fields
+        const requiredFields = ['name', 'location', 'phone', 'currency'];
+        requiredFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (!field.value.trim()) {
+                showError(fieldId, 'This field is required');
+                isValid = false;
+            }
+        });
+        
+        // Validate phone format
+        const phone = phoneInput.value.trim();
+        if (phone && !/^\+?[\d\s-]{10,20}$/.test(phone)) {
+            showError('phone', 'Invalid phone format. Use +XXX... or local digits');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            // Scroll to first error
+            const firstError = document.querySelector('.border-red-500');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    });
+    
+    function showError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        field.classList.add('border-red-500');
+        
+        let errorDiv = field.parentElement.nextElementSibling;
+        if (!errorDiv || !errorDiv.classList.contains('error-message')) {
+            errorDiv = document.createElement('div');
+            errorDiv.className = 'mt-1 text-sm text-red-600 dark:text-red-400 flex items-start error-message';
+            field.parentElement.after(errorDiv);
+        }
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle mt-0.5 mr-1.5"></i><span>${message}</span>`;
+    }
+});
+</script>
 {% endblock %}

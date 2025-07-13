@@ -23,7 +23,16 @@ logging.basicConfig(level=logging.DEBUG)
 # Define Python Enum for unit types
 class UnitType(enum.Enum):
     piece = 'piece'
-    weight = 'weight'
+    kg = 'kg'            
+    grams = 'grams'
+    punnet = 'punnet'
+    bunch = 'bunch'
+    packet = 'packet'
+    litr = 'litre'
+
+class ShopType(enum.Enum):
+    pos = 'point of sale'
+    pop ='point of purchase'
 
 
 class AdjustmentType(enum.Enum):
@@ -277,37 +286,58 @@ class Business(BaseModel):
             self.display_name = self.name
 
 
-
 class Shop(BaseModel, BusinessScopedMixin):
     __tablename__ = 'shops'
+    __table_args__ = (
+        db.Index('ix_shops_business_id', 'business_id'),  
+        db.Index('ix_shops_name', 'name'),
+        db.Index('ix_shops_phone', 'phone'),
+        db.Index('ix_shops_is_active', 'is_active'),
+        {'extend_existing': True}  
+    )
 
     name = db.Column(db.String(150), nullable=False)
     location = db.Column(db.String(255), nullable=True)
-    phone = db.Column(db.String(20), nullable=True)
+    phone = db.Column(db.String(20), nullable=True, unique=True)
+    email = db.Column(db.String(150), nullable=True, unique=True)
     currency = db.Column(db.String(10), default="KES", nullable=True)
     logo_url = db.Column(db.String(255), nullable=True)
-
-    # Relationships
-    # business relationship is provided by BusinessScopedMixin
-    users = db.relationship('User', back_populates='shop', cascade="all, delete-orphan")
-    products = db.relationship('Product', back_populates='shop', cascade="all, delete-orphan")
-    sales = db.relationship('Sale', back_populates='shop', cascade="all, delete-orphan")
-    categories = db.relationship('Category', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic')
-    cart_items = db.relationship('CartItem', back_populates='shop', cascade="all, delete-orphan")
-    suppliers = db.relationship('Supplier', back_populates='shop', cascade="all, delete-orphan")
-    expenses = db.relationship('Expense', back_populates='shop', cascade="all, delete-orphan")
-    stock_logs = db.relationship('StockLog', back_populates='shop', cascade="all, delete-orphan")
-    price_changes = db.relationship('PriceChange', back_populates='shop', cascade="all, delete-orphan")
-    register_sessions = db.relationship('RegisterSession', back_populates='shop', cascade='all, delete-orphan')
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    type = db.Column(SQLAlchemyEnum(ShopType), nullable=True)  
     
-    # Tax relationship (one-to-many: one shop can have multiple taxes)
-    taxes = db.relationship('Tax', back_populates='shop', cascade="all, delete-orphan")
+
+    # Rest of your model relationships and methods...
+    register_sessions = db.relationship('RegisterSession', back_populates='shop', cascade='all, delete-orphan')
+    # Optimized relationships with explicit join conditions and load strategies
+    users = db.relationship( 'User', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic'  )
+    price_changes = db.relationship('PriceChange', back_populates='shop', cascade="all, delete-orphan")    
+    products = db.relationship( 'Product',  back_populates='shop', cascade="all, delete-orphan", lazy='dynamic',   order_by='Product.name' )    
+    sales = db.relationship('Sale', back_populates='shop',  cascade="all, delete-orphan", lazy='dynamic', order_by='Sale.created_at.desc()')    
+    categories = db.relationship('Category',  back_populates='shop', cascade="all, delete-orphan", lazy='dynamic', order_by='Category.name' )    
+    cart_items = db.relationship('CartItem',  back_populates='shop', cascade="all, delete-orphan",  lazy='dynamic')
+
+    # Other relationships with optimized loading
+    suppliers = db.relationship( 'Supplier', back_populates='shop', cascade="all, delete-orphan",  lazy='dynamic', order_by='Supplier.name' )    
+    expenses = db.relationship( 'Expense',  back_populates='shop',  cascade="all, delete-orphan",  lazy='dynamic', order_by='Expense.date.desc()')
+
+    # Added bulk operations for stock logs
+    stock_logs = db.relationship('StockLog', back_populates='shop', cascade="all, delete-orphan", lazy='dynamic', order_by='StockLog.created_at.desc()'
+    )
+    # Tax relationship with optimized loading
+    taxes = db.relationship( 'Tax',  back_populates='shop', cascade="all, delete-orphan",  lazy='selectin',  order_by='Tax.name')
 
     def __repr__(self):
-        return f"<Shop {self.name}>"
+        return f"<Shop {self.name} (ID: {self.id})>"
 
-    def serialize(self, include_taxes=False):
-        """Serialize shop data for API responses"""
+    def serialize(self, include_relations=None):
+        """
+        Enhanced serialization with configurable relation inclusion
+        and optimized query patterns.
+        
+        Args:
+            include_relations (list): Optional list of relations to include
+                ('taxes', 'categories', etc.)
+        """
         data = {
             'id': self.id,
             'name': self.name,
@@ -316,15 +346,67 @@ class Shop(BaseModel, BusinessScopedMixin):
             'phone': self.phone,
             'currency': self.currency,
             'logo_url': self.logo_url,
+            'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
         
-        if include_taxes:
-            data['taxes'] = [tax.serialize() for tax in self.taxes]
+        # Dynamic relation inclusion
+        if include_relations:
+            for relation in include_relations:
+                if relation == 'taxes':
+                    data['taxes'] = [tax.serialize() for tax in self.taxes]
+                elif relation == 'categories':
+                    data['categories'] = [c.serialize() for c in self.categories.all()]
+                elif relation == 'stats':
+                    data.update(self.get_business_stats())
         
         return data
-    
+
+    def get_business_stats(self):
+        """
+        Get key business statistics with optimized queries
+        """
+        from sqlalchemy import func
+        
+        return {
+            'product_count': self.products.count(),
+            'active_product_count': self.products.filter_by(is_active=True).count(),
+            'category_count': self.categories.count(),
+            'sale_count': self.sales.count(),
+            'revenue_30days': db.session.query(
+                func.sum(Sale.total_amount)
+            ).filter(
+                Sale.shop_id == self.id,
+                Sale.created_at >= func.date_sub(func.now(), {'days': 30})
+            ).scalar() or 0
+        }
+
+    @classmethod
+    def find_by_name(cls, business_id, name):
+       
+        return cls.query.filter(
+            cls.business_id == business_id,
+            func.lower(cls.name) == func.lower(name)
+        ).first()
+
+    @classmethod
+    def search(cls, business_id, query, limit=10):
+        """
+        Full-text search implementation
+        """
+        return cls.query.filter(
+            cls.business_id == business_id,
+            cls.name.ilike(f'%{query}%')
+        ).limit(limit).all()
+
+    def deactivate(self):
+        """
+        Soft delete implementation
+        """
+        self.is_active = False
+        db.session.commit()
+        return self   
 
 
 class RegisterSession(BaseModel, ShopScopedMixin):
@@ -433,7 +515,7 @@ class User(UserMixin, BaseModel, ShopScopedMixin, BusinessScopedMixin):
     
     # Permissions
     role = db.Column(db.Enum(Role), nullable=False, index=True)
-    permissions = db.Column(db.JSON, nullable=True)  # Additional permissions beyond role
+    permissions = db.Column(db.JSON, nullable=True)  
     
     # Relationships
     sales = db.relationship('Sale', back_populates='user')
@@ -754,6 +836,7 @@ class Product(BaseModel, ShopScopedMixin):
     stock = db.Column(Integer, nullable=False, default=0)
     low_stock_threshold = db.Column(Integer, default=10)
     image_url = db.Column(String(255))
+    unit = db.Column(SQLAlchemyEnum(UnitType), nullable=True)
     
     # Relationships
     category_id = db.Column(Integer, db.ForeignKey('categories.id'), nullable=False, index=True)
