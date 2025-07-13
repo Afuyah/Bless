@@ -421,17 +421,7 @@
         // Update on HTMX navigation
         document.addEventListener('htmx:afterSwap', setActiveNav);
         
-        // Global loader for HTMX
-        document.addEventListener('htmx:beforeRequest', function() {
-            const loader = document.getElementById('global-loader');
-            if (loader) {
-                loader.classList.remove('opacity-0', 'pointer-events-none');
-                loader.classList.add('opacity-100');
-                setTimeout(() => {
-                    loader.querySelector('div').classList.remove('scale-95');
-                }, 10);
-            }
-        });
+       
         
         document.addEventListener('htmx:afterOnLoad', function() {
             const loader = document.getElementById('global-loader');

@@ -258,95 +258,41 @@
 <!-- Mobile Overlay -->
 <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"></div>
 
-<!-- Global HTMX Loader -->
-<div id="global-loader" role="status" aria-live="polite"
-     class="fixed inset-0 z-50 flex items-center justify-center bg-white/30 dark:bg-black/40 backdrop-blur-sm
-            transition-opacity duration-200 pointer-events-none opacity-0">
-  <div class="flex flex-col items-center justify-center bg-white dark:bg-gray-900 rounded-xl shadow-lg px-6 py-5
-              scale-95 transition-transform duration-300">
-    
-    <!-- Spinner -->
-    <div class="relative h-10 w-10 mb-3">
-      <span class="absolute inset-0 rounded-full border-[3px] border-blue-500 border-t-transparent animate-spin"></span>
-      <span class="absolute inset-0 rounded-full border-[3px] border-blue-200 dark:border-blue-800 opacity-25"></span>
+<!-- HTMX Loading Indicator -->
+    <div id="htmx-loader" class="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none">
+        <div class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+            <p class="mt-3 text-sm font-medium text-gray-600 dark:text-gray-300">Loading content...</p>
+        </div>
     </div>
 
-    <!-- Label -->
-    <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Loading Data...</h3>
-    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Please wait</p>
-  </div>
-</div>
-
-
-<!-- Sidebar Activation Script -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const sidebar = document.getElementById('sidebar');
-  const mobileButton = document.getElementById('mobile-menu-button');
-  const overlay = document.getElementById('sidebar-overlay');
-  const menuIcon = document.getElementById('menu-icon');
-  let sidebarVisible = false;
 
-  // Toggle mobile sidebar
-  function toggleSidebar() {
-    sidebarVisible = !sidebarVisible;
-    sidebar.classList.toggle('-translate-x-full', !sidebarVisible);
-    overlay.classList.toggle('opacity-0', !sidebarVisible);
-    overlay.classList.toggle('pointer-events-none', !sidebarVisible);
-    menuIcon.classList.toggle('rotate-90', sidebarVisible);
-  }
-
-  // Mobile menu button
-  mobileButton.addEventListener('click', toggleSidebar);
-  
-  // Close sidebar when clicking overlay
-  overlay.addEventListener('click', toggleSidebar);
-
-  // Collapse/expand desktop sidebar
-  document.getElementById('sidebar-collapse').addEventListener('click', function() {
-    sidebar.classList.toggle('w-20');
-    sidebar.classList.toggle('overflow-hidden');
-    document.querySelectorAll('.nav-link span').forEach(el => {
-      el.classList.toggle('opacity-0');
-      el.classList.toggle('absolute');
-    });
-    this.querySelector('svg').classList.toggle('rotate-180');
-  });
-
-  // Performance optimization - lazy load icons
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const icon = entry.target.querySelector('i');
-          if (icon) icon.classList.add('fa-fw'); // Ensure fixed width
-          observer.unobserve(entry.target);
-        }
+     document.addEventListener('DOMContentLoaded', function() {
+               
+        // Set up HTMX loading indicators
+        initHTMXLoaders();
+        
       });
-    }, { rootMargin: '50px 0px' });
-
-    document.querySelectorAll('.nav-link').forEach(link => {
-      observer.observe(link);
-    });
-  }
-
-  // Active link highlighting
-  function setActiveNav() {
-    const currentPath = window.location.pathname.split('/').pop() || 'dashboard';
-    document.querySelectorAll('.nav-link').forEach(link => {
-      const navItem = link.getAttribute('data-nav-item');
-      if (navItem && currentPath.includes(navItem)) {
-        link.classList.add('bg-blue-50/50', 'dark:bg-gray-800/60', 'text-blue-600', 'dark:text-blue-400');
-        link.querySelector('i').classList.add('text-blue-500');
-        link.querySelector('.nav-highlight').classList.add('opacity-100');
-      }
-    });
-  }
-
-  // Initialize active state
-  setActiveNav();
-  
-  // Update active state on navigation
-  document.body.addEventListener('htmx:afterSwap', setActiveNav);
-});
+     // HTMX loading indicators
+    function initHTMXLoaders() {
+        const loader = document.getElementById('htmx-loader');
+        
+        document.addEventListener('htmx:beforeRequest', function(evt) {
+            // Only show loader for main content swaps
+            if (evt.detail.target.id === 'main-content') {
+                loader.classList.remove('opacity-0', 'pointer-events-none');
+            }
+        });
+        
+        document.addEventListener('htmx:afterRequest', function(evt) {
+            loader.classList.add('opacity-0', 'pointer-events-none');
+        });
+        
+        document.addEventListener('htmx:afterOnLoad', function(evt) {
+            if (evt.detail.failed) {
+                showToast('Request failed. Please try again.', 'error');
+            }
+        });
+    }
 </script>

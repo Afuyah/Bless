@@ -2,7 +2,7 @@
 
 
 
-<!-- Premium Sidebar Navigation -->
+<!-- Sidebar Navigation -->
 <div class="hidden md:flex md:flex-shrink-0">
   <div class="fixed md:relative z-40 bg-white dark:bg-gray-900 w-80 h-full border-r border-gray-100 dark:border-gray-800/50 flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out shadow-xl">
     <!-- Gradient Accent -->
@@ -10,7 +10,7 @@
     
     <!-- Sidebar Content Container -->
     <div class="flex flex-col h-full">
-      <!-- Premium Sidebar Header -->
+      <!-- Sidebar Header -->
       <div class="px-6 py-5 border-b border-gray-200/50 dark:border-gray-700/50">
         <div class="flex items-center space-x-3">
           <div class="flex-shrink-0">
@@ -22,8 +22,8 @@
           </div>
           <div>
             <h6 class="text-sm font-bold tracking-wider text-gray-800 dark:text-gray-200 uppercase">
-              {% if current_user.is_superadmin() %}BHAPOS<span class="text-indigo-600 dark:text-indigo-400">Pro</span>{% endif %}
-              {% if current_user.is_tenant() %}Business<span class="text-green-600 dark:text-green-400">Hub</span>{% endif %}
+              {% if current_user.is_superadmin() %}{{BHAPOS}}<span class="text-indigo-600 dark:text-indigo-400">Pro</span>{% endif %}
+              {% if current_user.is_tenant() %}{{ business.name}}<span class="text-green-600 dark:text-green-400">Hub</span>{% endif %}
               {% if current_user.is_cashier() %}POS<span class="text-blue-600 dark:text-blue-400">Terminal</span>{% endif %}
             </h6>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">v2.4.1</p>
@@ -180,7 +180,7 @@
         </nav>
       </div>
       
-      <!-- Premium User Section -->
+      <!-- User Section -->
       <div class="px-4 py-4 border-t border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-gray-50/50 to-gray-100/50 dark:from-gray-800 dark:to-gray-800/80">
         <div class="flex items-center">
           <div class="flex-shrink-0">
