@@ -45,3 +45,4 @@ reportlab
 pdfkit
 flask-marshmallow
 flask_wtf
+python-dateutilil

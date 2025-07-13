@@ -123,27 +123,28 @@ def get_peak_sales_day(product_id, time_period='month'):
            'Thursday', 'Friday', 'Saturday']
     return days[int(result.day_of_week)] if result else "No sales data"
 
-def get_avg_days_between_sales(product_id, time_period='month'):
-    """Calculate average days between purchases"""
-    time_filter = get_time_filter(time_period)
-    
-    sale_dates = db.session.query(
-        func.date(Sale.date).label('sale_date')
-    ).join(CartItem).filter(
-        CartItem.product_id == product_id,
-        time_filter
-    ).distinct().order_by('sale_date').all()
-    
-    if len(sale_dates) < 2:
-        return 0.0
+def get_avg_days_between_sales(product_id, time_period):
+    sale_dates = db.session.query(Sale.date)\
+        .join(CartItem)\
+        .filter(CartItem.product_id == product_id)\
+        .order_by(Sale.date.asc())\
+        .all()
 
-    parsed_dates = [row[0] for row in sale_dates]
+    # Convert to date objects safely
+    parsed_dates = [
+        d if isinstance(d, date) else datetime.strptime(d, '%Y-%m-%d').date()
+        for d, in sale_dates
+    ]
+
     if len(parsed_dates) < 2:
         return 0.0
 
-    deltas = [(parsed_dates[i] - parsed_dates[i - 1]).days for i in range(1, len(parsed_dates))]
-    return round(statistics.mean(deltas), 1)
+    deltas = [
+        (parsed_dates[i] - parsed_dates[i - 1]).days
+        for i in range(1, len(parsed_dates))
+    ]
 
+    return round(statistics.mean(deltas), 1)
 
 
 # Inventory Metrics

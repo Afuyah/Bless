@@ -240,7 +240,8 @@
           {% for sale in sales %}
           <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-              {{ sale.date.strftime('%a, %b %d %I:%M %p') }}
+              {{ sale.date | format_datetime  }}
+             
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
               #{{ sale.id }}

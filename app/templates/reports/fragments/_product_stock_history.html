@@ -19,7 +19,7 @@
         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {% for log in stock_history %}
             <tr>
-                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">{{ log.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">{{ log.date | format_datetime  }}</td>
                 <td class="px-6 py-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">{{ log.user.username if log.user else 'System' }}</td>
                 <td class="px-6 py-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">{{ log.previous_stock }}</td>
                 <td class="px-6 py-4 text-sm {{ 'text-green-600' if log.new_stock > log.previous_stock else 'text-red-600' }} whitespace-nowrap">{{ log.new_stock }}</td>
@@ -35,6 +35,8 @@
             {% endfor %}
         </tbody>
     </table>
+
+
 
     {% if pagination.pages > 1 %}
     <div class="flex items-center justify-between mt-4">
