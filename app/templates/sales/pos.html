@@ -1805,7 +1805,11 @@ function renderCartItems() {
                 </div>
                 <div class="text-xs text-gray-500 mt-0.5 dark:text-gray-400">
                     ${formatCurrency(item.price)} each
-                    ${isCombo ? `<span class="ml-2 px-2 py-0.5 text-yellow-700 bg-yellow-100 rounded-full text-[11px]">Combo: ${item.combination_size} for ${formatCurrency(item.combination_price)}</span>` : ''}
+                    <br />
+
+                    ${isCombo ? `<span class="ml-2 px-2 py-0.5 text-yellow-700 bg-yellow-100 rounded-full text-[11px]"> 
+                    ${item.combination_size} for ${formatCurrency(item.combination_price)}</span>` : ''}
+
                     ${item.discount > 0 ? `<span class="ml-2 px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-[11px]">${item.discount}% off</span>` : ''}
                 </div>
 

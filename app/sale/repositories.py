@@ -101,7 +101,22 @@ class ProductRepository:
             .order_by(func.count(CartItem.id).desc())\
             .limit(limit)\
             .all()
+    @staticmethod
+    def get_bulk_for_sale_and_session(product_ids: List[int], shop_id: int):
+        products = Product.query.filter(
+            Product.id.in_(product_ids),
+            Product.shop_id == shop_id,
+            Product.is_deleted == False
+        ).all()
 
+        register_session = RegisterSession.query.filter_by(
+            shop_id=shop_id,
+            closed_at=None,
+            is_deleted=False
+        ).first()
+
+        return products, register_session
+                
     @staticmethod
     def update_stock(product_id: int, quantity_change: int) -> bool:
         """
@@ -127,6 +142,10 @@ class ProductRepository:
         except Exception:
             db.session.rollback()
             return False
+
+
+
+
 
 class CategoryRepository:
     @staticmethod

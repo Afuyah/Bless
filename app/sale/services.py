@@ -5,16 +5,45 @@ from typing import List, Dict, Optional
 from flask import request, session
 from .. import db, socketio
 from .repositories import ProductRepository, CategoryRepository, SaleRepository, RegisterSessionRepository
-from ..models import Shop, Sale, CartItem, Category, Product, RegisterSession
-
+from ..models import Shop, Sale, CartItem, Category, Product, RegisterSession, Tax
+from sqlalchemy.sql import bindparam
 from app.utils.pricing import PricingUtil
-
+import threading
 from sqlalchemy.orm import joinedload, with_loader_criteria
 from app.utils.time import get_kenya_today_range
 from sqlalchemy import and_, func, case
 import logging
 
+import logging
+import traceback
+from functools import lru_cache
+
+
+
+
 logger = logging.getLogger(__name__)
+
+
+def run_checkout_tasks(sale_id: int, shop_id: int, user_id: int, total: float, item_count: int):
+    try:
+        # Generate receipt (safe access)
+        receipt = ReceiptService.generate(sale_id)
+        logger.info("Receipt generated successfully")
+
+        # Clear cart
+        CartService.clear(shop_id, user_id)
+
+        # Emit real-time update
+        socketio.emit('sale_completed', {
+            'sale_id': sale_id,
+            'shop_id': shop_id,
+            'total': total,
+            'items_count': item_count,
+        }, room=f'pos_{shop_id}')
+
+    except Exception as e:
+        logger.error("Post-checkout task failed", extra={'sale_id': sale_id, 'error': str(e), 'trace': traceback.format_exc()})
+
 
 # In services.py
 class SalesService:
@@ -46,6 +75,7 @@ class SalesService:
             logger.error(f"Error getting POS data: {str(e)}", exc_info=True)
             raise ValueError("Failed to load POS data") from e
 
+    
     @staticmethod
     def process_checkout(
         shop_id: int,
@@ -55,53 +85,63 @@ class SalesService:
         customer_data: Optional[Dict] = None
     ) -> Dict:
         """
-        Complete the sale transaction with full validation and session tracking
+        Ultra-optimized sale transaction processing with minimal latency and safe commit flow.
         """
+
         if not cart_items:
             raise ValueError("Cannot process empty sale")
+        if not payment_method:
+            raise ValueError("Payment method required")
+
+        cart_items = [{'product_id': int(item['product_id']), 'quantity': int(item['quantity'])}
+                      for item in cart_items]
 
         try:
-            validated_items = []
-            for item in cart_items:
-                product = ProductRepository.get_for_sale(item['product_id'], shop_id)
-                if not product:
-                    raise ValueError(f"Product {item['product_id']} not found in shop")
-                if product.stock < item['quantity']:
-                    raise ValueError(
-                        f"Insufficient stock for {product.name}. "
-                        f"Available: {product.stock}, Requested: {item['quantity']}"
-                    )
-
-                subtotal = PricingUtil.calculate_combination_price(product, item['quantity'])
-                cost = float(product.cost_price) * item['quantity']
-
-                validated_items.append({
-                    'product_id': product.id,
-                    'quantity': item['quantity'],
-                    'price': float(product.selling_price),  # keep for UI/reference
-                    'cost_price': float(product.cost_price),
-                    'name': product.name,
-                    'subtotal': subtotal,
-                    'total_cost': cost
-                })
-
-            # Financials
-            subtotal = sum(Decimal(str(item['subtotal'])) for item in validated_items)
-            total_cost = sum(Decimal(str(item['total_cost'])) for item in validated_items)
-            tax_amount = TaxService.calculate_tax(float(subtotal), shop_id)
-            total = subtotal + Decimal(str(tax_amount))
-
-            # Ensure register session is open
-            register_session = RegisterSession.query.filter_by(
-                shop_id=shop_id,
-                closed_at=None,
-                is_deleted=False
-            ).first()
-
+            product_ids = [item['product_id'] for item in cart_items]
+            products, register_session = ProductRepository.get_bulk_for_sale_and_session(product_ids, shop_id)
             if not register_session:
-                raise ValueError("No open register session. Please open the register first.")
+                raise ValueError("No open register session")
 
-            # Create Sale record
+            product_map = {p.id: p for p in products}
+
+            subtotal = Decimal('0')
+            total_cost = Decimal('0')
+            cart_item_data = []
+            stock_updates = []
+
+            tax_rate = Decimal(str(Tax.get_tax_rate(shop_id)))
+
+            for item in cart_items:
+                product = product_map.get(item['product_id'])
+                if not product:
+                    raise ValueError(f"Product {item['product_id']} not found")
+                quantity = item['quantity']
+                if product.stock < quantity:
+                    raise ValueError(f"Insufficient stock for {product.name}")
+
+                item_subtotal = (
+                    (quantity // product.combination_size * product.combination_price +
+                     min(quantity % product.combination_size * product.selling_price, product.combination_price))
+                    if product.is_combo and product.combination_size > 1
+                    else quantity * product.selling_price
+                )
+                item_cost = quantity * product.cost_price
+
+                subtotal += Decimal(str(item_subtotal))
+                total_cost += Decimal(str(item_cost))
+
+                cart_item_data.append({
+                    'shop_id': shop_id,
+                    'product_id': product.id,
+                    'quantity': quantity,
+                    'unit_price': float(product.selling_price),
+                    'total_price': float(item_subtotal)
+                })
+                stock_updates.append({'p_id': product.id, 'new_stock': product.stock - quantity})
+
+            tax_amount = subtotal * tax_rate
+            total = subtotal + tax_amount
+
             sale = Sale(
                 shop_id=shop_id,
                 user_id=user_id,
@@ -110,58 +150,52 @@ class SalesService:
                 tax=float(tax_amount),
                 total=float(total),
                 payment_method=payment_method,
-                customer_name=customer_data.get('name'),
-                customer_phone=customer_data.get('phone'),
-                profit=float(subtotal - total_cost)  # Net profit before tax
+                customer_name=str(customer_data.get('name', '')).strip()[:100] if customer_data else None,
+                customer_phone=str(customer_data.get('phone', '')).strip()[:20] if customer_data else None,
+                profit=float(subtotal - total_cost)
             )
             db.session.add(sale)
-            db.session.flush()
+            db.session.flush()  # Get sale.id
 
-            # Save cart items
-            for item in validated_items:
-                cart_item = CartItem(
-                    shop_id=shop_id,
-                    product_id=item['product_id'],
-                    quantity=item['quantity'],
-                    sale_id=sale.id,
-                    unit_price=item['price'],
-                    total_price=item['subtotal']  # ← combo-based subtotal
+            if cart_item_data:
+                db.session.execute(
+                    CartItem.__table__.insert(),
+                    [dict(item, sale_id=sale.id) for item in cart_item_data]
                 )
-                db.session.add(cart_item)
 
-                # Reduce stock
-                product = Product.query.get(item['product_id'])
-                product.stock -= item['quantity']
-                db.session.add(product)
-
-            # Generate receipt
-            receipt = ReceiptService.generate(sale.id)
-
-            # Clear cart
-            CartService.clear(shop_id, user_id)
-
-            # Emit real-time event
-            socketio.emit('sale_completed', {
-                'sale_id': sale.id,
-                'shop_id': shop_id,
-                'total': float(total),
-                'items_count': len(validated_items),
-                'timestamp': datetime.utcnow().isoformat()
-            }, room=f'pos_{shop_id}')
+            if stock_updates:
+                db.session.execute(
+                    Product.__table__.update()
+                    .where(Product.id == bindparam('p_id'))
+                    .values(stock=bindparam('new_stock')),
+                    stock_updates
+                )
 
             db.session.commit()
+
+            # Launch background thread
+            threading.Thread(
+                target=run_checkout_tasks,
+                args=(sale.id, shop_id, user_id, float(total), len(cart_items)),
+                daemon=True
+            ).start()
 
             return {
                 'success': True,
                 'sale_id': sale.id,
-                'receipt': receipt,
                 'amount_paid': float(total),
-                'change_due': 0.0
+                'change_due': 0.0,
+                'receipt': None,  
+                'receipt_pending': True
             }
 
         except Exception as e:
             db.session.rollback()
-            logger.error(f"Checkout failed for shop {shop_id}: {str(e)}", exc_info=True)
+            logger.error("Checkout failed", extra={
+                'shop_id': shop_id,
+                'error': str(e),
+                'trace': traceback.format_exc()
+            })
             raise ValueError(f"Checkout processing failed: {str(e)}")
 
 
@@ -518,18 +552,29 @@ class PaymentService:
 class TaxService:
     @staticmethod
     def calculate_tax(subtotal: float, shop_id: int) -> float:
-        """Calculate tax amount based on shop location"""
-        # Simplified - in reality would use shop's tax rules
-        return round(subtotal * 0, 2)  # 0% tax
+        tax = Tax.query.filter_by(shop_id=shop_id, is_active=True, is_deleted=False).first()
+        if not tax:
+            return 0.0
+        return round(subtotal * tax.rate, 2)
 
     @staticmethod
     def get_rates(shop_id: int) -> List[Dict]:
-        """Get applicable tax rates for display"""
+        tax = Tax.query.filter_by(shop_id=shop_id, is_active=True, is_deleted=False).first()
+        if not tax:
+            return []
         return [{
-            'name': 'VAT',
-            'rate': 0.0,
-            'inclusive': False
+            'name': tax.name,
+            'rate': tax.rate,
+            'inclusive': False,
+            'description': tax.description,
+            'kra_code': tax.kra_code
         }]
+
+    @staticmethod
+    @lru_cache(maxsize=32)
+    def get_tax_rate(shop_id: int) -> float:
+        tax = Tax.query.filter_by(shop_id=shop_id, is_active=True, is_deleted=False).first()
+        return float(tax.rate if tax else 0.0)
 
 
 

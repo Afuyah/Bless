@@ -470,10 +470,18 @@ class Tax(BaseModel, ShopScopedMixin):
     rate = db.Column(db.Float, nullable=False) 
     description = db.Column(db.String(255), nullable=True)
     kra_code = db.Column(db.String(50), nullable=True) 
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+
 
     __table_args__ = (
         db.UniqueConstraint('shop_id', 'name', name='uq_tax_name_per_shop'),
     )
+
+
+    @staticmethod
+    def get_tax_rate(shop_id: int) -> float:
+        tax = Tax.query.filter_by(shop_id=shop_id, is_active=True, is_deleted=False).first()
+        return float(tax.rate if tax else 0.0) 
 
     def serialize(self):
         return {
