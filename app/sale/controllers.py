@@ -235,18 +235,18 @@ class TransactionController(MethodView):
         """
         try:
             checkout_data = CheckoutSchema().load(request.json)
-            
+
             result = SalesService.process_checkout(
                 shop_id=shop_id,
                 user_id=current_user.id,
-                cart_items=CartService.get(shop_id, current_user.id),
+                cart_items=checkout_data['cart_items'],  # <- use client-sent cart
                 payment_method=checkout_data['payment_method'],
                 customer_data={
                     'name': checkout_data.get('customer_name'),
                     'phone': checkout_data.get('customer_phone')
                 }
             )
-            
+
             return jsonify({
                 'success': True,
                 'sale_id': result['sale_id'],
@@ -254,7 +254,6 @@ class TransactionController(MethodView):
                 'amount_paid': result['amount_paid']
             })
 
-            
         except ValidationError as e:
             return jsonify({'error': e.messages}), 400
         except ValueError as e:

@@ -453,7 +453,7 @@
                             <button id="complete-sale"
                                 class="w-full bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 rounded-lg font-medium flex items-center justify-center shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm">
                                 <i class="fas fa-check-circle mr-2"></i>
-                                Complete Sale (<span id="complete-sale-amount">Ksh 0.00</span>)
+                                Complete Sale 
                             </button>
                         </div>
                     </div>
@@ -648,12 +648,46 @@
                 <button onclick="submitCloseRegister()"
                     class="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all flex items-center space-x-2 btn-press shadow-md hover:shadow-lg">
                     <i class="fas fa-lock"></i>
-                    <span>Close Register</span>
+                    <span>Close Session</span>
                 </button>
             </div>
         </div>
     </div>
 </div>
+
+
+<!-- Confirm Sale Modal -->
+<div id="confirm-sale-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md mx-4 p-6 space-y-5 border border-gray-200 dark:border-gray-700">
+    
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Confirmation </h2>
+      <button onclick="hideModal('confirm-sale-modal')" class="text-gray-400 hover:text-red-500 transition">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div id="confirm-sale-summary" class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+      <!-- Summary injected here by JS -->
+    </div>
+
+    <div class="flex justify-end gap-3 pt-4">
+      <button id="cancel-confirm-sale" class="px-4 py-2 text-sm rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+        Cancel
+      </button>
+      <button id="print-confirm-sale" class="px-4 py-2 text-sm rounded-md bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-100 hover:bg-blue-200 dark:hover:bg-blue-700 transition">
+        Print & Complete
+      </button>
+      <button id="confirm-complete-sale" class="px-4 py-2 text-sm rounded-md bg-green-600 text-white hover:bg-green-700 transition">
+        Complete
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+
 
 <!-- Premium Loading Overlay -->
 <div id="global-loading-overlay"
@@ -683,6 +717,8 @@
         minimumFractionDigits: 2
     });
 
+// Tax rate (configurable)
+const TAX_RATE = 0.16; // 16% VAT
     // ====================
     // DOM Elements
     // ====================
@@ -731,19 +767,27 @@
         registerStatusSpinner: document.getElementById('register-status-spinner'),
     };
 
+
     // ====================
     // State Management
     // ====================
-    const state = {
-        cart: [],
-        products: [],
-        categories: [],
-        selectedPaymentMethod: 'cash',
-        currentRegisterSession: null,
-        lastRegisterSession: null,
-        pendingCartUpdates: new Set(), // Track pending cart operations
-        shopInfo: null
-    };
+   const state = {
+    cart: [],
+    products: [],
+    categories: [],    
+    lastAddedProductId: null, 
+    lastAddTime: 0,
+    selectedPaymentMethod: 'cash',
+    currentRegisterSession: null,
+    lastRegisterSession: null,
+    shopInfo: null,
+    // Client-side only properties
+    cartVersion: 0, // For version tracking
+    pendingOperations: new Set() // Now properly initialized as a Set
+};
+
+
+
 
     // ====================
     // Utility Functions
@@ -779,6 +823,8 @@
         const options = { hour: '2-digit', minute: '2-digit' };
         return new Date(dateString).toLocaleTimeString('en-KE', options);
     }
+
+
 
     // ====================
     // UI Helper Functions
@@ -867,6 +913,16 @@
     }
 
 
+function saveCartToLocalStorage() {
+    localStorage.setItem('pos_cart', JSON.stringify(state.cart));
+}
+
+function loadCartFromLocalStorage() {
+    const stored = localStorage.getItem('pos_cart');
+    if (stored) {
+        state.cart = JSON.parse(stored);
+    }
+}
 
 
 
@@ -1022,6 +1078,7 @@
         }
     }
 
+
     async function submitCloseRegister() {
         const closingCash = parseFloat(document.getElementById('closingCash').value);
         const expectedCash = parseFloat(document.getElementById('session-expected-cash').textContent);
@@ -1070,39 +1127,45 @@
     // ====================
     // POS Initialization 
     // ====================
-   async function initPOS() {
-    try {
-        // Show instant loading state 
-        requestAnimationFrame(() => showLoading('POS Starting', 'Preparing system...'));
+    async function initPOS() {
+        try {
+            // Show instant loading state 
+            requestAnimationFrame(() => showLoading('POS Starting', 'Preparing system...'));
 
-        // Fire critical requests immediately (no await)
-        const shopPromise = loadShopData();
-        const productsPromise = loadProducts();
+            // Fire critical requests immediately (no await)
+            const shopPromise = loadShopData();
+            const productsPromise = loadProducts();
 
-        // Show skeleton UI immediately 
-        showProductSkeletons(12); // Optimistic number
+            // Show skeleton UI immediately 
+            showProductSkeletons(12); // Optimistic number
 
-        // Wait only for critical data
-        await Promise.all([shopPromise, productsPromise]);
+            // Wait only for critical data (shop + products)
+            await Promise.all([shopPromise, productsPromise]);
 
-        // Sequentially load cart, then categories
-        loadCart()
-            .then(() => loadCategories())
-            .catch(err => console.warn('Background load failed:', err));
+            // Start non-critical loads in background
+            const nonCriticalLoads = Promise.allSettled([
+                loadCategories(),
+                loadCart()
+            ]).then(results => {
+                results.forEach((result, i) => {
+                    if (result.status === 'rejected') {
+                        console.warn(`Background load ${i} failed:`, result.reason);
+                    }
+                });
+            });
 
-        // Optional: Prefetch likely next resources
-        if ('connection' in navigator && !navigator.connection.saveData) {
-            prefetchResources();
+            // Optional: Prefetch likely next resources
+            if ('connection' in navigator && !navigator.connection.saveData) {
+                prefetchResources();
+            }
+
+        } catch (error) {
+            handleCriticalError(error);
+        } finally {
+            // Hide loading with slight delay to prevent flicker
+            setTimeout(hideLoading, 150);
         }
-
-    } catch (error) {
-        handleCriticalError(error);
-    } finally {
-        // Hide loading with slight delay to prevent flicker
-        setTimeout(hideLoading, 150);
     }
-}
-
 
     // ====================
     // Data Loading
@@ -1174,18 +1237,22 @@
             });
     }
 
-    function loadCart() {
-        return axios.get(`${API_BASE_URL}/cart/items`)
-
-            .then(res => {
-                state.cart = res.data?.items || [];
-                updateCartUI();
-            })
-            .catch(err => {
-                console.warn('Cart sync failed:', err);
-                state.cart = [];
-            });
+async function loadCart() {
+    try {
+        const stored = localStorage.getItem('pos_cart');
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) {
+                state.cart = parsed;
+            }
+        }
+    } catch (e) {
+        console.warn('Failed to load cart from localStorage', e);
+        state.cart = [];
     }
+
+    updateCartUI();
+}
 
     // ====================
     // Performance Helpers
@@ -1205,6 +1272,7 @@
             }).catch(() => { });
         });
     }
+
 
     function showProductSkeletons(count = 8) {
         // Ultra-fast template cloning
@@ -1228,14 +1296,18 @@
     </div>`;
     }
 
-    function renderProducts() {
-        const grid = elements.productGrid;
-        const empty = elements.productsEmptyState;
 
-        if (state.products.length === 0) {
-            grid.classList.add('hidden');
-            empty.classList.remove('hidden');
-            empty.innerHTML = `
+
+
+  function renderProducts() {
+    const grid = elements.productGrid;
+    const empty = elements.productsEmptyState;
+
+    // Handle empty product list
+    if (!state.products || state.products.length === 0) {
+        grid.classList.add('hidden');
+        empty.classList.remove('hidden');
+        empty.innerHTML = `
             <div class="text-center p-6">
                 <div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
                     <i class="fas fa-box-open text-gray-400 text-xl"></i>
@@ -1244,28 +1316,42 @@
                 <p class="text-gray-400 text-sm">Try adjusting your search or filters</p>
             </div>
         `;
-            return;
-        }
+        return;
+    }
 
-        grid.classList.remove('hidden');
-        empty.classList.add('hidden');
+    grid.classList.remove('hidden');
+    empty.classList.add('hidden');
 
-        // Use document fragment for better performance
-        const fragment = document.createDocumentFragment();
-        const cardTemplate = document.createElement('div');
-        cardTemplate.className = 'contents'; // CSS containment
+    // Create document fragment for better performance
+    const fragment = document.createDocumentFragment();
+    const cardTemplate = document.createElement('div');
+    cardTemplate.className = 'contents';
 
-        cardTemplate.innerHTML = state.products.map(product => {
-            const { id, name, price, stock, discount = 0, image_url, category, barcode, combination_size, combination_price } = product;
-            const isOutOfStock = stock <= 0;
-            const finalPrice = discount > 0 ? price * (1 - discount / 100) : price;
-            const hasImage = Boolean(image_url);
-            const initials = name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
-            const stockPercentage = Math.min(100, (stock / 20) * 100);
-            const isCombo = combination_size && combination_price;
-            const comboPricePerUnit = combination_price / combination_size;
+    // Generate product cards HTML
+    cardTemplate.innerHTML = state.products.map(product => {
+        const { 
+            id, 
+            name, 
+            price, 
+            stock, 
+            discount = 0, 
+            image_url, 
+            category, 
+            barcode, 
+            combination_size, 
+            combination_price 
+        } = product;
+        
 
-            return `
+        const isOutOfStock = stock <= 0;
+        const finalPrice = discount > 0 ? price * (1 - discount / 100) : price;
+        const hasImage = Boolean(image_url);
+        const initials = name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+        const stockPercentage = Math.min(100, (stock / 20) * 100);
+        const isCombo = combination_size && combination_price;
+        const comboPricePerUnit = combination_price / combination_size;
+
+        return `
         <div class="pos-card bg-white rounded-lg border border-gray-100 shadow-xs hover:shadow-md transition-all duration-150 
                     hover:border-primary-300 group overflow-hidden flex flex-col h-full"
              data-id="${id}">
@@ -1284,7 +1370,7 @@
                     </div>
                 `}
 
-                <!-- PERFECTLY CENTERED ADD BUTTON -->
+                <!-- Add to Cart Button -->
                 <div class="absolute inset-0 flex items-center justify-center">
                     <button class="quick-add-btn bg-primary-500 text-white rounded-full w-10 h-10 flex items-center justify-center 
                                   shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200
@@ -1302,7 +1388,7 @@
                 </div>
             </div>
 
-            <!-- Product Info (60% of card height) -->
+            <!-- Product Info -->
             <div class="p-2 flex-1 flex flex-col">
                 <!-- Name & Discount -->
                 <div class="flex justify-between items-start gap-1 mb-1">
@@ -1310,8 +1396,7 @@
                     ${discount > 0 ? `
                         <span class="discount-badge text-[0.65rem] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                             -${discount}%
-                        </span>` : ''
-                }
+                        </span>` : ''}
                 </div>
 
                 <!-- Combination Deal -->
@@ -1319,7 +1404,6 @@
                 <div class="mb-1 px-1.5 py-1 bg-amber-50 rounded-md border border-amber-200">
                     <div class="flex justify-between items-center text-[0.65rem]">
                         <span class="font-bold text-amber-700">${combination_size} for ${formatCurrency(combination_price)}</span>
-                       
                     </div>
                 </div>
                 ` : ''}
@@ -1330,16 +1414,14 @@
                     ${barcode ? `<span class="font-mono">${barcode}</span>` : ''}
                 </div>
 
-                <!-- Price & Add Button -->
+                <!-- Price & Stock Status -->
                 <div class="mt-auto flex justify-between items-center">
                     <div class="flex flex-col">
                         <span class="text-sm font-bold text-primary-600 leading-none">${formatCurrency(finalPrice)}</span>
                         ${discount > 0 ? `
-                            <span class="text-[0.65rem] text-gray-400 line-through">${formatCurrency(price)}</span>` : ''
-                }
+                            <span class="text-[0.65rem] text-gray-400 line-through">${formatCurrency(price)}</span>` : ''}
                     </div>
                     
-                    <!-- Stock Status -->
                     <div class="text-[0.65rem] font-medium px-1.5 py-0.5 rounded-full 
                               ${isOutOfStock ? 'bg-red-100 text-red-800' :
                     stock <= 3 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'}">
@@ -1349,38 +1431,50 @@
             </div>
         </div>
         `;
-        }).join('');
+    }).join('');
 
-        fragment.appendChild(cardTemplate);
-        grid.innerHTML = '';
-        grid.appendChild(fragment);
+    fragment.appendChild(cardTemplate);
+    grid.innerHTML = '';
+    grid.appendChild(fragment);
 
-        // Event delegation for better performance
-        grid.addEventListener('click', (e) => {
-            const addBtn = e.target.closest('.quick-add-btn');
-            if (!addBtn) return;
+    // Add event delegation for product clicks
+    setupProductClickHandlers();
+}
 
-            e.preventDefault();
-            e.stopPropagation();
 
-            const card = addBtn.closest('.pos-card');
-            const productId = parseInt(card.dataset.id);
-            const icon = addBtn.querySelector('i');
 
-            // Visual feedback
-            if (icon) {
-                icon.className = 'fas fa-check animate-pulse';
-                setTimeout(() => {
-                    icon.className = 'fas fa-plus';
-                }, 800);
+function setupProductClickHandlers() {
+    elements.productGrid.addEventListener('click', (e) => {
+        const addBtn = e.target.closest('.quick-add-btn');
+        if (!addBtn) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const card = addBtn.closest('.pos-card');
+        const productId = parseInt(card.dataset.id);
+        const icon = addBtn.querySelector('i');
+
+        // Visual feedback
+        if (icon) {
+            icon.className = 'fas fa-check animate-pulse';
+            setTimeout(() => {
+                icon.className = 'fas fa-plus';
+            }, 800);
+        }
+
+        // Handle add to cart
+        try {
+            const success = addToCart(productId);
+            if (!success) {
+                showNotification('Could not add item to cart', 'error');
             }
-
-            // Optimistic UI update
-            addToCart(productId).catch(() => {
-                // Error handling would revert optimistic changes
-            });
-        });
-    }
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            showNotification('Failed to add item to cart', 'error');
+        }
+    });
+}
 
 
     function renderCategories() {
@@ -1416,6 +1510,7 @@
                 <div class="scroll-fade-right absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
             </div>
         `;
+
 
             // Add event listeners with enhanced animations
             document.querySelectorAll('.category-tab').forEach(tab => {
@@ -1475,6 +1570,7 @@
                 });
             });
 
+
             // Add scroll indicators when tabs overflow
             const checkScroll = () => {
                 const container = elements.categoryTabs.querySelector('.category-tabs-scroll');
@@ -1522,575 +1618,684 @@
 
 
 
-    // ====================
-    // Cart State Management
-    // ====================
 
-    /**
-     * Adds a product to the cart with optimistic UI updates
-     * @param {number} productId - ID of product to add
-     */
-    async function addToCart(productId) {
-        if (state.pendingCartUpdates.has(productId)) return;
-        state.pendingCartUpdates.add(productId);
+// ====================
+// Enhanced Cart Operations
+// ====================
 
-        const product = state.products.find(p => p.id === productId);
-        if (!product) return;
+/**
+ * Adds a product to cart with debounce, including combo support
+ */
+function addToCart(productId) {
+    const now = Date.now();
 
-        try {
-            // Optimistic local update
-            let item = state.cart.find(i => i.product_id === productId);
-            if (item) {
-                item.quantity += 1;
-            } else {
-                state.cart.push({
-                    product_id: productId,
-                    name: product.name,
-                    price: product.price,
-                    discount: product.discount || 0,
-                    image_url: product.image_url,
-                    quantity: 1,
-                    is_combo: product.is_combo || false,
-                    combination_size: product.combination_size || 0,
-                    combination_price: product.combination_price || null
-                });
-            }
-
-            updateCartUI();
-
-            // Sync with server
-            await axios.post(`${API_BASE_URL}/cart?action=add`, {
-                product_id: productId,
-                quantity: 1
-            });
-
-            showNotification(`${product.name} added to cart`, 'success');
-        } catch (err) {
-            // Revert on error
-            const item = state.cart.find(i => i.product_id === productId);
-            if (item) {
-                if (item.quantity > 1) item.quantity -= 1;
-                else state.cart = state.cart.filter(i => i.product_id !== productId);
-            }
-            handleError('Failed to add to cart', err);
-        } finally {
-            state.pendingCartUpdates.delete(productId);
-            updateCartUI();
-        }
+    // Debounce to prevent rapid double clicks
+    if (state.lastAddedProductId === productId && (now - state.lastAddTime) < 500) {
+        return false;
     }
 
-    /**
-     * Updates item quantity in cart
-     * @param {number} productId - ID of product to update
-     * @param {number} delta - Quantity change (+1 or -1)
-     */
-    async function updateCartItemQuantity(productId, delta) {
-        if (state.pendingCartUpdates.has(productId)) return;
-        state.pendingCartUpdates.add(productId);
+    state.lastAddedProductId = productId;
+    state.lastAddTime = now;
 
-        const item = state.cart.find(i => i.product_id === productId);
-        if (!item) return;
-
-        const newQty = item.quantity + delta;
-        if (newQty < 1) return;
-
-        try {
-            // Optimistic update
-            item.quantity = newQty;
-            updateCartUI();
-
-            await axios.post(`${API_BASE_URL}/cart?action=update`, {
-                product_id: productId,
-                quantity: newQty
-            });
-
-        } catch (err) {
-            // Revert on error
-            item.quantity -= delta;
-            updateCartUI();
-            handleError('Failed to update quantity', err);
-        } finally {
-            state.pendingCartUpdates.delete(productId);
-            updateCartUI();
-        }
+    const product = state.products.find(p => p.id === productId);
+    if (!product) {
+        console.error(`Product ${productId} not found`);
+        return false;
     }
 
-    /**
-     * Removes item from cart
-     * @param {number} productId - ID of product to remove
-     */
-    async function removeFromCart(productId) {
-        if (state.pendingCartUpdates.has(productId)) return;
-        state.pendingCartUpdates.add(productId);
-
-        try {
-            state.cart = state.cart.filter(i => i.product_id !== productId);
-            updateCartUI();
-
-            await axios.post(`${API_BASE_URL}/cart?action=remove`, {
-                product_id: productId
-            });
-
-            showNotification('Item removed', 'success');
-        } catch (err) {
-            handleError('Failed to remove item', err);
-            await syncCartFromServer(); // Fallback sync
-        } finally {
-            state.pendingCartUpdates.delete(productId);
-            updateCartUI();
-        }
+    // Check stock limit
+    const availableStock = product.stock - getCurrentCartQuantity(productId);
+    if (availableStock <= 0) {
+        showNotification(`"${product.name}" is out of stock`, 'error');
+        return false;
     }
 
-    /**
-     * Clears entire cart after confirmation
-     */
-    async function clearCart() {
-        if (!state.cart.length) return;
-        if (!confirm('Are you sure you want to clear the cart?')) return;
-
-        try {
-            showLoading('Clearing cart');
-            await axios.post(`${API_BASE_URL}/cart?action=clear`);
-            state.cart = [];
-            updateCartUI();
-            showNotification('Cart cleared', 'success');
-        } catch (err) {
-            handleError('Failed to clear cart', err);
-        } finally {
-            hideLoading();
-        }
+    // Add 1 unit at a time — regardless of combo
+    const existingItem = state.cart.find(item => item.product_id === productId);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        state.cart.push({
+            product_id: product.id,
+            name: product.name,
+            price: product.price,
+            discount: product.discount || 0,
+            image_url: product.image_url,
+            quantity: 1,
+            is_combo: !!product.is_combo,
+            combination_size: product.combination_size || 0,
+            combination_price: product.combination_price || 0,
+            stock: product.stock
+        });
     }
 
-    // ====================
-    // Cart UI Rendering
-    // ====================
+    updateCartUI();
+    showNotification(`${product.name} added to cart`, 'success');
+    return true;
+}
 
-    /**
-     * Updates all cart UI elements (totals, buttons, etc.)
-     */
-    function updateCartUI() {
-        const subtotal = state.cart.reduce((sum, item) => sum + calculateComboSubtotal(item), 0);
-        const tax = 0; // Adjust if tax is dynamic
-        const total = subtotal + tax;
 
-        // Update summary elements
-        elements.subtotalEl.textContent = formatCurrency(subtotal);
-        elements.taxEl.textContent = formatCurrency(tax);
-        elements.totalEl.textContent = formatCurrency(total);
-        document.getElementById('complete-sale-amount').textContent = formatCurrency(total);
 
-        // Toggle checkout button state
-        elements.completeSaleBtn.disabled = state.cart.length === 0;
+function getCurrentCartQuantity(productId) {
+    const item = state.cart.find(i => i.product_id === productId);
+    return item ? item.quantity : 0;
+}
 
-        // Render appropriate cart state
-        if (state.cart.length === 0) {
-            showEmptyCartState();
-        } else {
-            renderCartItems();
-        }
+
+function calculateComboSubtotal(item) {
+    const quantity = item.quantity;
+
+    if (item.is_combo && item.combination_size > 1 && item.combination_price) {
+        const groupCount = Math.floor(quantity / item.combination_size);
+        const remaining = quantity % item.combination_size;
+
+        return (
+            groupCount * item.combination_price +
+            remaining * item.price
+        );
+    } else {
+        return quantity * item.price;
+    }
+}
+
+
+// ====================
+// Improved Quantity Management
+// ====================
+
+function updateCartItemQuantity(productId, delta) {
+    const item = state.cart.find(i => i.product_id === productId);
+    if (!item) return false;
+
+    const newQty = item.quantity + delta;
+    
+    // Validate new quantity
+    if (newQty < 1) {
+        // Remove item if quantity would go to zero
+        removeFromCart(productId);
+        return true;
     }
 
-    /**
-     * Renders empty cart state
-     */
-    function showEmptyCartState() {
-        elements.emptyCart.classList.remove('hidden');
-        elements.cartItems.innerHTML = `
-        <div class="text-center py-8 text-gray-500">
-            <i class="fas fa-shopping-cart fa-2x mb-2"></i>
-            <p>Your cart is empty</p>
-        </div>`;
+    
+
+    // Check stock limits
+    if (newQty > item.stock) {
+        showNotification(`Only ${item.stock} available for "${item.name}"`, 'error');
+        return false;
     }
 
-    /**
-     * Renders all cart items with interactive controls
-     */
-    function renderCartItems() {
-        elements.emptyCart.classList.add('hidden');
+    item.quantity = newQty;
+    updateCartUI();
+    return true;
+}
 
-        elements.cartItems.innerHTML = state.cart.map(item => {
-            const isPending = state.pendingCartUpdates.has(item.product_id);
-            return generateCartItemHTML(item, isPending);
-        }).join('');
+// ====================
+// Enhanced Pricing Calculations
+// ====================
 
-        attachCartItemEventListeners();
+function calculateItemSubtotal(item) {
+    // For combo items, calculate based on combo pricing
+    if (item.is_combo && item.combination_size > 1) {
+        const comboUnits = Math.floor(item.quantity / item.combination_size);
+        const remainder = item.quantity % item.combination_size;
+        
+        const comboPrice = comboUnits * item.combination_price;
+        const remainderPrice = remainder * item.price;
+        
+        // Apply whichever is cheaper for remainder items
+        return comboPrice + Math.min(remainderPrice, item.combination_price);
+    }
+    
+    // Regular item pricing
+    return item.quantity * item.price;
+}
+
+
+/**
+ * Renders empty cart state
+ */
+function renderEmptyCartState() { // Renamed from showEmptyCartState for consistency
+    elements.emptyCart.classList.remove('hidden');
+    elements.cartItems.innerHTML = `
+    <div class="text-center py-8 text-gray-500">
+        <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+        <p>Your cart is empty</p>
+    </div>`;
+}
+
+function renderCartItems() {
+    const cart = state.cart;
+    const cartContainer = elements.cartItems;
+
+    cartContainer.innerHTML = '';
+    elements.emptyCart.classList.toggle('hidden', cart.length > 0);
+
+    if (cart.length === 0) {
+        renderEmptyCartState();
+        return;
     }
 
-    /**
-     * Generates HTML for a single cart item
-     */
-    function generateCartItemHTML(item, isPending) {
-        const loadingClass = isPending ? 'opacity-50 pointer-events-none' : '';
-        const hasImage = !!item.image_url;
+    cart.forEach(item => {
+        const subtotal = calculateItemSubtotal(item);
+        const discount = calculateItemDiscount(item);
+        const isCombo = item.is_combo && item.combination_size > 1;
 
-        return `
-    <div class="cart-item ${loadingClass} bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-3 flex items-start justify-between transition-all" data-id="${item.product_id}">
-        <div class="flex items-start gap-4 w-full">
-            ${hasImage ? generateItemImage(item) : generateItemInitials(item)}
-            
-            <div class="flex-1">
-                ${generateItemHeader(item, isPending)}
-                ${generateItemDetails(item)}
-                ${generateQuantityControls(item, isPending)}
+        const itemEl = document.createElement('div');
+        itemEl.className = `
+            cart-item flex justify-between items-start gap-4 p-4 rounded-md border border-gray-200 bg-gray-50
+            shadow-sm mb-3 relative transition-all
+            dark:bg-gray-800 dark:border-gray-700
+        `;
+        itemEl.dataset.id = item.product_id;
+
+        itemEl.innerHTML = `
+            <!-- Product Image or Initials -->
+            <div class="w-12 h-12 flex items-center justify-center rounded-md bg-white border border-gray-300 overflow-hidden dark:bg-gray-700 dark:border-gray-600">
+                ${item.image_url
+                    ? `<img src="${item.image_url}" alt="${item.name}" class="w-full h-full object-cover">`
+                    : `<span class="text-sm font-semibold text-gray-600 dark:text-gray-200">${item.name.slice(0, 2).toUpperCase()}</span>`
+                }
             </div>
 
-            ${generateItemPricing(item)}
+            <!-- Product Info -->
+            <div class="flex-1">
+                <div class="flex justify-between items-center">
+                    <h4 class="text-sm font-semibold text-gray-800 dark:text-white truncate w-[80%]">${item.name}</h4>
+                    <button class="remove-item text-red-500 hover:text-red-700 text-xl font-bold" aria-label="Remove item">&times;</button>
+                </div>
+                <div class="text-xs text-gray-500 mt-0.5 dark:text-gray-400">
+                    ${formatCurrency(item.price)} each
+                    ${isCombo ? `<span class="ml-2 px-2 py-0.5 text-yellow-700 bg-yellow-100 rounded-full text-[11px]">Combo: ${item.combination_size} for ${formatCurrency(item.combination_price)}</span>` : ''}
+                    ${item.discount > 0 ? `<span class="ml-2 px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-[11px]">${item.discount}% off</span>` : ''}
+                </div>
+
+                <!-- Quantity Controls -->
+                <div class="flex items-center gap-2 mt-3">
+                    <button class="decrease-qty w-7 h-7 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600" aria-label="Decrease quantity">−</button>
+                    <span class="text-sm font-semibold text-gray-700 dark:text-white">${item.quantity}</span>
+                    <button class="increase-qty w-7 h-7 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600" aria-label="Increase quantity">+</button>
+                </div>
+            </div>
+
+            <!-- Subtotal -->
+            <div class="text-right text-sm font-medium text-primary-600 dark:text-primary-400 min-w-[90px]">
+                ${formatCurrency(subtotal)}
+                ${discount > 0 ? `<div class="text-xs text-green-600 dark:text-green-400 mt-1">Saved ${formatCurrency(discount)}</div>` : ''}
+            </div>
+        `;
+
+        cartContainer.appendChild(itemEl);
+    });
+
+    attachCartItemEventListeners();
+    saveCartToLocalStorage(); // Persist updated cart
+}
+
+
+
+function attachCartItemEventListeners() {
+    document.querySelectorAll('.cart-item').forEach(itemEl => {
+        const productId = parseInt(itemEl.dataset.id);
+
+        itemEl.querySelector('.decrease-qty')?.addEventListener('click', () => {
+            updateCartItemQuantity(productId, -1);
+        });
+
+        itemEl.querySelector('.increase-qty')?.addEventListener('click', () => {
+            updateCartItemQuantity(productId, 1);
+        });
+
+        itemEl.querySelector('.remove-item')?.addEventListener('click', () => {
+            removeFromCart(productId);
+        });
+    });
+}
+
+
+
+function saveCartToLocalStorage() {
+    try {
+        localStorage.setItem('pos_cart', JSON.stringify(state.cart));
+    } catch (e) {
+        console.warn('Failed to save cart:', e);
+    }
+}
+
+
+function loadCartFromLocalStorage() {
+    try {
+        const stored = localStorage.getItem('pos_cart');
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) {
+                state.cart = parsed;
+            }
+        }
+    } catch (e) {
+        console.warn('Error loading cart from localStorage:', e);
+        state.cart = [];
+    }
+}
+
+
+
+
+function setupProductClickHandlers() {
+    elements.productGrid.addEventListener('click', (e) => {
+        const addBtn = e.target.closest('.quick-add-btn');
+        if (!addBtn || addBtn.disabled) return;
+
+        const productCard = addBtn.closest('.pos-card');
+        const productId = parseInt(productCard.dataset.id);
+        const icon = addBtn.querySelector('i');
+
+        // Prevent double click
+        addBtn.disabled = true;
+        setTimeout(() => (addBtn.disabled = false), 500);
+
+        // Visual feedback
+        if (icon) {
+            icon.className = 'fas fa-spinner fa-spin';
+        }
+
+        const success = addToCart(productId);
+
+        // Feedback after processing
+        setTimeout(() => {
+            if (icon) {
+                icon.className = success ? 'fas fa-check text-green-600' : 'fas fa-plus text-red-500';
+            }
+
+            if (!success) {
+                addBtn.classList.add('animate-shake');
+                setTimeout(() => addBtn.classList.remove('animate-shake'), 600);
+            } else {
+                saveCartToLocalStorage();
+                updateCartUI(); // Always call UI update after cart change
+            }
+
+            // Revert icon after short delay
+            setTimeout(() => {
+                if (icon) icon.className = 'fas fa-plus';
+            }, 1000);
+        }, 200);
+    });
+}
+
+
+function calculateItemDiscount(item) {
+    if (!item.discount || item.discount <= 0) return 0;
+    return (item.price * item.quantity) * (item.discount / 100);
+}
+
+function calculateCartTotals() {
+    let subtotal = 0;
+    let discountTotal = 0;
+
+    for (const item of state.cart) {
+        subtotal += calculateItemSubtotal(item);
+        discountTotal += calculateItemDiscount(item);
+    }
+
+    const taxable = subtotal - discountTotal;
+    const tax = taxable * TAX_RATE;
+    const total = taxable + tax;
+
+    return {
+        subtotal,
+        discount: discountTotal,
+        taxable,
+        tax,
+        total
+    };
+}
+
+
+
+function updateCartUI() {
+    const totals = calculateCartTotals();
+
+    elements.subtotalEl.textContent = formatCurrency(totals.subtotal);
+    elements.taxEl.textContent = formatCurrency(totals.tax);
+    elements.totalEl.textContent = formatCurrency(totals.total);
+
+    elements.completeSaleBtn.disabled = state.cart.length === 0;
+
+    if (state.cart.length === 0) {
+        renderEmptyCartState();
+    } else {
+        renderCartItems();
+    }
+
+    updateProductBadges();
+    saveCartToLocalStorage(); // Always sync
+}
+
+
+function updateProductBadges() {
+    document.querySelectorAll('.product-card').forEach(card => {
+        const productId = parseInt(card.dataset.id);
+        const cartItem = state.cart.find(item => item.product_id === productId);
+        
+        let badge = card.querySelector('.cart-badge');
+        
+        if (cartItem) {
+            if (!badge) {
+                badge = document.createElement('div');
+                badge.className = 'cart-badge absolute top-1 right-1 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-md';
+                card.appendChild(badge);
+            }
+            badge.textContent = cartItem.quantity;
+        } else if (badge) {
+            badge.remove();
+        }
+    });
+}
+
+
+function clearCart() {
+    if (!state.cart.length) return;
+
+    if (!confirm('Are you sure you want to clear the cart?')) return;
+
+    state.cart = [];
+    state.cartVersion += 1;
+
+    updateCartUI();
+    showNotification('Cart cleared', 'success');
+}
+
+
+
+function removeFromCart(productId) {
+    const index = state.cart.findIndex(item => item.product_id === productId);
+    if (index === -1) return;
+
+    const removed = state.cart.splice(index, 1)[0];
+    updateCartUI();
+
+    showNotification(`Removed ${removed.name} from cart`, 'info');
+}
+
+
+
+// ====================
+// Finalized Sale Completion
+// ====================
+async function completeSale({ print = false } = {}) {
+    if (!state.cart || state.cart.length === 0) {
+        showNotification('Cart is empty', 'error');
+        return;
+    }
+
+    if (!state.selectedPaymentMethod) {
+        showNotification('Please select a payment method', 'error');
+        return;
+    }
+
+    try {
+        showLoading('Processing Sale...', 'Validating and saving transaction');
+
+        const payload = {
+            payment_method: state.selectedPaymentMethod,
+            customer_name: elements.customerNameInput.value.trim() || null,
+            cart_items: state.cart.map(item => ({
+                product_id: item.product_id,
+                quantity: item.quantity
+            }))
+        };
+
+        const res = await axios.post(`${API_BASE_URL}/transactions`, payload, {
+            timeout: 10000
+        });
+
+        if (!res.data?.success || !res.data.sale_id) {
+            throw new Error('Unexpected server response');
+        }
+
+        if (print) {
+            await handleReceiptGeneration(res.data.sale_id); // Print immediately
+        }
+
+        // Clear state
+        state.cart = [];
+        state.cartVersion++;
+        updateCartUI();
+        elements.customerNameInput.value = '';
+        showNotification('Sale completed successfully!', 'success');
+
+    } catch (error) {
+        handleSaleError(error);
+    } finally {
+        hideLoading();
+    }
+}
+
+
+
+
+function openConfirmSaleModal() {
+    if (!state.cart || state.cart.length === 0) {
+        showNotification('Cart is empty. Cannot proceed.', 'warning');
+        return;
+    }
+
+    const totals = calculateCartTotals();
+    const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+    const paymentMethod = state.selectedPaymentMethod || '—';
+
+    const summaryHTML = `
+        <div class="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+            <p><strong>Items:</strong> ${itemCount}</p>
+            <p><strong>Subtotal:</strong> ${formatCurrency(totals.subtotal)}</p>
+            <p><strong>Tax:</strong> ${formatCurrency(totals.tax)}</p>
+            <p><strong>Total:</strong> <span class="text-lg font-bold text-green-700 dark:text-green-300">${formatCurrency(totals.total)}</span></p>
+            <p><strong>Payment Method:</strong> ${paymentMethod}</p>
+            ${elements.customerNameInput.value.trim()
+                ? `<p><strong>Customer:</strong> ${elements.customerNameInput.value.trim()}</p>`
+                : ''}
         </div>
-    </div>`;
+    `;
+
+    document.getElementById('confirm-sale-summary').innerHTML = summaryHTML;
+    showModal('confirm-sale-modal');
+}
+
+
+
+
+async function submitSale(shouldPrint = false) {
+    hideModal('confirm-sale-modal'); // close modal
+
+    try {
+        showLoading('Completing Sale...');
+        const result = await completeSale(); // your existing logic
+        if (result?.sale_id && shouldPrint) {
+            await handleReceiptGeneration(result.sale_id);
+        }
+    } catch (e) {
+        handleSaleError(e);
+    } finally {
+        hideLoading();
+    }
+}
+
+
+
+
+function handleSaleError(error) {
+    console.error('Sale failed:', error);
+
+    let message = 'Sale failed. Please try again.';
+
+    if (error.response?.status === 400 && error.response.data?.message) {
+        message = error.response.data.message;
+    } else if (error.message) {
+        message = error.message;
     }
 
-    // Helper generators (extracted for readability)
-    function generateItemImage(item) {
-        return `
-    <div class="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden border border-gray-100">
-        <img src="${item.image_url}" alt="${item.name}" class="object-contain w-full h-full mix-blend-multiply" />
-    </div>`;
+    showNotification(message, 'error');
+}
+
+async function handleReceiptGeneration(saleId) {
+    try {
+        // Wait briefly for backend to commit the receipt
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const res = await axios.get(`${API_BASE_URL}/receipts`, {
+    params: { sale_id: saleId }
+})
+
+        handleReceipt(res.data);
+    } catch (error) {
+        console.warn('Receipt generation failed:', error);
+        showNotification('Sale completed but receipt not found yet', 'warning');
+    }
+}
+
+async function handleReceipt(receiptData) {
+    if (!receiptData || typeof receiptData !== 'object') {
+        console.error('Invalid receipt data:', receiptData);
+        showNotification('Receipt generation failed', 'error');
+        return;
     }
 
-    function generateItemInitials(item) {
-        return `
-    <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 font-semibold text-sm uppercase shadow-sm">
-        ${item.name.slice(0, 2)}
-    </div>`;
-    }
+    try {
+        const win = window.open('', '_blank', 'width=350,height=600');
 
-    function generateItemHeader(item, isPending) {
-        return `
-    <div class="flex justify-between items-start">
-        <div class="text-sm font-medium text-gray-800">${item.name}</div>
-        <button class="remove-item text-gray-400 hover:text-danger-500 transition-all ml-2 btn-press" ${isPending ? 'disabled' : ''}>
-            <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-times'} text-xs"></i>
-        </button>
-    </div>`;
-    }
-
-    function generateItemDetails(item) {
-        return `
-    <div class="mt-1 flex flex-wrap gap-1 items-center text-xs text-gray-500">
-        <span>${formatCurrency(item.price)} each</span>
-        ${item.discount > 0 ? `
-        <span class="bg-green-50 text-green-700 font-semibold px-1.5 py-0.5 rounded-full">
-            ${item.discount}% off
-        </span>` : ''}
-        ${item.is_combo && item.combination_size > 1 ? `
-        <span class="bg-amber-100 text-amber-700 font-semibold px-1.5 py-0.5 rounded-full">
-            ${item.combination_size} for ${formatCurrency(item.combination_price)}
-        </span>` : ''}
-    </div>`;
-    }
-
-    function generateQuantityControls(item, isPending) {
-        return `
-    <div class="mt-2 flex items-center gap-2">
-        <button class="decrease-quantity w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 transition-all btn-press" ${isPending ? 'disabled' : ''}>
-            <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-minus'} text-xs"></i>
-        </button>
-        <span class="text-sm font-semibold text-gray-800 w-6 text-center">${item.quantity}</span>
-        <button class="increase-quantity w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-100 transition-all btn-press" ${isPending ? 'disabled' : ''}>
-            <i class="fas ${isPending ? 'fa-spinner fa-spin' : 'fa-plus'} text-xs"></i>
-        </button>
-    </div>`;
-    }
-
-    function generateItemPricing(item) {
-        return `
-    <div class="ml-auto text-right min-w-[80px]">
-        <div class="text-sm font-semibold text-primary-600">${formatCurrency(calculateComboSubtotal(item))}</div>
-        ${item.discount > 0 ? `
-        <div class="text-xs text-success-600 font-medium mt-1">
-            Saved ${formatCurrency(item.price * item.quantity * item.discount / 100)}
-        </div>` : ''}
-    </div>`;
-    }
-
-    /**
-     * Attaches event listeners to cart item controls
-     */
-    function attachCartItemEventListeners() {
-        document.querySelectorAll('.increase-quantity:not([disabled])').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const productId = parseInt(btn.closest('.cart-item').dataset.id);
-                updateCartItemQuantity(productId, 1);
-            });
-        });
-
-        document.querySelectorAll('.decrease-quantity:not([disabled])').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const productId = parseInt(btn.closest('.cart-item').dataset.id);
-                updateCartItemQuantity(productId, -1);
-            });
-        });
-
-        document.querySelectorAll('.remove-item:not([disabled])').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const productId = parseInt(btn.closest('.cart-item').dataset.id);
-                removeFromCart(productId);
-            });
-        });
-    }
-
-    // ====================
-    // Sale Completion
-    // ====================
-    async function completeSale() {
-        if (!state.cart.length) {
-            showNotification('Cart is empty', 'error');
+        if (!win) {
+            showNotification('Popup blocked! Enable popups to print receipt.', 'error');
             return;
         }
 
-        try {
-            showLoading('Processing sale', 'Generating receipt...');
+        const shop = receiptData.shop || {};
+        const itemsHTML = receiptData.items.map(item => `
+            <tr>
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td>${formatCurrency(item.unit_price)}</td>
+                <td>${formatCurrency(item.total)}</td>
+            </tr>
+        `).join('');
 
-            const cart_items = state.cart.map(i => ({
-                product_id: i.product_id,
-                quantity: i.quantity
-            }));
-
-            const res = await axios.post(`${API_BASE_URL}/transactions`, {
-                cart_items,
-                payment_method: state.selectedPaymentMethod,
-                customer_name: elements.customerNameInput.value || ''
-            });
-
-            const receipt = await axios.get(`${API_BASE_URL}/receipts?sale_id=${res.data.sale_id}`);
-            handleReceipt(receipt.data);
-
-            state.cart = [];
-            updateCartUI();
-            elements.customerNameInput.value = '';
-            showNotification('Sale completed!', 'success');
-        } catch (err) {
-            handleError('Failed to complete sale', err);
-        } finally {
-            hideLoading();
-        }
-    }
-
-
-    // ====================
-    // Optional Background Sync
-    // ====================
-    async function syncCartFromServer() {
-        try {
-            const res = await axios.get(`${API_BASE_URL}/cart/items`);
-            state.cart = res.data.cart || [];
-            updateCartUI();
-        } catch (err) {
-            console.warn('Cart sync failed', err);
-        }
-    }
-
-
-    function handleReceipt(receiptData) {
-        if (!receiptData || typeof receiptData !== 'object') {
-            console.error('Invalid receipt data:', receiptData);
-            alert('Unable to generate receipt. Please try again.');
-            return;
-        }
-
-        const receiptWindow = window.open('', '_blank', 'width=340,height=600');
-        receiptWindow.document.write(`
+        const html = `
+            <!DOCTYPE html>
             <html>
             <head>
                 <title>Receipt #${receiptData.id}</title>
+                <meta charset="UTF-8" />
                 <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Roboto:wght@300;400;500&display=swap');
-                    
                     body {
-                        font-family: 'Roboto', sans-serif;
-                        width: 80mm;
-                        margin: 0 auto;
-                        padding: 15px 10px;
-                        color: #333;
+                        font-family: 'Segoe UI', sans-serif;
                         font-size: 14px;
-                        line-height: 1.4;
+                        color: #333;
+                        background: #fff;
+                        margin: 0;
+                        padding: 12px;
+                        width: 80mm;
                     }
-                    
-                    .header {
+                    .header, .footer {
                         text-align: center;
-                        margin-bottom: 15px;
-                        padding-bottom: 10px;
-                        border-bottom: 1px solid #eee;
+                        margin-bottom: 12px;
                     }
-                    
                     .shop-name {
-                        font-family: 'Roboto', sans-serif;
-                        font-weight: 500;
-                        font-size: 1.4em;
-                        letter-spacing: 0.5px;
-                        margin-bottom: 3px;
-                        color: #222;
+                        font-size: 1.2em;
+                        font-weight: bold;
                     }
-                    
-                    .shop-details {
-                        font-size: 0.9em;
-                        color: #666;
-                        margin-bottom: 5px;
-                    }
-                    
-                    .receipt-info {
-                        margin-bottom: 15px;
-                        font-size: 0.9em;
-                        color: #555;
-                    }
-                    
-                    .receipt-info div {
-                        margin-bottom: 3px;
-                    }
-                    
-                    .items {
+                    .receipt-meta, .totals, .items {
                         width: 100%;
-                        border-collapse: collapse;
-                        margin-bottom: 15px;
-                        font-family: 'Roboto Mono', monospace;
+                        margin-bottom: 10px;
                     }
-                    
-                    .items thead th {
-                        text-align: left;
-                        border-bottom: 2px solid #ddd;
-                        padding: 5px 0;
-                        font-weight: 500;
-                        font-size: 0.9em;
-                        color: #555;
-                    }
-                    
-                    .items tbody td {
-                        padding: 6px 0;
-                        border-bottom: 1px solid #eee;
-                        vertical-align: top;
-                    }
-                    
-                    .items tbody tr:last-child td {
-                        border-bottom: none;
-                    }
-                    
-                    .items td:nth-child(1) {
-                        width: 40%;
-                    }
-                    
-                    .items td:nth-child(2) {
-                        width: 15%;
-                        text-align: center;
-                    }
-                    
-                    .items td:nth-child(3),
-                    .items td:nth-child(4) {
-                        width: 22.5%;
-                        text-align: right;
-                    }
-                    
-                    .total {
-                        margin: 15px 0;
-                        padding-top: 10px;
-                        border-top: 2px dashed #ddd;
-                        font-family: 'Roboto Mono', monospace;
-                    }
-                    
-                    .total div {
+                    .receipt-meta div, .totals div {
                         display: flex;
                         justify-content: space-between;
-                        margin-bottom: 6px;
-                    }
-                    
-                    .grand-total {
-                        font-weight: 500;
-                        font-size: 1.1em;
-                        margin-top: 8px;
-                        color: #000;
-                    }
-                    
-                    .payment-method {
-                        margin-top: 15px;
-                        padding-top: 8px;
-                        border-top: 1px dashed #ddd;
                         font-size: 0.9em;
+                        margin-bottom: 3px;
                     }
-                    
-                    .footer {
-                        text-align: center;
-                        margin-top: 25px;
+                    .items table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-family: monospace;
+                    }
+                    .items th, .items td {
+                        padding: 5px 0;
+                        border-bottom: 1px dashed #ccc;
+                        text-align: left;
                         font-size: 0.85em;
-                        color: #777;
-                        padding-top: 10px;
-                        border-top: 1px solid #eee;
                     }
-                    
+                    .grand-total {
+                        font-weight: bold;
+                        font-size: 1.1em;
+                        border-top: 2px solid #333;
+                        padding-top: 6px;
+                        margin-top: 4px;
+                    }
                     .barcode {
-                        margin-top: 15px;
-                        text-align: center;
                         font-family: 'Libre Barcode 39', cursive;
-                        font-size: 28px;
-                    }
-                    
-                    .thank-you {
-                        font-weight: 500;
-                        margin-top: 5px;
+                        font-size: 24px;
+                        margin-top: 10px;
                     }
                 </style>
             </head>
             <body>
                 <div class="header">
-                    <div class="shop-name">${receiptData.shop.name}</div>
-                    <div class="shop-details">${receiptData.shop.location}</div>
-                    <div class="shop-details">${receiptData.shop.contact || ''}</div>
+                    <div class="shop-name">${shop.name || 'Your Shop'}</div>
+                    <div>${shop.location || ''}</div>
+                    <div>${shop.contact || ''}</div>
                 </div>
-                
-                <div class="receipt-info">
-                    <div><strong>Receipt #</strong> ${receiptData.id}</div>
-                    <div><strong>Date:</strong> ${receiptData.date}</div>
-                    <div><strong>Cashier:</strong> ${receiptData.cashier}</div>
-                    ${receiptData.customer ? `<div><strong>Customer:</strong> ${receiptData.customer.name}</div>` : ''}
+
+                <div class="receipt-meta">
+                    <div><strong>Receipt #</strong><span>${receiptData.id}</span></div>
+                    <div><strong>Date</strong><span>${receiptData.date || new Date().toLocaleString()}</span></div>
+                    <div><strong>Cashier</strong><span>${receiptData.cashier || '-'}</span></div>
+                    ${receiptData.customer?.name ? `<div><strong>Customer</strong><span>${receiptData.customer.name}</span></div>` : ''}
                 </div>
-                
-                <table class="items">
-                    <thead>
-                        <tr>
-                            <th>ITEM</th>
-                            <th>QTY</th>
-                            <th>PRICE</th>
-                            <th>TOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${receiptData.items.map(item => `
-                            <tr>
-                                <td>${item.name}</td>
-                                <td>${item.quantity}</td>
-                                <td>${formatCurrency(item.unit_price)}</td>
-                                <td>${formatCurrency(item.total)}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                
-                <div class="total">
-                    <div><span>Subtotal:</span> <span>${formatCurrency(receiptData.subtotal)}</span></div>
-                    <div><span>Tax (0):</span> <span>${formatCurrency(receiptData.tax)}</span></div>
-                    <div class="grand-total"><span>TOTAL:</span> <span>${formatCurrency(receiptData.total)}</span></div>
+
+                <div class="items">
+                    <table>
+                        <thead>
+                            <tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+                        </thead>
+                        <tbody>${itemsHTML}</tbody>
+                    </table>
                 </div>
-                
-                <div class="payment-method">
-                    <div><strong>Payment Method:</strong> ${receiptData.payment_method}</div>
-                    ${receiptData.change_due ? `<div><strong>Change Due:</strong> ${formatCurrency(receiptData.change_due)}</div>` : ''}
+
+                <div class="totals">
+                    <div><span>Subtotal</span><span>${formatCurrency(receiptData.subtotal)}</span></div>
+                    <div><span>Tax</span><span>${formatCurrency(receiptData.tax || 0)}</span></div>
+                    <div class="grand-total"><span>Total</span><span>${formatCurrency(receiptData.total)}</span></div>
+                    <div><span>Paid By</span><span>${receiptData.payment_method}</span></div>
+                    ${receiptData.change_due ? `<div><span>Change</span><span>${formatCurrency(receiptData.change_due)}</span></div>` : ''}
                 </div>
-                
+
                 <div class="footer">
                     <div class="barcode">*${receiptData.id}*</div>
-                    <div class="thank-you">THANK YOU!</div>
-                    <div>Please come again</div>
-                    <div style="margin-top: 8px;">${receiptData.shop.return_policy || 'Goods sold are not returnable'}</div>
+                    <div><strong>THANK YOU!</strong></div>
+                    <div>Please come again.</div>
+                    <div style="margin-top: 6px; font-size: 0.8em;">
+                        ${shop.return_policy || 'Goods sold are not returnable.'}
+                    </div>
                 </div>
             </body>
             </html>
-        `);
-        receiptWindow.document.close();
+        `;
 
-        // Auto-print receipt
+        win.document.write(html);
+        win.document.close();
+
         setTimeout(() => {
-            receiptWindow.print();
-            receiptWindow.close();
-        }, 500);
+            win.print();
+            win.close();
+        }, 600);
+
+    } catch (err) {
+        console.error('Receipt print failed:', err);
+        showNotification('Sale complete, but receipt could not be printed', 'warning');
     }
+}
+
+
+
 
     // ====================
     // Sales Summary
@@ -2372,7 +2577,22 @@
 
         // Cart buttons
         elements.clearCartBtn.addEventListener('click', clearCart);
-        elements.completeSaleBtn.addEventListener('click', completeSale);
+        elements.completeSaleBtn.addEventListener('click', () => {openConfirmSaleModal();});
+        document.getElementById('cancel-confirm-sale').addEventListener('click', () => {
+            hideModal('confirm-sale-modal');
+        });
+
+        document.getElementById('confirm-complete-sale').addEventListener('click', async () => {
+            hideModal('confirm-sale-modal');
+            await completeSale(); // Only triggered on confirmation
+        });
+
+        document.getElementById('print-confirm-sale').addEventListener('click', async () => {
+            hideModal('confirm-sale-modal');
+            await completeSale({ print: true });
+        });
+
+
 
         // Payment methods
         setupPaymentMethods();
