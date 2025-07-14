@@ -30,9 +30,7 @@ def run_checkout_tasks(sale_id: int, shop_id: int, user_id: int, total: float, i
         receipt = ReceiptService.generate(sale_id)
         logger.info("Receipt generated successfully")
 
-        # Clear cart
-        CartService.clear(shop_id, user_id)
-
+        
         # Emit real-time update
         socketio.emit('sale_completed', {
             'sale_id': sale_id,
@@ -68,8 +66,8 @@ class SalesService:
                     for p in ProductRepository.get_available_for_sale(shop_id)
                 ],
                 'payment_methods': PaymentService.get_available_methods(shop_id),
-                'tax_rates': TaxService.get_rates(shop_id),
-                'current_cart': CartService.get(shop_id, current_user.id)
+                'tax_rates': TaxService.get_rates(shop_id)
+                
             }
         except Exception as e:
             logger.error(f"Error getting POS data: {str(e)}", exc_info=True)
@@ -255,142 +253,7 @@ class SalesService:
         }
 
 
-class CartService:
-    @staticmethod
-    def get(shop_id: int, user_id: int) -> List[Dict]:
-        """Get current cart contents with product validation and combo pricing support"""
-        cart_key = f'cart_{shop_id}_{user_id}'
-        cart = session.get(cart_key, [])
-
-        valid_items = []
-        for item in cart:
-            product = ProductRepository.get_for_sale(item['product_id'], shop_id)
-            if not product:
-                continue
-
-            is_combo = bool(product.combination_size and product.combination_size > 1)
-
-            valid_items.append({
-                'product_id': product.id,
-                'quantity': item['quantity'],
-                'price': float(product.selling_price),
-                'name': product.name,
-                'image': product.image_url,
-                'subtotal': PricingUtil.calculate_combination_price(product, item['quantity']),
-                'is_combo': is_combo,
-                'combination_size': product.combination_size if is_combo else None,
-                'combination_price': float(product.combination_price) if is_combo else None
-            })
-
-        # If any invalid items were removed, update session cart
-        if len(valid_items) != len(cart):
-            session[cart_key] = valid_items
-            session.modified = True
-
-        return valid_items
-
-
-
-    @staticmethod
-    def add_item(shop_id: int, user_id: int, product_id: int, quantity: int = 1) -> Dict:
-        """Add product to cart with validation"""
-        product = ProductRepository.get_for_sale(product_id, shop_id)
-        if not product:
-            raise ValueError("Product not available for sale")
-
-        cart_key = f'cart_{shop_id}_{user_id}'
-        cart = session.get(cart_key, [])
-
-        existing_item = next((item for item in cart if item['product_id'] == product_id), None)
-
-        if existing_item:
-            existing_item['quantity'] += quantity
-        else:
-            cart.append({
-                'product_id': product_id,
-                'quantity': quantity,
-                'price': float(product.selling_price),
-                'name': product.name,
-                'image': product.image_url,
-                'is_combo': bool(product.combination_size and product.combination_size > 1),
-                'combination_size': product.combination_size,
-                'combination_price': float(product.combination_price) if product.combination_price else None
-            })
-
-        # Recalculate all subtotals
-        for item in cart:
-            p = ProductRepository.get_for_sale(item['product_id'], shop_id)
-            item['subtotal'] = PricingUtil.calculate_combination_price(p, item['quantity'])
-
-        session[cart_key] = cart
-        session.modified = True
-
-        return {
-            'success': True,
-            'cart': cart,
-            'cart_count': sum(item['quantity'] for item in cart),
-            'cart_total': sum(item['subtotal'] for item in cart)
-        }
-
-
-
-
-    @staticmethod
-    def update_quantity(shop_id: int, user_id: int, product_id: int, new_quantity: int) -> Dict:
-        """Update product quantity in cart"""
-        if new_quantity <= 0:
-            raise ValueError("Quantity must be positive")
-
-        cart_key = f'cart_{shop_id}_{user_id}'
-        cart = session.get(cart_key, [])
-
-        item = next((i for i in cart if i['product_id'] == product_id), None)
-        if not item:
-            raise ValueError("Product not in cart")
-
-        item['quantity'] = new_quantity
-
-        product = ProductRepository.get_for_sale(product_id, shop_id)
-        item['subtotal'] = PricingUtil.calculate_combination_price(product, new_quantity)
-        item['is_combo'] = bool(product.combination_size and product.combination_size > 1)
-        item['combination_size'] = product.combination_size
-        item['combination_price'] = float(product.combination_price) if product.combination_price else None
-
-        session[cart_key] = cart
-        session.modified = True
-
-        return {
-            'success': True,
-            'cart_count': sum(i['quantity'] for i in cart),
-            'cart_total': sum(i['subtotal'] for i in cart)
-        }
-
-
-    @staticmethod
-    def clear(shop_id: int, user_id: int) -> None:
-        """Empty the cart completely"""
-        cart_key = f'cart_{shop_id}_{user_id}'
-        if cart_key in session:
-            del session[cart_key]
-            session.modified = True
-    @staticmethod
-    def remove_item(shop_id: int, user_id: int, product_id: int) -> Dict:
-        """Remove a product from the cart"""
-        cart_key = f'cart_{shop_id}_{user_id}'
-        cart = session.get(cart_key, [])
-
-        cart = [item for item in cart if item['product_id'] != product_id]
-
-        session[cart_key] = cart
-        session.modified = True
-
-        return {
-            'success': True,
-            'cart': cart,
-            'cart_count': sum(i['quantity'] for i in cart),
-            'cart_total': sum(i['price'] * i['quantity'] for i in cart)
-        }
-        
+     
 
 class ReceiptService:
     @staticmethod

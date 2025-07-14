@@ -8,7 +8,6 @@ from .repositories import RegisterSessionRepository
 from .services import SalesService
 from .controllers import (
     SalesController,
-    CartController,
     TransactionController,
     ReceiptController,
     ProductAPIController,         
@@ -30,11 +29,7 @@ sales_bp.add_url_rule(
     view_func=controllers.SalesController.as_view('sales_screen'),
     methods=['GET']
 )
-sales_bp.add_url_rule(
-    '/cart',
-    view_func=controllers.CartController.as_view('cart_operations'),
-    methods=['GET', 'POST']
-)
+
 sales_bp.add_url_rule(
     '/transactions',
     view_func=controllers.TransactionController.as_view('transaction_history'),
@@ -65,19 +60,7 @@ api_bp.add_url_rule(
 )
 
 
-# handle POST /api/shops/<shop_id>/cart?action=add|update|remove
-api_bp.add_url_rule(
-    '/cart',
-    view_func=controllers.CartController.as_view('cart_action_api'), 
-    methods=['POST']
-)
 
-
-api_bp.add_url_rule(
-    '/cart/items',
-    view_func=controllers.CartController.as_view('cart_items_api'),
-    methods=['GET']
-)
 api_bp.add_url_rule(
     '/transactions/recent',
     view_func=controllers.TransactionController.as_view('recent_transactions_api'),

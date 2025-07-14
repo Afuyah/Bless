@@ -7,7 +7,7 @@ from sqlalchemy import and_
 from .repositories import ProductRepository, CategoryRepository, RegisterSessionRepository, SaleRepository
 from .services import (
     SalesService,
-    CartService,
+
     ProductService,
     ReceiptService,
     CategoryService,
@@ -110,78 +110,6 @@ class CategoryAPIController(MethodView):
             logger.error(f"Failed to fetch categories: {str(e)}", exc_info=True)
             return jsonify({'error': 'Failed to load categories'}), 500
 
-
-class CartController(MethodView):
-    decorators = [login_required, shop_access_required, csrf.exempt]
-    
-    @role_required(Role.CASHIER, Role.ADMIN, Role.TENANT)
-    def get(self, shop_id):
-        """
-        Get cart contents - GET /api/shops/<shop_id>/cart/items
-        """
-        try:
-            cart = CartService.get(shop_id, current_user.id)
-            return jsonify({
-                'success': True,
-                'cart': cart,
-                'total': sum(item['price'] * item['quantity'] for item in cart),
-                'count': len(cart)
-            })
-        except Exception as e:
-            logger.error(f"Failed to get cart: {str(e)}")
-            return jsonify({'error': 'Failed to get cart'}), 500
-    
-    @role_required(Role.CASHIER, Role.ADMIN, Role.TENANT)
-    def post(self, shop_id):
-        """
-        Handle cart operations - POST /shops/<shop_id>/cart?action=<action>
-        """
-        try:
-            action = request.args.get('action', 'add')
-            
-            if action == 'add':
-                data = CartItemSchema().load(request.json)
-                result = CartService.add_item(
-                    shop_id=shop_id,
-                    user_id=current_user.id,
-                    product_id=data['product_id'],
-                    quantity=data.get('quantity', 1)
-                )
-            elif action == 'update':
-                data = CartItemSchema().load(request.json)
-                result = CartService.update_quantity(
-                    shop_id=shop_id,
-                    user_id=current_user.id,
-                    product_id=data['product_id'],
-                    new_quantity=data['quantity']
-                )
-            elif action == 'remove':
-                data = CartItemSchema().load(request.json)
-                result = CartService.remove_item(
-                    shop_id=shop_id,
-                    user_id=current_user.id,
-                    product_id=data['product_id']
-                )
-            elif action == 'clear':
-                CartService.clear(shop_id=shop_id, user_id=current_user.id)
-                result = {
-                    'success': True,
-                    'cart': [],
-                    'cart_count': 0,
-                    'cart_total': 0
-                }
-            else:
-                return jsonify({'error': 'Invalid action'}), 400
-                
-            return jsonify(result)
-            
-        except ValidationError as e:
-            return jsonify({'error': e.messages}), 400
-        except ValueError as e:
-            return jsonify({'error': str(e)}), 400
-        except Exception as e:
-            logger.error(f"Cart operation failed: {str(e)}")
-            return jsonify({'error': 'Cart operation failed'}), 500
 
 
 
