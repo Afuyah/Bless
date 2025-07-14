@@ -431,7 +431,13 @@ class RegisterSession(BaseModel, ShopScopedMixin):
 
     __table_args__ = (
         db.Index('ix_register_shop_date', 'shop_id', 'opened_at'),
+        db.Index('ix_register_shop_closed', 'shop_id', 'closed_at'),
+        db.Index('ix_register_opened_by', 'opened_by_id'),
+        db.Index('ix_register_closed_by', 'closed_by_id'),
+        db.Index('ix_register_opened_at', 'opened_at'),
+        db.Index('ix_register_closed_at', 'closed_at'),
     )
+
 
     def is_open(self):
         return self.closed_at is None
@@ -638,8 +644,7 @@ class User(UserMixin, BaseModel, ShopScopedMixin, BusinessScopedMixin):
 
         return data
 
-    
-       
+           
 class Category(BaseModel, ShopScopedMixin):
     __tablename__ = 'categories'
     
@@ -732,6 +737,11 @@ class Sale(BaseModel, ShopScopedMixin):
     __table_args__ = (
         db.Index('ix_sale_total', 'total'),
         db.Index('ix_sale_date', 'date'),
+        db.Index('ix_sale_shop_date', 'shop_id', 'date'),
+        db.Index('ix_sale_session', 'register_session_id'),
+        db.Index('ix_sale_user', 'user_id'),
+        db.Index('ix_sale_payment', 'payment_method'),
+        db.Index('ix_sale_shop_pay_date', 'shop_id', 'payment_method', 'date'),
     )
 
     @validates('payment_method')
@@ -790,8 +800,6 @@ class Sale(BaseModel, ShopScopedMixin):
 
     def __repr__(self):
         return f'<Sale id={self.id}, total={self.total}, date={self.date.strftime("%Y-%m-%d %H:%M:%S")}>'
-
-
 
 
 class CartItem(BaseModel, ShopScopedMixin):
@@ -867,7 +875,14 @@ class Product(BaseModel, ShopScopedMixin):
     __table_args__ = (
         db.Index('ix_product_shop_category', 'shop_id', 'category_id'),
         db.Index('ix_product_name_shop', 'name', 'shop_id'),
+        db.Index('ix_product_barcode', 'barcode'),
+        db.Index('ix_product_sku', 'sku'),
+        db.Index('ix_product_shop_supplier', 'shop_id', 'supplier_id'),
+        db.Index('ix_product_shop_active', 'shop_id', 'is_active'),
+        db.Index('ix_product_shop_stock', 'shop_id', 'stock'),
+        db.Index('ix_product_shop_combo', 'shop_id', 'combination_size'),
     )
+
 
     @validates('cost_price', 'selling_price', 'stock')
     def validate_prices_stock(self, key, value):
@@ -891,14 +906,10 @@ class Product(BaseModel, ShopScopedMixin):
             return False
         return self.stock < self.low_stock_threshold
 
-
-
     @hybrid_property
     def is_combo(self):
         return self.combination_size is not None and self.combination_size > 1
         
-
-
     @hybrid_property
     def display_price(self):
         """Returns the appropriate price based on combination settings"""
@@ -980,8 +991,7 @@ class Supplier(BaseModel, ShopScopedMixin):
 
 class Expense(BaseModel, ShopScopedMixin):
     __tablename__ = 'expenses'
-    
-    
+ 
     description = db.Column(String(200), nullable=False)
     amount = db.Column(Numeric(10, 2), nullable=False)  # Changed to Numeric for precision
     date = db.Column(DateTime, default=datetime.utcnow, index=True)
@@ -1016,7 +1026,6 @@ class Expense(BaseModel, ShopScopedMixin):
             'quantity': self.quantity,
             'product_name': self.product.name if self.product else None  # Optional product name
         }
-
 
 
 class StockLog(BaseModel, ShopScopedMixin):
