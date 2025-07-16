@@ -556,23 +556,21 @@ def update_product_stock(product, quantity_to_add, total_amount):
 
 # Route to display the product management page
 @inventory_bp.route('/admin_update_stock', methods=['GET'])
-@login_required
+@shop_access_required
+@role_required(Role.ADMIN, Role.TENANT)
 def update_stock_page():
-    if not current_user.is_admin():
-        flash("Access denied.", "danger")
-        return redirect(url_for("home.index"))
-
-    products = Product.query.all()
+    products = Product.query.filter_by(shop_id=shop_id)
 
     return render_template(
         'auth/admin_dashboard.html',
-        fragment_template='admin/fragments/_update_stock_fragment.html',  # your main stock list
+        fragment_template='admin/fragments/_update_stock_fragment.html',  
         products=products,
         active_page='update_stock',
         sales_data={"change": 0},  # prevent sidebar errors
         monthly_revenue=0,
         date=date,
-        datetime=datetime
+        datetime=datetime, 
+        shop_id=shop_id
     )
 
 @inventory_bp.route('/shops/<int:shop_id>/products/<int:product_id>/update_stock_form')

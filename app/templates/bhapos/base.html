@@ -17,6 +17,7 @@
   <!-- HTMX -->
   <script src="https://unpkg.com/htmx.org@1.9.2"></script>
   <script src="{{ url_for ('static', filename='js/tailwind.js')}}"></script>
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
  <script>
@@ -139,6 +140,30 @@
   background-color: rgba(59, 130, 246, 0.1);
   color: #93c5fd;
 }
+
+/* Cart container transitions */
+#cart-container {
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    will-change: transform;
+}
+
+/* Floating cart button styling */
+#cart-toggle {
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge animation */
+#cart-badge {
+    transition: all 0.2s ease;
+    transform: scale(1);
+}
+
+#cart-badge.hidden {
+    transform: scale(0);
+}
+
+
 </style>
   {% block head %}{% endblock %}
 </head>

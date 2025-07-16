@@ -271,11 +271,9 @@
 
         <!-- Content Area -->
         <main class="flex-1 overflow-hidden relative bg-white">
-
-            <div class="h-full pl-[2.6rem] group-hover:pl-[12rem] transition-all duration-300">
+    <div class="h-full pl-[2.6rem] group-hover:pl-[12rem] transition-all duration-300">
                 <!-- Register Closed State -->
-                <div id="register-closed-state"
-                    class="h-full flex flex-col items-center justify-center text-center p-6">
+                 <div id="register-closed-state" class="h-full flex flex-col items-center justify-center text-center p-6">
                     <div
                         class="w-28 h-28 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center mb-6 shadow-inner border border-amber-200">
                         <i class="fas fa-cash-register text-4xl text-amber-500"></i>
@@ -293,11 +291,19 @@
 
 
                 <!-- POS Interface (Hidden by default) -->
-                <div id="pos-interface" class="h-full hidden flex flex-col lg:flex-row overflow-hidden">
+               <div id="pos-interface" class="h-full hidden lg:flex lg:flex-row overflow-hidden">
 
 
-                    <!-- Product Catalog (Left Panel) -->
-                    <div class="flex-1 flex flex-col border-r border-gray-100 bg-white overflow-hidden">
+        <div class="flex-1 lg:flex lg:flex-row overflow-hidden w-full">
+                  
+                   
+                        <!-- Product Catalog (Left Panel) -->
+                          <div id="catalog-container"
+     class="flex-1 flex flex-col border-r border-gray-100 bg-white overflow-hidden transition-all duration-300">
+
+
+
+
                         <!-- Search and Categories -->
                         <div class="p-4 border-b border-gray-100 bg-white/95 backdrop-blur-sm sticky top-0 z-10">
                             <div class="flex flex-col space-y-3">
@@ -328,8 +334,7 @@
                             </div>
 
                             <!-- Product Grid -->
-                           <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 transition-all duration-300 ease-in-out">
-
+                           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="product-grid">
 
 
                                 <!-- Products will be loaded here -->
@@ -350,32 +355,34 @@
 
 
                     <!-- Cart Container -->
-                    <div id="cart-container"
-                        class="w-full lg:w-[26rem] flex flex-col border-t lg:border-t-0 border-gray-100 bg-white shadow-2xl z-20 
-                               fixed lg:fixed bottom-0 left-0 right-0 lg:top-0 lg:right-0 lg:bottom-0 lg:left-auto 
-                               mx-auto lg:mx-0 max-w-[100vw] transform 
-                               translate-y-full lg:translate-x-full 
-                               transition-transform duration-300 ease-in-out 
-                               rounded-t-2xl lg:rounded-none overflow-hidden"
-                        style="max-height: 88vh;">
+                 <div id="cart-container"
+     class="w-full lg:w-[26rem] flex flex-col border-t lg:border-t-0 border-gray-100 bg-white shadow-2xl z-20 
+            fixed lg:relative bottom-0 left-0 right-0 lg:top-0 lg:right-0 lg:bottom-0 lg:left-auto 
+            mx-auto lg:mx-0 max-w-[100vw] transform 
+            translate-y-full lg:translate-y-0 
+            transition-transform duration-300 ease-in-out rounded-t-2xl lg:rounded-none overflow-hidden"
+     style="max-height: 88vh;">
 
 
                         <!-- Header -->
-                        <div
-                            class="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-3 text-white flex justify-between items-center shadow-sm">
-                            <div class="flex items-center space-x-3">
-                                <button id="cart-toggle" class="lg:hidden text-white text-sm">
-                                    <i class="fas fa-chevron-up"></i>
+                        
+                            <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-3 text-white flex justify-between items-center shadow-sm">
+                                <div class="flex items-center space-x-3">
+                                    <!-- cart header toggle -->
+                                    <button id="cart-collapse-toggle" class="text-white text-sm">
+                                        <i class="fas fa-chevron-up"></i>
+                                    </button>
+
+
+                                    <h3 class="text-base font-semibold flex items-center gap-2">
+                                        <i class="fas fa-shopping-basket"></i> Current Cart
+                                    </h3>
+                                </div>
+                                <button id="clear-cart" class="text-amber-300 hover:text-white transition-colors text-xs flex items-center font-medium">
+                                    <i class="fas fa-trash-alt mr-1"></i> <span class="hidden sm:inline">Clear</span>
                                 </button>
-                                <h3 class="text-base font-semibold flex items-center gap-2">
-                                    <i class="fas fa-shopping-basket"></i> Current Cart
-                                </h3>
                             </div>
-                            <button id="clear-cart"
-                                class="text-amber-300 hover:text-white transition-colors text-xs flex items-center font-medium">
-                                <i class="fas fa-trash-alt mr-1"></i> <span class="hidden sm:inline">Clear</span>
-                            </button>
-                        </div>
+
 
                         <!-- Cart Items -->
                         <div class="flex-1 overflow-y-auto px-4 py-3 bg-gray-50"
@@ -467,9 +474,23 @@
                     </div>
                 </div>
             </div>
+            </div>
         </main>
     </div>
 </div>
+
+
+<!-- floating cart toggle -->
+<div class="lg:hidden fixed bottom-4 right-4 z-30">
+    <button id="floating-cart-toggle" class="w-12 h-12 rounded-full bg-primary-600 text-white shadow-lg flex items-center justify-center">
+        <i class="fas fa-shopping-cart"></i>
+        <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"></span>
+    </button>
+</div>
+
+
+
+
 
 <!-- Sales Summary Modal -->
 <div id="salesSummary" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
@@ -694,17 +715,6 @@
 </div>
 
 
-<!-- Floating Cart Toggle Button (Mobile Only) -->
-<button id="mobile-cart-toggle"
-    class="lg:hidden fixed bottom-20 right-4 z-30 bg-amber-500 hover:bg-amber-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-xl transition-all">
-    <div class="relative">
-        <i class="fas fa-shopping-basket text-xl"></i>
-        <span id="cart-count-badge"
-            class="absolute -top-1.5 -right-1.5 bg-white text-amber-600 font-bold text-xs px-1.5 py-0.5 rounded-full shadow">
-            0
-        </span>
-    </div>
-</button>
 
 
 
@@ -802,7 +812,9 @@ const TAX_RATE = 0.16; // 16% VAT
     shopInfo: null,
     // Client-side only properties
     cartVersion: 0, // For version tracking
-    pendingOperations: new Set() // Now properly initialized as a Set
+    pendingOperations: new Set() ,// Now properly initialized as a Set
+    cartVisible: false,
+  
 };
 
 
@@ -1270,8 +1282,11 @@ async function loadCart() {
         state.cart = [];
     }
 
-    updateCartUI();
+    // Just update totals + render — don't auto toggle visibility
+    updateCartUI(); 
 }
+
+
 
     // ====================
     // Performance Helpers
@@ -1291,6 +1306,7 @@ async function loadCart() {
             }).catch(() => { });
         });
     }
+
 
 
     function showProductSkeletons(count = 8) {
@@ -1648,7 +1664,7 @@ function setupProductClickHandlers() {
 function addToCart(productId) {
     const now = Date.now();
 
-    // Prevent rapid double-clicking (debounce)
+    // Prevent double clicks within 500ms
     if (state.lastAddedProductId === productId && (now - state.lastAddTime) < 500) {
         return false;
     }
@@ -1656,14 +1672,13 @@ function addToCart(productId) {
     state.lastAddedProductId = productId;
     state.lastAddTime = now;
 
-    // Find the product
     const product = state.products.find(p => p.id === productId);
     if (!product) {
-        console.error(`Product with ID ${productId} not found in state.products`);
+        console.error(`Product ${productId} not found`);
         return false;
     }
 
-    // Check available stock
+    // Check stock
     const availableStock = product.stock - getCurrentCartQuantity(productId);
     if (availableStock <= 0) {
         showNotification(`"${product.name}" is out of stock`, 'error');
@@ -1689,36 +1704,28 @@ function addToCart(productId) {
         });
     }
 
-    // Update cart UI
-    updateCartUI();
-
-    // Update floating badge
-    if (typeof updateCartBadge === 'function') {
-        updateCartBadge();
+    // Only auto-show on desktop when first item is added
+    if (!state.isMobileView && state.cart.length === 1) {
+        state.cartVisible = true;
     }
+
+    updateCartUI();
+    document.dispatchEvent(new CustomEvent('cartUpdated', {
+        detail: { action: 'add', productId }
+    }));
 
     showNotification(`${product.name} added to cart`, 'success');
     return true;
 }
 
 
+
+
+
 function getCurrentCartQuantity(productId) {
     const item = state.cart.find(i => i.product_id === productId);
     return item ? item.quantity : 0;
 }
-
-
-function updateCartBadge() {
-    const badge = document.getElementById('cart-count-badge');
-    if (!badge) return;
-
-    const count = state.cart.reduce((sum, item) => sum + item.quantity, 0);
-    badge.textContent = count;
-
-    // Optionally hide when 0
-    badge.classList.toggle('hidden', count === 0);
-}
-
 
 
 function calculateComboSubtotal(item) {
@@ -1747,31 +1754,26 @@ function updateCartItemQuantity(productId, delta) {
     if (!item) return false;
 
     const newQty = item.quantity + delta;
-
-    // If quantity is zero or less, remove the item
+    
+    // Validate new quantity
     if (newQty < 1) {
+        // Remove item if quantity would go to zero
         removeFromCart(productId);
         return true;
     }
 
-    // Validate against available stock
+    
+
+    // Check stock limits
     if (newQty > item.stock) {
         showNotification(`Only ${item.stock} available for "${item.name}"`, 'error');
         return false;
     }
 
-    // Update quantity
     item.quantity = newQty;
     updateCartUI();
-
-    // Update floating badge if it exists
-    if (typeof updateCartBadge === 'function') {
-        updateCartBadge();
-    }
-
     return true;
 }
-
 
 // ====================
 // Enhanced Pricing Calculations
@@ -1795,16 +1797,6 @@ function calculateItemSubtotal(item) {
 }
 
 
-function updateProductGridColumns(cartVisible) {
-    const grid = document.getElementById('product-grid');
-    if (!grid) return;
-
-    grid.classList.remove('lg:grid-cols-5', 'lg:grid-cols-7');
-    grid.classList.add(cartVisible ? 'lg:grid-cols-5' : 'lg:grid-cols-7');
-}
-
-
-
 /**
  * Renders empty cart state
  */
@@ -1816,8 +1808,6 @@ function renderEmptyCartState() { // Renamed from showEmptyCartState for consist
         <p>Your cart is empty</p>
     </div>`;
 }
-
-
 
 function renderCartItems() {
     const cart = state.cart;
@@ -1861,7 +1851,7 @@ function renderCartItems() {
                 </div>
                 <div class="text-xs text-gray-500 mt-0.5 dark:text-gray-400">
                     ${formatCurrency(item.price)} each
-                    <br />
+                    </br>
 
                     ${isCombo ? `<span class="ml-2 px-2 py-0.5 text-yellow-700 bg-yellow-100 rounded-full text-[11px]"> 
                     ${item.combination_size} for ${formatCurrency(item.combination_price)}</span>` : ''}
@@ -1913,6 +1903,30 @@ function attachCartItemEventListeners() {
 
 
 
+function attachCartItemEventListeners() {
+    document.querySelectorAll('.cart-item').forEach(itemEl => {
+        const productId = parseInt(itemEl.dataset.id);
+
+        itemEl.querySelector('.decrease-qty')?.addEventListener('click', () => {
+            updateCartItemQuantity(productId, -1);
+        });
+
+        itemEl.querySelector('.increase-qty')?.addEventListener('click', () => {
+            updateCartItemQuantity(productId, 1);
+        });
+
+        itemEl.querySelector('.remove-item')?.addEventListener('click', () => {
+            removeFromCart(productId);
+        });
+    });
+}
+
+
+
+// ==============================
+// Local Storage Sync
+// ==============================
+
 function saveCartToLocalStorage() {
     try {
         localStorage.setItem('pos_cart', JSON.stringify(state.cart));
@@ -1920,7 +1934,6 @@ function saveCartToLocalStorage() {
         console.warn('Failed to save cart:', e);
     }
 }
-
 
 function loadCartFromLocalStorage() {
     try {
@@ -1935,55 +1948,240 @@ function loadCartFromLocalStorage() {
         console.warn('Error loading cart from localStorage:', e);
         state.cart = [];
     }
+}
 
-    updateCartUI(); // <-- Ensure UI is refreshed on load
+// ==============================
+// Cart Visibility Control
+// ==============================
+
+function showCart() {
+    state.cartVisible = true;
+    updateCartVisibility();
+}
+
+function hideCart() {
+    state.cartVisible = false;
+    updateCartVisibility();
 }
 
 
-
-
+// ==============================
+// Product Click Handler
+// ==============================
 
 function setupProductClickHandlers() {
-    elements.productGrid.addEventListener('click', (e) => {
+    elements.productGrid?.addEventListener('click', (e) => {
         const addBtn = e.target.closest('.quick-add-btn');
         if (!addBtn || addBtn.disabled) return;
 
         const productCard = addBtn.closest('.pos-card');
-        const productId = parseInt(productCard.dataset.id);
+        const productId = parseInt(productCard?.dataset.id);
         const icon = addBtn.querySelector('i');
 
-        // Prevent double click
+        if (!productId) return;
+
+        // Prevent spamming
         addBtn.disabled = true;
         setTimeout(() => (addBtn.disabled = false), 500);
 
-        // Visual feedback
-        if (icon) {
-            icon.className = 'fas fa-spinner fa-spin';
-        }
+        // Show spinner
+        if (icon) icon.className = 'fas fa-spinner fa-spin';
 
         const success = addToCart(productId);
 
-        // Feedback after processing
         setTimeout(() => {
             if (icon) {
-                icon.className = success ? 'fas fa-check text-green-600' : 'fas fa-plus text-red-500';
+                icon.className = success
+                    ? 'fas fa-check text-green-600'
+                    : 'fas fa-plus text-red-500';
             }
 
             if (!success) {
                 addBtn.classList.add('animate-shake');
                 setTimeout(() => addBtn.classList.remove('animate-shake'), 600);
+                showNotification('Failed to add to cart', 'error');
             } else {
+                updateCartUI();
                 saveCartToLocalStorage();
-                updateCartUI(); // Always call UI update after cart change
+                document.dispatchEvent(new Event('cartUpdated'));
             }
 
-            // Revert icon after short delay
+            // Reset icon after short delay
             setTimeout(() => {
                 if (icon) icon.className = 'fas fa-plus';
             }, 1000);
         }, 200);
     });
 }
+
+
+
+function updateCartUI() {
+    const totals = calculateCartTotals();
+
+    elements.subtotalEl.textContent = formatCurrency(totals.subtotal);
+    elements.taxEl.textContent = formatCurrency(totals.tax);
+    elements.totalEl.textContent = formatCurrency(totals.total);
+
+    elements.completeSaleBtn.disabled = state.cart.length === 0;
+
+   if (state.cart.length === 0) {
+    renderEmptyCartState();
+    if (window.innerWidth >= 1024) hideCart(); // Only auto-hide on large screens
+        } else {
+            renderCartItems();
+            if (window.innerWidth >= 1024) showCart(); // Only auto-show on large screens
+        }
+
+
+    updateProductBadges();
+    saveCartToLocalStorage();
+
+    document.dispatchEvent(new Event('cartUpdated')); // Always dispatch for consistency
+}
+
+
+
+
+function updateProductBadges() {
+    document.querySelectorAll('.pos-card').forEach(card => {
+        const productId = parseInt(card.dataset.id);
+        const cartItem = state.cart.find(item => item.product_id === productId);
+        
+        let badge = card.querySelector('.cart-badge');
+
+        if (cartItem) {
+            if (!badge) {
+                badge = document.createElement('div');
+                badge.className = 'cart-badge absolute top-1 right-1 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-md';
+                card.appendChild(badge);
+            }
+            badge.textContent = cartItem.quantity;
+        } else if (badge) {
+            badge.remove();
+        }
+    });
+}
+
+
+
+
+
+function clearCart() {
+    if (!state.cart.length) return;
+
+    const confirmed = confirm('Clear all items from cart?');
+    if (!confirmed) return;
+
+    state.cart = [];
+    hideCart();  // Automatically hides and adjusts grid
+
+    updateCartUI();
+    document.dispatchEvent(new Event('cartUpdated'));
+
+    showNotification('Cart cleared', 'success');
+}
+
+
+function removeFromCart(productId) {
+    const index = state.cart.findIndex(item => item.product_id === productId);
+    if (index === -1) return;
+
+    const removed = state.cart.splice(index, 1)[0];
+
+    if (state.cart.length === 0) {
+        hideCart();  // Hide cart if now empty
+    }
+
+    updateCartUI();
+    document.dispatchEvent(new Event('cartUpdated'));
+
+    showNotification(`Removed ${removed.name} from cart`, 'info');
+}
+
+
+
+
+function setupCartVisibility() {
+    const cartContainer = document.getElementById('cart-container');
+
+    // Hide cart initially
+    hideCart();
+
+    // Detect viewport changes
+    window.addEventListener('resize', () => {
+        state.isMobileView = window.innerWidth < 768;
+        updateCartVisibility();
+    });
+
+    // Toggle buttons (header + floating)
+    document.querySelectorAll('[id="cart-toggle"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            state.cartVisible = !state.cartVisible;
+            updateCartVisibility();
+        });
+    });
+
+    // Recalculate visibility when cart updates
+    document.addEventListener('cartUpdated', updateCartVisibility);
+}
+
+// ==============================
+// Visibility Logic
+// ==============================
+
+function updateCartVisibility() {
+    const cart = document.getElementById('cart-container');
+    const grid = document.getElementById('product-grid');
+    const toggleBtn = document.getElementById('cart-toggle');
+    const badge = document.getElementById('cart-badge');
+
+    const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+    const isMobile = window.innerWidth < 1024;
+    const shouldShow = state.cartVisible && itemCount > 0;
+
+    // Update cart badge
+    if (badge) {
+        badge.textContent = itemCount;
+        badge.classList.toggle('hidden', itemCount === 0);
+    }
+
+    if (isMobile) {
+        // Show/hide cart with slide animation on mobile
+        cart?.classList.toggle('translate-y-full', !shouldShow);
+
+        if (toggleBtn) {
+            toggleBtn.innerHTML = shouldShow 
+                ? '<i class="fas fa-chevron-down"></i>'
+                : '<i class="fas fa-chevron-up"></i>';
+            toggleBtn.classList.toggle('text-primary-600', shouldShow);
+        }
+
+    } else {
+        // Desktop: cart is always visible — only adjust grid
+        grid?.classList.toggle('lg:grid-cols-6', itemCount === 0);
+        grid?.classList.toggle('lg:grid-cols-5', itemCount > 0);
+    }
+}
+
+
+
+function setupCartToggles() {
+    const cart = document.getElementById('cart-container');
+    const headerToggle = document.getElementById('cart-collapse-toggle');
+    const floatingToggle = document.getElementById('floating-cart-toggle');
+
+    function toggleCartVisibility() {
+        const isVisible = !cart.classList.contains('translate-y-full');
+        cart.classList.toggle('translate-y-full', isVisible);
+    }
+
+    headerToggle?.addEventListener('click', toggleCartVisibility);
+    floatingToggle?.addEventListener('click', toggleCartVisibility);
+}
+
+
+
 
 
 function calculateItemDiscount(item) {
@@ -2015,76 +2213,7 @@ function calculateCartTotals() {
 
 
 
-function updateCartUI() {
-    const totals = calculateCartTotals();
 
-    elements.subtotalEl.textContent = formatCurrency(totals.subtotal);
-    elements.taxEl.textContent = formatCurrency(totals.tax);
-    elements.totalEl.textContent = formatCurrency(totals.total);
-
-    elements.completeSaleBtn.disabled = state.cart.length === 0;
-
-    if (state.cart.length === 0) {
-        renderEmptyCartState();
-    } else {
-        renderCartItems();
-    }
-
-    updateProductBadges();
-    updateCartBadge(); // ✅ Add this line to fix the badge
-    saveCartToLocalStorage(); // Always sync
-}
-
-
-
-function updateProductBadges() {
-    document.querySelectorAll('.product-card').forEach(card => {
-        const productId = parseInt(card.dataset.id);
-        const cartItem = state.cart.find(item => item.product_id === productId);
-        
-        let badge = card.querySelector('.cart-badge');
-        
-        if (cartItem) {
-            if (!badge) {
-                badge = document.createElement('div');
-                badge.className = 'cart-badge absolute top-1 right-1 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-md';
-                card.appendChild(badge);
-            }
-            badge.textContent = cartItem.quantity;
-        } else if (badge) {
-            badge.remove();
-        }
-    });
-}
-
-
-function clearCart() {
-    if (!state.cart.length) return;
-
-    if (!confirm('Are you sure you want to clear the cart?')) return;
-
-    state.cart = [];
-    state.cartVersion += 1;
-
-    updateCartUI();
-    showNotification('Cart cleared', 'success');
-}
-
-
-
-function removeFromCart(productId) {
-    const index = state.cart.findIndex(item => item.product_id === productId);
-    if (index === -1) return;
-
-    const removed = state.cart.splice(index, 1)[0];
-
-    updateCartUI(); // Refresh UI (includes badge + storage)
-    saveCartToLocalStorage(); // Explicit in case someone calls this outside updateCartUI
-
-    if (removed?.name) {
-        showNotification(`Removed "${removed.name}" from cart`, 'info');
-    }
-}
 
 
 
@@ -2103,8 +2232,8 @@ async function completeSale({ print = false } = {}) {
     }
 
     try {
-        showLoading('Processing Sale...', 'Validating and saving transaction');
-
+        showLoading('Processing Sale...');
+        
         const payload = {
             payment_method: state.selectedPaymentMethod,
             customer_name: elements.customerNameInput.value.trim() || null,
@@ -2122,16 +2251,19 @@ async function completeSale({ print = false } = {}) {
             throw new Error('Unexpected server response');
         }
 
-        if (print) {
-            await handleReceiptGeneration(res.data.sale_id); // Print immediately
-        }
-
-        // Clear state
+        // Clear cart and reset
         state.cart = [];
-        state.cartVersion++;
-        updateCartUI();
+        state.cartVisible = false;
         elements.customerNameInput.value = '';
+        
+        updateCartUI();
+        document.dispatchEvent(new Event('cartUpdated'));
+        
         showNotification('Sale completed successfully!', 'success');
+        
+        if (print) {
+            await handleReceiptGeneration(res.data.sale_id);
+        }
 
     } catch (error) {
         handleSaleError(error);
@@ -2206,8 +2338,6 @@ function handleSaleError(error) {
     showNotification(message, 'error');
 }
 
-
-
 async function handleReceiptGeneration(saleId) {
     try {
         // Wait briefly for backend to commit the receipt
@@ -2223,6 +2353,10 @@ async function handleReceiptGeneration(saleId) {
         showNotification('Sale completed but receipt not found yet', 'warning');
     }
 }
+
+
+
+
 
 async function handleReceipt(receiptData) {
     if (!receiptData || typeof receiptData !== 'object') {
@@ -2462,7 +2596,6 @@ async function handleReceipt(receiptData) {
         }
     }
 
-
     // ====================
     // Payment Method Selection
     // ====================
@@ -2479,7 +2612,6 @@ async function handleReceipt(receiptData) {
             state.selectedPaymentMethod = button.dataset.method;
         });
     }
-
 
     // ====================
     // Product Search
@@ -2577,112 +2709,6 @@ async function handleReceipt(receiptData) {
     }
 
 
-function updateProductGridColumns(cartVisible) {
-    const grid = document.getElementById('product-grid');
-    if (!grid) return;
-
-    grid.classList.remove('lg:grid-cols-5', 'lg:grid-cols-7');
-    grid.classList.add(cartVisible ? 'lg:grid-cols-5' : 'lg:grid-cols-7');
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const cart = document.getElementById('cart-container');
-    const isVisible = !cart.classList.contains('translate-y-full');
-    updateProductGridColumns(isVisible);
-});
-
-
-
-
-    // ====================
-    // Mobile Responsiveness
-    // ====================
-    function setupMobileUI() {
-        // Toggle sidebar on mobile
-        document.getElementById('menu-toggle').addEventListener('click', function () {
-            document.querySelector('.sidebar').classList.toggle('w-16');
-            document.querySelector('.sidebar').classList.toggle('w-64');
-
-            // Toggle icons-only mode
-            const sidebarItems = document.querySelectorAll('.sidebar span, .sidebar h2');
-            sidebarItems.forEach(item => {
-                item.classList.toggle('hidden');
-                item.classList.toggle('md:block');
-            });
-        });
-
-        // Toggle cart visibility on mobile
-        let cartVisible = false;
-        const cartContainer = document.getElementById('cart-container');
-        const cartToggle = document.getElementById('cart-toggle');
-
-        cartToggle.addEventListener('click', function () {
-            cartVisible = !cartVisible;
-            if (cartVisible) {
-                cartContainer.classList.remove('translate-y-full');
-                cartToggle.innerHTML = '<i class="fas fa-chevron-down"></i>';
-            } else {
-                cartContainer.classList.add('translate-y-full');
-                cartToggle.innerHTML = '<i class="fas fa-chevron-up"></i>';
-            }
-        });
-
-
-// Floating Cart Button Toggle (Small screens only)
-const floatingCartToggle = document.getElementById('mobile-cart-toggle');
-if (floatingCartToggle) {
-    floatingCartToggle.addEventListener('click', () => {
-        const isVisible = !cartContainer.classList.contains('translate-y-full');
-        cartContainer.classList.toggle('translate-y-full');
-
-        // Optionally flip icon (basket <-> close)
-        const icon = floatingCartToggle.querySelector('i');
-        if (icon) {
-            icon.className = isVisible ? 'fas fa-shopping-basket' : 'fas fa-times';
-        }
-    });
-}
-
-}
-
-function updateCartBadge() {
-    const countBadge = document.getElementById('cart-count-badge');
-    if (countBadge && state.cart) {
-        const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
-        countBadge.textContent = itemCount;
-        countBadge.classList.toggle('hidden', itemCount === 0);
-    }
-}
-
-
-        // Watch for cart changes to auto-show on mobile
-        const observer = new MutationObserver(function (mutations) {
-            mutations.forEach(function (mutation) {
-                if (mutation.type === 'childList') {
-                    showCartOnMobile();
-                }
-            });
-        });
-
-       
- 
-
-
-// Update mobile cart count badge
-const countBadge = document.getElementById('cart-count-badge');
-if (countBadge) {
-    const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
-    countBadge.textContent = itemCount;
-}
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    const cart = document.getElementById('cart-container');
-    const isVisible = !cart.classList.contains('translate-y-full');
-    updateProductGridColumns(isVisible);
-});
-
-
 
     // ====================
     // Event Listeners
@@ -2712,6 +2738,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
 
+         setupCartVisibility();
 
         // Payment methods
         setupPaymentMethods();
@@ -2719,9 +2746,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Product search
         setupProductSearch();
 
-        // Mobile UI
-        setupMobileUI();
-
+        
         // Close modals when clicking outside
         document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
             backdrop.addEventListener('click', (e) => {
@@ -2741,7 +2766,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('DOMContentLoaded', () => {
         setupEventListeners();
         checkRegisterStatus();
-    });
+        setupCartToggles();
+
+        });
 </script>
 
 {% endblock %}
