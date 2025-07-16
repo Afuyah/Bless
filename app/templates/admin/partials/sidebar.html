@@ -1,9 +1,14 @@
 <!-- Modern POS Admin Sidebar -->
 <div id="sidebar" class="fixed md:relative z-40 w-72 h-full flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-lg transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-in-out">
   
-  <!-- Sidebar Header with Collapse Control -->
-  <div class="flex items-center justify-between p-2 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
-    
+  <!-- Sidebar Header with Logo and Collapse -->
+  <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+    <div class="flex items-center space-x-3">
+      <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white font-semibold">
+        BP
+      </div>
+      <span class="text-lg font-semibold text-gray-800 dark:text-white">Bhapos</span>
+    </div>
     
     <!-- Collapse Button (Desktop) -->
     <button id="sidebar-collapse" class="hidden md:flex p-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="Toggle sidebar">
@@ -19,9 +24,10 @@
       <div>
         <h3 class="text-sm font-semibold text-blue-600 dark:text-blue-400 truncate">{{ business.name }}</h3>
         <p class="text-xs text-gray-600 dark:text-gray-300 mt-0.5 flex items-center">
-         
-          <span class="mx-1.5">•</span>
+          <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-1.5"></span>
           <span>{{ now.strftime('%b %d, %Y') }}</span>
+          <span class="mx-1.5">•</span>
+          <span>{{ now.strftime('%I:%M %p') }}</span>
         </p>
       </div>
       <div class="flex items-center space-x-1.5">
@@ -34,7 +40,7 @@
     </div>
   </div>
 
-  <!-- Navigation Menu - Optimized with Intersection Observer -->
+  <!-- Navigation Menu -->
   <nav class="flex-1 overflow-y-auto overscroll-contain py-3 px-2" aria-label="Main navigation">
     <!-- Dashboard -->
     <div class="mb-1">
@@ -45,8 +51,8 @@
          hx-push-url="true"
          hx-indicator="#global-loader"
          class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
-                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
-                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+                text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                hover:bg-gray-50/50 dark:hover:bg-gray-800/50 relative">
         <div class="relative mr-3 flex-shrink-0">
           <i class="fas fa-tachometer-alt text-gray-500 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-200"></i>
         </div>
@@ -60,7 +66,6 @@
       <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center">
         <i class="fas fa-warehouse text-xs mr-2 opacity-70"></i>
         <span class="truncate">Sales & Inventory</span>
-        <span class="nav-highlight absolute inset-y-0 left-0 w-1 bg-blue-500 rounded-r opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
       </h4>
     </div>
 
@@ -72,9 +77,9 @@
          hx-swap="innerHTML swap:300ms"
          hx-push-url="true"
          hx-indicator="#global-loader"
-          class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
-                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
-                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+         class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                hover:bg-gray-50/50 dark:hover:bg-gray-800/50 relative">
         <div class="relative mr-3 flex-shrink-0">
           <i class="fas fa-boxes text-gray-500 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-200"></i>
         </div>
@@ -91,9 +96,9 @@
          hx-swap="innerHTML swap:300ms"
          hx-push-url="true"
          hx-indicator="#global-loader"
-          class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
-                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
-                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+         class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                hover:bg-gray-50/50 dark:hover:bg-gray-800/50 relative">
         <div class="relative mr-3 flex-shrink-0">
           <i class="fas fa-tags text-gray-500 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-200"></i>
         </div>
@@ -110,9 +115,9 @@
          hx-swap="innerHTML swap:300ms"
          hx-push-url="true"
          hx-indicator="#global-loader"
-          class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
-                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
-                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+         class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                hover:bg-gray-50/50 dark:hover:bg-gray-800/50 relative">
         <div class="relative mr-3 flex-shrink-0">
           <i class="fas fa-tag text-gray-500 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-200"></i>
         </div>
@@ -138,8 +143,8 @@
          hx-push-url="true"
          hx-indicator="#global-loader"
          class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
-                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
-                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+                text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                hover:bg-gray-50/50 dark:hover:bg-gray-800/50 relative">
         <div class="relative mr-3 flex-shrink-0">
           <i class="fas fa-sun text-gray-500 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-200"></i>
         </div>
@@ -156,9 +161,9 @@
          hx-swap="innerHTML swap:300ms"
          hx-push-url="true"
          hx-indicator="#global-loader"
-          class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
-                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
-                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+         class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                hover:bg-gray-50/50 dark:hover:bg-gray-800/50 relative">
         <div class="relative mr-3 flex-shrink-0">
           <i class="fas fa-calendar-week text-gray-500 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-200"></i>
         </div>
@@ -175,9 +180,9 @@
          hx-swap="innerHTML swap:300ms"
          hx-push-url="true"
          hx-indicator="#global-loader"
-          class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
-                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
-                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+         class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                hover:bg-gray-50/50 dark:hover:bg-gray-800/50 relative">
         <div class="relative mr-3 flex-shrink-0">
           <i class="fas fa-chart-bar text-gray-500 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-200"></i>
         </div>
@@ -195,8 +200,8 @@
          hx-push-url="true"
          hx-indicator="#global-loader"
          class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
-                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
-                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+                text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                hover:bg-gray-50/50 dark:hover:bg-gray-800/50 relative">
         <div class="relative mr-3 flex-shrink-0">
           <i class="fas fa-clipboard-list text-gray-500 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-200"></i>
         </div>
@@ -221,9 +226,9 @@
          hx-swap="innerHTML swap:300ms"
          hx-push-url="true"
          hx-indicator="#global-loader"
-          class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
-                  text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
-                  hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+         class="nav-item group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400
+                hover:bg-gray-50/50 dark:hover:bg-gray-800/50 relative">
         <div class="relative mr-3 flex-shrink-0">
           <i class="fas fa-users-cog text-gray-500 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-200"></i>
         </div>
@@ -259,41 +264,132 @@
 <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"></div>
 
 <!-- HTMX Loading Indicator -->
-    <div id="htmx-loader" class="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none">
-        <div class="flex flex-col items-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
-            <p class="mt-3 text-sm font-medium text-gray-600 dark:text-gray-300">Loading content...</p>
-        </div>
+<div id="htmx-loader" class="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none">
+  <div class="flex flex-col items-center">
+    <div class="relative w-12 h-12">
+      <div class="absolute inset-0 border-2 border-transparent border-t-blue-500 border-b-blue-500 rounded-full animate-spin"></div>
+      <div class="absolute inset-1 border-2 border-transparent border-t-blue-400 border-b-blue-400 rounded-full animate-spin animation-delay-200"></div>
     </div>
-
+    <p class="mt-3 text-sm font-medium text-gray-600 dark:text-gray-300">Loading content...</p>
+  </div>
+</div>
 
 <script>
-
-     document.addEventListener('DOMContentLoaded', function() {
-               
-        // Set up HTMX loading indicators
-        initHTMXLoaders();
-        
-      });
-     // HTMX loading indicators
-    function initHTMXLoaders() {
-        const loader = document.getElementById('htmx-loader');
-        
-        document.addEventListener('htmx:beforeRequest', function(evt) {
-            // Only show loader for main content swaps
-            if (evt.detail.target.id === 'main-content') {
-                loader.classList.remove('opacity-0', 'pointer-events-none');
-            }
-        });
-        
-        document.addEventListener('htmx:afterRequest', function(evt) {
-            loader.classList.add('opacity-0', 'pointer-events-none');
-        });
-        
-        document.addEventListener('htmx:afterOnLoad', function(evt) {
-            if (evt.detail.failed) {
-                showToast('Request failed. Please try again.', 'error');
-            }
-        });
+  document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar toggle functionality
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const menuIcon = document.getElementById('menu-icon');
+    
+    // Toggle sidebar on mobile
+    function toggleSidebar() {
+      const isOpening = sidebar.classList.contains('-translate-x-full');
+      
+      sidebar.classList.toggle('-translate-x-full');
+      sidebarOverlay.classList.toggle('opacity-0');
+      sidebarOverlay.classList.toggle('pointer-events-none');
+      
+      // Toggle menu icon between bars and X
+      if (isOpening) {
+        menuIcon.classList.remove('fa-bars');
+        menuIcon.classList.add('fa-times');
+      } else {
+        menuIcon.classList.remove('fa-times');
+        menuIcon.classList.add('fa-bars');
+      }
+      
+      // Disable scrolling when sidebar is open
+      document.body.style.overflow = isOpening ? 'hidden' : '';
     }
+    
+    // Mobile menu button
+    if (mobileMenuButton) {
+      mobileMenuButton.addEventListener('click', toggleSidebar);
+    }
+    
+    // Close sidebar when clicking on overlay
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener('click', toggleSidebar);
+    }
+    
+    // Desktop collapse functionality
+    const sidebarCollapse = document.getElementById('sidebar-collapse');
+    if (sidebarCollapse) {
+      sidebarCollapse.addEventListener('click', function() {
+        sidebar.classList.toggle('w-72');
+        sidebar.classList.toggle('w-20');
+        document.querySelectorAll('.nav-item span').forEach(el => {
+          el.classList.toggle('hidden');
+        });
+        sidebarCollapse.querySelector('svg').classList.toggle('rotate-180');
+      });
+    }
+    
+    // Set active nav item based on current URL
+    function setActiveNav() {
+      const currentPath = window.location.pathname;
+      document.querySelectorAll('.nav-item').forEach(item => {
+        const itemPath = item.getAttribute('href');
+        const isActive = currentPath === itemPath || 
+                        (currentPath.startsWith(itemPath) && itemPath !== '/');
+        
+        item.classList.toggle('bg-gray-100/50', isActive);
+        item.classList.toggle('dark:bg-gray-800/80', isActive);
+        item.classList.toggle('text-primary-600', isActive);
+        item.classList.toggle('dark:text-primary-400', isActive);
+        
+        const icon = item.querySelector('i');
+        if (icon) {
+          icon.classList.toggle('text-primary-500', isActive);
+          icon.classList.toggle('text-gray-500', !isActive);
+          icon.classList.toggle('dark:text-gray-400', !isActive);
+        }
+        
+        // Show highlight for active item
+        const highlight = item.querySelector('.nav-highlight');
+        if (highlight) {
+          highlight.classList.toggle('opacity-100', isActive);
+        }
+      });
+    }
+    
+    // Initialize active state
+    setActiveNav();
+    
+    // Update on HTMX navigation
+    document.addEventListener('htmx:afterSwap', setActiveNav);
+    
+    // HTMX loading indicators
+    const loader = document.getElementById('htmx-loader');
+    
+    document.addEventListener('htmx:beforeRequest', function(evt) {
+      // Only show loader for main content swaps
+      if (evt.detail.target.id === 'main-content') {
+        loader.classList.remove('opacity-0', 'pointer-events-none');
+      }
+    });
+    
+    document.addEventListener('htmx:afterRequest', function(evt) {
+      loader.classList.add('opacity-0', 'pointer-events-none');
+    });
+    
+    // Close sidebar on mobile when a nav item is clicked
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        if (window.innerWidth < 768) {
+          toggleSidebar();
+        }
+      });
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      if (window.innerWidth >= 768) {
+        sidebar.classList.remove('-translate-x-full');
+        sidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
+        document.body.style.overflow = '';
+      }
+    });
+  });
 </script>
