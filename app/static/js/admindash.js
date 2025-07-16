@@ -89,21 +89,7 @@ document.addEventListener('click', function(event) {
   }
 });
 
-// HTMX Event Handlers
-document.addEventListener('htmx:beforeRequest', function(evt) {
-  const target = evt.detail.elt;
-  if (target.hasAttribute('hx-get') || target.hasAttribute('hx-post')) {
-    appState.isLoading = true;
-    const loader = document.getElementById('global-loader') || createGlobalLoader();
-    loader?.classList.remove('hidden');
-    
-    // For chart-specific requests
-    if (target.id === 'chart-refresh') {
-      document.getElementById('chart-loader')?.classList.remove('hidden');
-      document.getElementById('sales-chart-container')?.classList.add('opacity-50');
-    }
-  }
-});
+
 
 document.addEventListener('htmx:afterRequest', function(evt) {
   appState.isLoading = false;
