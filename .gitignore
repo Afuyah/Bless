@@ -1,0 +1,25 @@
+
+node_modules/
+package.json
+package-lock.json
+tailwind.config.js
+postcss.config.js
+src/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment
+.env
+.env.*
+
+# OS junk files
+.DS_Store
+Thumbs.db
+
+# Virtualenv
+venv/
+env/
