@@ -1,82 +1,81 @@
-<nav x-data="{ mobileMenuOpen: false, notificationsOpen: false, userDropdownOpen: false }" 
-     class="bg-white shadow-sm sticky top-0 border-b border-gray-200 backdrop-blur-md z-30">
-  <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+<nav x-data="{ mobileMenuOpen: false, userDropdownOpen: false }" 
+     class="bg-white dark:bg-gray-900 shadow-sm sticky top-0 border-b border-gray-200 dark:border-gray-800 backdrop-blur-lg z-30">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
-      
-      <!-- Mobile menu button and logo -->
+      <!-- Left Section: Mobile Menu Button and Logo -->
       <div class="flex items-center">
         <!-- Mobile menu button (for sidebar toggle) -->
-        <button @click="$dispatch('toggle-sidebar')" class="md:hidden mr-2 p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none">
+        <button @click="$dispatch('toggle-sidebar')" 
+                class="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
-     
-        <!-- Primary Nav (Desktop) -->
-        <div class="hidden sm:ml-6 sm:flex sm:space-x-2">
+
+        <!-- Primary Navigation (Desktop) -->
+        <div class="hidden lg:flex lg:items-center lg:space-x-4 ml-6">
           {% if current_user.is_superadmin() %}
-            <a href="{{ url_for('bhapos.list_businesses') }}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors duration-200 flex items-center">
-              <i class="fas fa-building mr-2 text-gray-500"></i>
-              Businesses
-            </a>
-            <a href="{{ url_for('bhapos.list_users') }}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors duration-200 flex items-center">
-              <i class="fas fa-users mr-2 text-gray-500"></i>
-              Users
-            </a>
-            <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors duration-200 flex items-center">
-              <i class="fas fa-chart-line mr-2 text-gray-500"></i>
-              Analytics
-            </a>
+          <a href="{{ url_for('bhapos.list_businesses') }}" 
+             class="flex items-center px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors duration-200">
+            <i class="fas fa-building mr-2 text-gray-500 dark:text-gray-400"></i>
+            Businesses
+          </a>
+          <a href="{{ url_for('bhapos.list_users') }}" 
+             class="flex items-center px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors duration-200">
+            <i class="fas fa-users mr-2 text-gray-500 dark:text-gray-400"></i>
+            Users
+          </a>
+          <a href="#" 
+             class="flex items-center px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors duration-200">
+            <i class="fas fa-chart-line mr-2 text-gray-500 dark:text-gray-400"></i>
+            Analytics
+          </a>
           {% endif %}
         </div>
       </div>
 
-      <!-- Desktop Menu -->
-      <div class="hidden md:flex md:items-center md:space-x-4">
+      <!-- Right Section: Desktop Menu -->
+      <div class="hidden lg:flex lg:items-center lg:space-x-4">
         {% if current_user.is_authenticated %}
         <!-- Quick Actions -->
         <div class="flex items-center space-x-3">
           <!-- New Sale Button -->
           {% if current_user.is_cashier() or current_user.is_tenant() %}
-          <div class="relative group">
-            <a href="#" class="relative flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700 shadow-sm transition-all duration-200">
-              <i class="fas fa-plus-circle mr-2"></i>
-              <span>New Sale</span>
-              <span class="ml-1.5 px-1.5 py-0.5 text-xs font-bold bg-white/20 rounded-full">⌘N</span>
-            </a>
-          </div>
+          <a href="#" 
+             class="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 rounded-lg shadow-sm transition-all duration-200">
+            <i class="fas fa-plus-circle mr-2"></i>
+            New Sale
+            <span class="ml-2 px-2 py-0.5 text-xs font-semibold bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 rounded-full">⌘N</span>
+          </a>
           {% endif %}
 
           <!-- Search Trigger -->
-          <button class="p-2 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
-            <i class="fas fa-search"></i>
+          <button class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
+            <i class="fas fa-search text-sm"></i>
           </button>
         </div>
 
-        <!-- User dropdown -->
-        <div class="relative ml-4">
+        <!-- User Dropdown -->
+        <div class="relative">
           <button @click="userDropdownOpen = !userDropdownOpen" 
-                  class="flex items-center max-w-xs rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-200 group">
-            <span class="sr-only">Open user menu</span>
-            <div class="flex items-center space-x-2">
-              <div class="text-right hidden lg:block">
-                <p class="text-sm font-medium text-gray-700">{{ current_user.username }}</p>
-                <p class="text-xs text-gray-500">
-                  {% if current_user.is_superadmin() %}Super Admin{% endif %}
-                  {% if current_user.is_tenant() %}Business Owner{% endif %}
-                  {% if current_user.is_cashier() %}Cashier{% endif %}
-                </p>
-              </div>
-              <div class="relative">
-                <img class="h-9 w-9 rounded-full border-2 border-gray-200 group-hover:border-gray-300 transition-colors duration-200" 
-                     src="{{ current_user.avatar_url or url_for('static', filename='images/default-avatar.png') }}" 
-                     alt="User profile">
-                <span class="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-green-400 ring-2 ring-white"></span>
-              </div>
+                  class="flex items-center space-x-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 group">
+            <div class="text-right hidden xl:block">
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ current_user.username }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                {% if current_user.is_superadmin() %}Super Admin{% endif %}
+                {% if current_user.is_tenant() %}Business Owner{% endif %}
+                {% if current_user.is_cashier() %}Cashier{% endif %}
+              </p>
+            </div>
+            <div class="relative">
+              <img class="h-8 w-8 rounded-full border-2 border-gray-200 dark:border-gray-700 group-hover:border-blue-500 dark:group-hover:border-blue-600 transition-colors duration-200" 
+                   src="{{ current_user.avatar_url or url_for('static', filename='images/default-avatar.png') }}" 
+                   alt="User profile">
+              <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-white dark:ring-gray-900"></span>
             </div>
           </button>
 
-          <!-- User dropdown menu -->
+          <!-- User Dropdown Menu -->
           <div x-show="userDropdownOpen" @click.away="userDropdownOpen = false"
                x-transition:enter="transition ease-out duration-200"
                x-transition:enter-start="transform opacity-0 scale-95 translate-y-1"
@@ -84,69 +83,76 @@
                x-transition:leave="transition ease-in duration-150"
                x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
                x-transition:leave-end="transform opacity-0 scale-95 translate-y-1"
-               class="origin-top-right absolute right-0 mt-2 w-64 rounded-lg shadow-lg py-1 bg-white ring-1 ring-gray-200 focus:outline-none z-50 divide-y divide-gray-100 overflow-hidden">
-            <!-- User info -->
-            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
-              <p class="text-sm font-semibold text-gray-900 truncate">{{ current_user.username }}</p>
-              <p class="text-sm text-gray-500 truncate">{{ current_user.email }}</p>
+               class="absolute right-0 mt-2 w-64 rounded-lg shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700 z-50 divide-y divide-gray-100 dark:divide-gray-700 overflow-hidden">
+            <!-- User Info -->
+            <div class="px-4 py-3 bg-gray-50 dark:bg-gray-800/50">
+              <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ current_user.username }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ current_user.email }}</p>
             </div>
-            
+
             <!-- Links -->
             <div class="py-1">
-              <a href="#" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150">
-                <div class="mr-3 h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600">
+              <a href="#" 
+                 class="group flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150">
+                <div class="mr-3 h-8 w-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300">
                   <i class="fas fa-user-circle"></i>
                 </div>
-                <span>Profile</span>
-                <span class="ml-auto text-xs text-gray-400 group-hover:text-gray-500">⌘P</span>
+                Profile
+                <span class="ml-auto text-xs text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400">⌘P</span>
               </a>
-              <a href="#" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150">
-                <div class="mr-3 h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600">
+              <a href="#" 
+                 class="group flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150">
+                <div class="mr-3 h-8 w-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300">
                   <i class="fas fa-cog"></i>
                 </div>
-                <span>Settings</span>
-                <span class="ml-auto text-xs text-gray-400 group-hover:text-gray-500">⌘S</span>
+                Settings
+                <span class="ml-auto text-xs text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400">⌘S</span>
               </a>
               {% if current_user.is_superadmin() %}
-              <a href="{{ url_for('bhapos.superadmin_dashboard', shop_id=current_shop.id) }}" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150">
-                <div class="mr-3 h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600">
+              <a href="{{ url_for('bhapos.superadmin_dashboard', shop_id=current_shop.id) }}" 
+                 class="group flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150">
+                <div class="mr-3 h-8 w-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300">
                   <i class="fas fa-lock"></i>
                 </div>
-                <span>Admin Panel</span>
-                <span class="ml-auto text-xs text-gray-400 group-hover:text-gray-500">⌘A</span>
+                Admin Panel
+                <span class="ml-auto text-xs text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400">⌘A</span>
               </a>
               {% endif %}
             </div>
-            
+
             <!-- Footer -->
-            <div class="py-1 bg-gray-50">
-              <a href="{{ url_for('auth.logout') }}" class="group flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition-colors duration-150">
-                <div class="mr-3 h-8 w-8 rounded-lg bg-red-100 flex items-center justify-center text-red-600">
+            <div class="py-1 bg-gray-50 dark:bg-gray-800/50">
+              <a href="{{ url_for('auth.logout') }}" 
+                 class="group flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/50 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-150">
+                <div class="mr-3 h-8 w-8 rounded-lg bg-red-100 dark:bg-red-900/50 flex items-center justify-center text-red-600 dark:text-red-400">
                   <i class="fas fa-sign-out-alt"></i>
                 </div>
-                <span>Sign out</span>
-                <span class="ml-auto text-xs text-gray-400 group-hover:text-gray-500">⌘Q</span>
+                Sign out
+                <span class="ml-auto text-xs text-gray-400 group-hover:text-red-500 dark:group-hover:text-red-400">⌘Q</span>
               </a>
             </div>
           </div>
         </div>
         {% else %}
-        <!-- Guest menu -->
+        <!-- Guest Menu -->
         <div class="flex items-center space-x-3">
-          <a href="{{ url_for('auth.login') }}" class="px-3 py-1.5 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200">
-            <i class="fas fa-sign-in-alt mr-1"></i> Sign in
+          <a href="{{ url_for('auth.login') }}" 
+             class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors duration-200">
+            <i class="fas fa-sign-in-alt mr-2"></i> Sign in
           </a>
-          <a href="{{ url_for('auth.register') }}" class="px-4 py-1.5 rounded-md text-sm font-medium text-white bg-gray-800 hover:bg-gray-700 shadow-sm transition-colors duration-200">
-            <i class="fas fa-user-plus mr-1"></i> Register
+          <a href="{{ url_for('auth.register') }}" 
+             class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 shadow-sm transition-colors duration-200">
+            <i class="fas fa-user-plus mr-2"></i> Register
           </a>
         </div>
         {% endif %}
       </div>
 
-      <!-- Mobile menu button -->
-      <div class="flex md:hidden">
-        <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" 
-                class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
+      <!-- Mobile Menu Button -->
+      <div class="flex lg:hidden">
+        <button @click="mobileMenuOpen = !mobileMenuOpen" 
+                type="button" 
+                class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
           <span class="sr-only">Open main menu</span>
           <i class="fas fa-bars text-xl" x-show="!mobileMenuOpen"></i>
           <i class="fas fa-times text-xl" x-show="mobileMenuOpen"></i>
@@ -155,80 +161,89 @@
     </div>
   </div>
 
-  <!-- Mobile menu -->
-  <div class="md:hidden" x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false"
+  <!-- Mobile Menu -->
+  <div class="lg:hidden" x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false"
        x-transition:enter="transition ease-out duration-200"
        x-transition:enter-start="transform opacity-0 scale-95"
        x-transition:enter-end="transform opacity-100 scale-100"
        x-transition:leave="transition ease-in duration-150"
        x-transition:leave-start="transform opacity-100 scale-100"
        x-transition:leave-end="transform opacity-0 scale-95">
-    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white shadow-lg">
+    <div class="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-gray-900 shadow-lg border-t border-gray-200 dark:border-gray-800">
       {% if current_user.is_authenticated %}
-      <!-- User profile -->
-      <div class="px-4 py-3 border-b border-gray-200 flex items-center">
+      <!-- User Profile -->
+      <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-800 flex items-center bg-gray-50 dark:bg-gray-800/50">
         <div class="flex-shrink-0 relative">
-          <img class="h-10 w-10 rounded-full border-2 border-gray-200" src="{{ current_user.avatar_url or url_for('static', filename='images/default-avatar.png') }}" alt="User profile">
-          <span class="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-green-400 ring-2 ring-white"></span>
+          <img class="h-10 w-10 rounded-full border-2 border-gray-200 dark:border-gray-700" 
+               src="{{ current_user.avatar_url or url_for('static', filename='images/default-avatar.png') }}" 
+               alt="User profile">
+          <span class="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-green-400 ring-2 ring-white dark:ring-gray-900"></span>
         </div>
         <div class="ml-3">
-          <div class="text-base font-medium text-gray-800">{{ current_user.username }}</div>
-          <div class="text-sm font-medium text-gray-500">
+          <div class="text-base font-medium text-gray-800 dark:text-white">{{ current_user.username }}</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400">
             {% if current_user.is_superadmin() %}Super Admin{% endif %}
             {% if current_user.is_tenant() %}Business Owner{% endif %}
             {% if current_user.is_cashier() %}Cashier{% endif %}
           </div>
         </div>
       </div>
-      
+
       <!-- Mobile Navigation Links -->
       <div class="pt-2 space-y-1">
         {% if current_user.is_superadmin() %}
-          <a href="{{ url_for('bhapos.list_businesses') }}" class="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200">
-            <i class="fas fa-building mr-3 text-gray-500"></i>
-            Businesses
-          </a>
-          <a href="{{ url_for('bhapos.list_users') }}" class="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200">
-            <i class="fas fa-users mr-3 text-gray-500"></i>
-            Users
-          </a>
-          <a href="#" class="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200">
-            <i class="fas fa-chart-line mr-3 text-gray-500"></i>
-            Analytics
-          </a>
+        <a href="{{ url_for('bhapos.list_businesses') }}" 
+           class="flex items-center px-3 py-2 rounded-lg text-base font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors duration-200">
+          <i class="fas fa-building mr-3 text-gray-500 dark:text-gray-400"></i>
+          Businesses
+        </a>
+        <a href="{{ url_for('bhapos.list_users') }}" 
+           class="flex items-center px-3 py-2 rounded-lg text-base font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors duration-200">
+          <i class="fas fa-users mr-3 text-gray-500 dark:text-gray-400"></i>
+          Users
+        </a>
+        <a href="#" 
+           class="flex items-center px-3 py-2 rounded-lg text-base font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors duration-200">
+          <i class="fas fa-chart-line mr-3 text-gray-500 dark:text-gray-400"></i>
+          Analytics
+        </a>
         {% endif %}
-        
         {% if current_user.is_cashier() or current_user.is_tenant() %}
-          <a href="#" class="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200">
-            <i class="fas fa-plus-circle mr-3 text-gray-500"></i>
-            New Sale
-          </a>
+        <a href="#" 
+           class="flex items-center px-3 py-2 rounded-lg text-base font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors duration-200">
+          <i class="fas fa-plus-circle mr-3 text-gray-500 dark:text-gray-400"></i>
+          New Sale
+        </a>
         {% endif %}
-        
-        <a href="#" class="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200">
-          <i class="fas fa-user-circle mr-3 text-gray-500"></i>
+        <a href="#" 
+           class="flex items-center px-3 py-2 rounded-lg text-base font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors duration-200">
+          <i class="fas fa-user-circle mr-3 text-gray-500 dark:text-gray-400"></i>
           Profile
         </a>
-        <a href="#" class="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200">
-          <i class="fas fa-cog mr-3 text-gray-500"></i>
+        <a href="#" 
+           class="flex items-center px-3 py-2 rounded-lg text-base font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors duration-200">
+          <i class="fas fa-cog mr-3 text-gray-500 dark:text-gray-400"></i>
           Settings
         </a>
       </div>
-        
+
       <!-- Footer -->
-      <div class="pt-4 pb-2 border-t border-gray-200">
-        <a href="{{ url_for('auth.logout') }}" class="group flex items-center px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-white hover:bg-red-500 transition-colors duration-200">
+      <div class="pt-4 pb-2 border-t border-gray-200 dark:border-gray-800">
+        <a href="{{ url_for('auth.logout') }}" 
+           class="group flex items-center px-3 py-2 rounded-lg text-base font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/50 transition-colors duration-200">
           <i class="fas fa-sign-out-alt mr-3"></i>
           Sign out
         </a>
       </div>
       {% else %}
       <div class="px-2 pt-2 pb-3 space-y-2">
-        <a href="{{ url_for('auth.login') }}" class="flex items-center justify-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200">
+        <a href="{{ url_for('auth.login') }}" 
+           class="flex items-center justify-center px-3 py-2 rounded-lg text-base font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors duration-200">
           <i class="fas fa-sign-in-alt mr-2"></i>
           Sign in
         </a>
-        <a href="{{ url_for('auth.register') }}" class="flex items-center justify-center px-3 py-2 rounded-md text-base font-medium text-white bg-gray-800 hover:bg-gray-700 shadow-sm transition-colors duration-200">
+        <a href="{{ url_for('auth.register') }}" 
+           class="flex items-center justify-center px-3 py-2 rounded-lg text-base font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 shadow-sm transition-colors duration-200">
           <i class="fas fa-user-plus mr-2"></i>
           Register
         </a>
