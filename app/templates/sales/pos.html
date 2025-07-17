@@ -1137,34 +1137,105 @@ async function loadCart() {
         });
     }
 
+// State management for loading status
+let isLoading = false;
+let hasError = false;
 
+async function loadProductsWithSkeletons() {
+    // Reset state
+    isLoading = true;
+    hasError = false;
+    
+    // Clear previous content and errors
+    elements.productGrid.innerHTML = '';
+    
+    // Show skeletons
+    showProductSkeletons(8);
+    
+    try {
+        // Fetch products (replace with your actual data fetching)
+        const products = await fetchProducts();
+        
+        // Hide skeletons and render products
+        renderProducts(products);
+    } catch (error) {
+        // Show error state
+        hasError = true;
+        showErrorState();
+    } finally {
+        isLoading = false;
+    }
+}
 
-   function showProductSkeletons(count = 8) {
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <div class="skeleton-item bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4 animate-pulse">
+function showProductSkeletons(count = 8) {
+    // Create a document fragment for better performance
+    const fragment = document.createDocumentFragment();
+    
+    for (let i = 0; i < count; i++) {
+        const skeleton = document.createElement('div');
+        skeleton.className = 'skeleton-item bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4 animate-pulse transition-opacity duration-300';
+        skeleton.innerHTML = `
             <div class="skeleton-line w-3/4 h-5 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
             <div class="skeleton-line w-1/2 h-3 bg-gray-200 dark:bg-gray-700 rounded mb-3"></div>
             <div class="skeleton-image w-full h-28 bg-gray-200 dark:bg-gray-700 rounded-xl mb-3"></div>
             <div class="skeleton-line w-1/2 h-4 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
             <div class="skeleton-line w-1/3 h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
-        </div>`.repeat(count);
+        `;
+        fragment.appendChild(skeleton);
+    }
+    
+    elements.productGrid.appendChild(fragment);
+}
 
-    elements.productGrid.replaceChildren(template.content.cloneNode(true));
+function renderProducts(products) {
+    // First fade out skeletons
+    const skeletons = elements.productGrid.querySelectorAll('.skeleton-item');
+    skeletons.forEach(skeleton => {
+        skeleton.style.opacity = '0';
+    });
+    
+    // Wait for fade out to complete before removing
+    setTimeout(() => {
+        elements.productGrid.innerHTML = '';
+        
+        // Render actual products
+        products.forEach(product => {
+            const productElement = createProductElement(product);
+            elements.productGrid.appendChild(productElement);
+        });
+    }, 300); // Match this with your CSS transition duration
+}
+
+function showErrorState() {
+    // Fade out skeletons first
+    const skeletons = elements.productGrid.querySelectorAll('.skeleton-item');
+    skeletons.forEach(skeleton => {
+        skeleton.style.opacity = '0';
+    });
+    
+    // Then show error message
+    setTimeout(() => {
+        elements.productGrid.innerHTML = errorFallbackUI();
+    }, 300);
 }
 
 function errorFallbackUI() {
     return `
-    <div class="error-fallback flex flex-col items-center justify-center p-6 text-center">
+    <div class="error-fallback flex flex-col items-center justify-center p-6 text-center animate-fade-in">
         <svg class="w-16 h-16 text-red-500 dark:text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 3a9 9 0 100 18 9 9 0 000-18z" />
         </svg>
         <p class="text-gray-600 dark:text-gray-300 font-medium mb-3">Products unavailable</p>
-        <button onclick="initPOS()" class="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-all shadow-sm" aria-label="Retry loading products">
+        <button onclick="loadProductsWithSkeletons()" class="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-all shadow-sm" aria-label="Retry loading products">
             Retry
         </button>
     </div>`;
 }
+
+
+
+
+
 
 function renderProducts() {
     const grid = elements.productGrid;
@@ -1347,112 +1418,144 @@ function renderCategories() {
     if (state.categories.length > 0) {
         elements.categoryTabs.innerHTML = `
         <div class="category-tabs-container relative">
-            <div class="category-tabs-scroll flex space-x-3 pb-3 overflow-x-auto scrollbar-hide">
+            <div class="category-tabs-scroll flex space-x-2 md:space-x-3 pb-2 md:pb-3 overflow-x-auto scrollbar-hide px-1">
                 <!-- All Products Tab -->
-                <button class="category-tab relative px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 ease-out 
-                            bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md hover:shadow-lg
-                            flex items-center group transform hover:scale-105 active:scale-95" 
+                <button class="category-tab relative px-4 py-1.5 md:px-6 md:py-2 rounded-lg md:rounded-full font-medium text-xs md:text-sm transition-all duration-200 ease-out 
+                            bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-sm hover:shadow-md
+                            flex items-center group active:scale-[0.98]" 
                         data-id="all" aria-label="Show all products">
-                    <i class="fas fa-layer-group mr-2 text-white/90 group-hover:text-white transition-all"></i>
-                    <span>All Products</span>
-                    <span class="active-indicator absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1.5 bg-white rounded-full opacity-100"></span>
+                    <i class="fas fa-layer-group mr-1.5 md:mr-2 text-white/90 group-hover:text-white transition-all text-sm md:text-base"></i>
+                    <span>All</span>
+                    <span class="active-indicator absolute -bottom-0.5 md:-bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 md:w-8 md:h-1.5 bg-white rounded-full opacity-100"></span>
                 </button>
                 
                 <!-- Category Tabs -->
                 ${state.categories.map(category => `
-                    <button class="category-tab relative px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 ease-out 
-                                bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 
-                                hover:bg-amber-50 dark:hover:bg-amber-900/30 hover:border-amber-400 dark:hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400
-                                flex items-center group transform hover:scale-105 active:scale-95 shadow-sm hover:shadow-md" 
+                    <button class="category-tab relative px-4 py-1.5 md:px-6 md:py-2 rounded-lg md:rounded-full font-medium text-xs md:text-sm transition-all duration-200 ease-out 
+                                bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 
+                                hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-300 dark:hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400
+                                flex items-center group active:scale-[0.98] shadow-xs hover:shadow-sm" 
                             data-id="${category.id}" aria-label="Show ${category.name} products">
-                        ${category.icon ? `<i class="${category.icon} mr-2 text-gray-500 dark:text-gray-400 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-all"></i>` : ''}
-                        <span>${category.name}</span>
-                        <span class="active-indicator absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1.5 bg-amber-500 rounded-full opacity-0 group-hover:opacity-30"></span>
+                        ${category.icon ? `<i class="${category.icon} mr-1.5 md:mr-2 text-gray-500 dark:text-gray-400 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-all text-sm md:text-base"></i>` : ''}
+                        <span class="whitespace-nowrap">${category.name.length > 12 ? category.name.substring(0, 10) + '...' : category.name}</span>
+                        <span class="active-indicator absolute -bottom-0.5 md:-bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 md:w-8 md:h-1.5 bg-amber-500 rounded-full opacity-0 group-hover:opacity-30"></span>
                     </button>
                 `).join('')}
             </div>
             
             <!-- Gradient fade effect for scrollable tabs -->
-            <div class="scroll-fade-right absolute right-0 top-0 bottom-3 w-12 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none hidden"></div>
+            <div class="scroll-fade-right absolute right-0 top-0 bottom-2 md:bottom-3 w-8 md:w-12 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none hidden"></div>
         </div>
         `;
 
-        // Add event listeners with enhanced animations
+        // Add event listeners
         document.querySelectorAll('.category-tab').forEach(tab => {
             tab.addEventListener('click', (e) => {
                 const categoryId = tab.dataset.id;
 
-                // Smooth transition animation
-                tab.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    tab.style.transform = '';
-                }, 150);
+                // Add click feedback animation
+                tab.classList.add('active');
+                setTimeout(() => tab.classList.remove('active'), 200);
 
-                // Filter products with a slight delay for better UX
-                setTimeout(() => {
-                    filterProductsByCategory(categoryId);
-                }, 50);
+                // Filter products with delay for better UX
+                setTimeout(() => filterProductsByCategory(categoryId), 50);
 
                 // Update active tab styling
-                document.querySelectorAll('.category-tab').forEach(t => {
-                    t.classList.remove(
-                        'bg-gradient-to-r', 'from-amber-500', 'to-amber-600',
-                        'text-white', 'shadow-md',
-                        'border-amber-400', 'bg-amber-50', 'dark:bg-amber-900/30', 'text-amber-600', 'dark:text-amber-400'
-                    );
-                    t.classList.add(
-                        'bg-white', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-200', 'border-gray-300', 'dark:border-gray-600'
-                    );
-
-                    // Reset indicators
-                    const indicator = t.querySelector('.active-indicator');
-                    if (indicator) {
-                        indicator.classList.remove('opacity-100', 'bg-white');
-                        indicator.classList.add('opacity-0', 'bg-amber-500');
-                    }
-                });
-
-                // Style active tab
-                if (categoryId === 'all') {
-                    tab.classList.remove('bg-white', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-200', 'border-gray-300', 'dark:border-gray-600');
-                    tab.classList.add('bg-gradient-to-r', 'from-amber-500', 'to-amber-600', 'text-white', 'shadow-md');
-
-                    const indicator = tab.querySelector('.active-indicator');
-                    if (indicator) {
-                        indicator.classList.remove('opacity-0', 'bg-amber-500');
-                        indicator.classList.add('opacity-100', 'bg-white');
-                    }
-                } else {
-                    tab.classList.remove('bg-white', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-200', 'border-gray-300', 'dark:border-gray-600');
-                    tab.classList.add('border-amber-400', 'bg-amber-50', 'dark:bg-amber-900/30', 'text-amber-600', 'dark:text-amber-400');
-
-                    const indicator = tab.querySelector('.active-indicator');
-                    if (indicator) {
-                        indicator.classList.remove('opacity-0');
-                        indicator.classList.add('opacity-100');
-                    }
-                }
+                updateActiveTabStyles(categoryId);
             });
         });
 
-        // Add scroll indicators when tabs overflow
-        const checkScroll = () => {
-            const container = elements.categoryTabs.querySelector('.category-tabs-scroll');
-            const fadeRight = elements.categoryTabs.querySelector('.scroll-fade-right');
-
-            if (container.scrollWidth > container.clientWidth) {
-                fadeRight.classList.remove('hidden');
-            } else {
-                fadeRight.classList.add('hidden');
-            }
-        };
-
-        // Initial check and on resize
-        checkScroll();
-        window.addEventListener('resize', checkScroll);
+        // Handle scroll indicators
+        setupScrollIndicators();
     }
 }
 
+function updateActiveTabStyles(activeCategoryId) {
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        // Reset all tabs to default state
+        tab.classList.remove(
+            'bg-gradient-to-r', 'from-amber-500', 'to-amber-600',
+            'text-white', 'shadow-sm', 'shadow-md',
+            'border-amber-300', 'bg-amber-50', 'dark:bg-amber-900/20', 
+            'text-amber-600', 'dark:text-amber-400', 'hover:shadow-md'
+        );
+        
+        tab.classList.add(
+            'bg-white', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-200', 
+            'border-gray-200', 'dark:border-gray-700', 'shadow-xs'
+        );
+
+        // Reset indicators
+        const indicator = tab.querySelector('.active-indicator');
+        if (indicator) {
+            indicator.classList.remove('opacity-100', 'bg-white');
+            indicator.classList.add('opacity-0', 'bg-amber-500');
+        }
+    });
+
+    // Style the active tab
+    const activeTab = document.querySelector(`.category-tab[data-id="${activeCategoryId}"]`);
+    if (activeTab) {
+        if (activeCategoryId === 'all') {
+            activeTab.classList.remove(
+                'bg-white', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-200', 
+                'border-gray-200', 'dark:border-gray-700', 'shadow-xs'
+            );
+            activeTab.classList.add(
+                'bg-gradient-to-r', 'from-amber-500', 'to-amber-600', 
+                'text-white', 'shadow-sm'
+            );
+
+            const indicator = activeTab.querySelector('.active-indicator');
+            if (indicator) {
+                indicator.classList.remove('opacity-0', 'bg-amber-500');
+                indicator.classList.add('opacity-100', 'bg-white');
+            }
+        } else {
+            activeTab.classList.remove(
+                'bg-white', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-200', 
+                'border-gray-200', 'dark:border-gray-700', 'shadow-xs'
+            );
+            activeTab.classList.add(
+                'border-amber-300', 'bg-amber-50', 'dark:bg-amber-900/20', 
+                'text-amber-600', 'dark:text-amber-400', 'shadow-sm'
+            );
+
+            const indicator = activeTab.querySelector('.active-indicator');
+            if (indicator) {
+                indicator.classList.remove('opacity-0');
+                indicator.classList.add('opacity-100');
+            }
+        }
+    }
+}
+
+function setupScrollIndicators() {
+    const checkScroll = () => {
+        const container = elements.categoryTabs.querySelector('.category-tabs-scroll');
+        const fadeRight = elements.categoryTabs.querySelector('.scroll-fade-right');
+
+        if (!container || !fadeRight) return;
+
+        // Check if content overflows
+        const hasOverflow = container.scrollWidth > container.clientWidth;
+        fadeRight.classList.toggle('hidden', !hasOverflow);
+
+        // Also check for left overflow (if you want left fade)
+        // const showLeftFade = container.scrollLeft > 0;
+        // fadeLeft.classList.toggle('hidden', !showLeftFade);
+    };
+
+    // Initial check and event listeners
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    
+    // Optional: Add scroll event listener if you want dynamic fade effects
+    const container = elements.categoryTabs.querySelector('.category-tabs-scroll');
+    if (container) {
+        container.addEventListener('scroll', checkScroll);
+    }
+}
     function filterProductsByCategory(categoryId) {
         let filteredProducts = [];
 
@@ -2268,7 +2371,22 @@ async function handleReceipt(receiptData) {
                         font-size: 24px;
                         margin-top: 10px;
                     }
-                </style>
+
+                  
+                        .skeleton-item {
+                            transition: opacity 0.3s ease;
+                        }
+
+                        .animate-fade-in {
+                            animation: fadeIn 0.3s ease-in;
+                        }
+
+                        @keyframes fadeIn {
+                            from { opacity: 0; }
+                            to { opacity: 1; }
+                        }
+                        */
+                                        </style>
             </head>
             <body>
                 <div class="header">
