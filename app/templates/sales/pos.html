@@ -516,9 +516,7 @@
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const sidebarClose = document.getElementById('sidebar-close');
-        const cartContainer = document.getElementById('cart-container');
-        const cartToggle = document.getElementById('floating-cart-toggle');
-        const cartCollapseToggle = document.getElementById('cart-collapse-toggle');
+      
         const fullscreenToggle = document.getElementById('fullscreen-toggle');
 
         // Sidebar toggle
@@ -530,11 +528,7 @@
             sidebar.classList.add('-translate-x-full');
         });
 
-        // Cart toggle
-        cartToggle.addEventListener('click', () => {
-            cartContainer.classList.toggle('translate-y-full');
-        });
-
+     
         cartCollapseToggle.addEventListener('click', () => {
             cartContainer.classList.toggle('translate-y-full');
         });
