@@ -1,187 +1,195 @@
-<!DOCTYPE html>
-<html lang="en" class="h-full">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}BHAPOS{% endblock %}</title>
-  <!-- Tailwind CSS -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-  <!-- Alpine.js -->
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  {% block head %}{% endblock %}
-</head>
-<body class="h-full bg-gray-100 dark:bg-gray-900" x-data="{ isSidebarOpen: false }">
-  <!-- Sidebar -->
-  <div x-cloak
-       class="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out"
-       :class="{ '-translate-x-full': !isSidebarOpen, 'translate-x-0': isSidebarOpen }"
-       @click.away="isSidebarOpen = false"
-       aria-label="Main navigation"
-       x-bind:class="isSidebarOpen ? 'shadow-2xl' : ''">
-    <!-- Sidebar Content -->
+
+
+
+
+<!-- Sidebar Navigation -->
+<div class="hidden md:flex md:flex-shrink-0">
+  <div class="fixed md:relative z-40 bg-white dark:bg-gray-900 w-80 h-full border-r border-gray-100 dark:border-gray-800/50 flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out shadow-xl">
+    <!-- Gradient Accent -->
+    <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-purple-600"></div>
+    
+    <!-- Sidebar Content Container -->
     <div class="flex flex-col h-full">
       <!-- Sidebar Header -->
-      <div class="px-4 py-5 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-b from-gray-50 dark:from-gray-800 to-transparent">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <div class="flex-shrink-0">
-              <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-md">
-                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                </svg>
-              </div>
-            </div>
-            <div>
-              <h6 class="text-base font-bold text-gray-900 dark:text-white tracking-tight">
-                {% if current_user.is_superadmin() %}
-                  BHAPOS<span class="text-blue-600 dark:text-blue-400">Pro</span>
-                {% elif current_user.is_tenant() %}
-                  {{ business.name }}<span class="text-green-600 dark:text-green-400">Hub</span>
-                {% elif current_user.is_cashier() %}
-                  POS<span class="text-indigo-600 dark:text-indigo-400">Terminal</span>
-                {% endif %}
-              </h6>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">v2.4.1</p>
+      <div class="px-6 py-5 border-b border-gray-200/50 dark:border-gray-700/50">
+        <div class="flex items-center space-x-3">
+          <div class="flex-shrink-0">
+            <div class="h-10 w-10 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center shadow-md">
+              <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
             </div>
           </div>
-          <!-- Close Button for Mobile -->
-          <button class="md:hidden p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700" 
-                  @click="isSidebarOpen = false" 
-                  aria-label="Close sidebar">
-            <i class="fas fa-times text-lg"></i>
-          </button>
+          <div>
+            <h6 class="text-sm font-bold tracking-wider text-gray-800 dark:text-gray-200 uppercase">
+              {% if current_user.is_superadmin() %}{{BHAPOS}}<span class="text-indigo-600 dark:text-indigo-400">Pro</span>{% endif %}
+              {% if current_user.is_tenant() %}{{ business.name}}<span class="text-green-600 dark:text-green-400">Hub</span>{% endif %}
+              {% if current_user.is_cashier() %}POS<span class="text-blue-600 dark:text-blue-400">Terminal</span>{% endif %}
+            </h6>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">v2.4.1</p>
+          </div>
         </div>
       </div>
-
-      <!-- Scrollable Navigation -->
-      <div class="flex-1 flex flex-col overflow-y-auto custom-scrollbar px-4 py-6">
-        <nav class="space-y-2">
+      
+      <!-- Scrollable Content Area -->
+      <div class="flex-1 flex flex-col overflow-y-auto custom-scrollbar">
+        <!-- Primary Navigation -->
+        <nav class="flex-1 px-4 py-6 space-y-1">
           <!-- Dashboard Link -->
           {% if current_user.is_authenticated %}
-          <a href="{% if current_user.is_superadmin() %}{{ url_for('bhapos.superadmin_dashboard') }}{% else %}{{ url_for('bhapos.tenant_dashboard') }}{% endif %}" 
-             class="group relative flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:shadow-sm" 
-             :class="{ 'bg-blue-50 dark:bg-blue-900/30': $route === '{% if current_user.is_superadmin() %}{{ url_for('bhapos.superadmin_dashboard') }}{% else %}{{ url_for('bhapos.tenant_dashboard') }}{% endif %}' }">
-            <span class="absolute left-0 w-1 h-6 rounded-r-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            <span class="flex items-root justify-center w-8 h-8 mr-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-blue-600 dark:text-blue-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-all">
-              <i class="fas fa-tachometer-alt text-base"></i>
-            </span>
-            Dashboard
-            <span class="ml-auto inline-flex items-center justify-center h-5 px-2.5 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors">
-              <i class="fas fa-home text-xs mr-1"></i> Home
-            </span>
-          </a>
+          <div class="mb-6">
+            <a href="{% if current_user.is_superadmin() %}{{ url_for('bhapos.superadmin_dashboard') }}{% else %}{{ url_for('bhapos.tenant_dashboard') }}{% endif %}" 
+               class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                      text-gray-700 dark:text-gray-200 
+                      hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 dark:hover:from-gray-800 dark:hover:to-gray-800
+                      hover:shadow-sm">
+              <span class="absolute left-0 w-1 h-6 rounded-r-full bg-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+              <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-xl bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/30 text-blue-600 dark:text-blue-400 group-hover:from-blue-200 group-hover:to-blue-100 dark:group-hover:from-blue-900/50 dark:group-hover:to-blue-800/50 transition-all shadow-inner">
+                <i class="fas fa-tachometer-alt-fast text-sm"></i>
+              </span>
+              Dashboard
+              <span class="ml-auto inline-flex items-center justify-center h-5 px-2 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors">
+                <i class="fas fa-home mr-1 text-xs"></i> Home
+              </span>
+            </a>
+          </div>
           {% endif %}
-
-          <!-- Management Section with Collapsible Sub-Menu -->
-          <div x-data="{ isManagementOpen: false }" class="mt-6">
-            <button @click="isManagementOpen = !isManagementOpen" 
-                    class="w-full flex items-center px-3 py-2 text-xs font-semibold tracking-wider text-gray-500 dark:text-gray-400 uppercase hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
-              <span class="flex-1 text-left">Management</span>
-              <i class="fas" :class="isManagementOpen ? 'fa-chevron-down' : 'fa-chevron-right'" aria-hidden="true"></i>
-            </button>
-            <div x-show="isManagementOpen" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform -translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0" class="space-y-1 mt-2">
-              {% if current_user.is_superadmin() %}
+          
+          <!-- Role-Specific Navigation -->
+          <div class="space-y-2">
+            <div class="px-4 flex items-center">
+              <h4 class="text-xs font-bold tracking-wider text-gray-500 dark:text-gray-400 uppercase flex-1">
+                Management
+              </h4>
+              <span class="h-px flex-1 bg-gray-200 dark:bg-gray-700 ml-3"></span>
+            </div>
+            
+            {% if current_user.is_superadmin() %}
               <a href="{{ url_for('bhapos.create_business') }}" 
-                 class="group relative flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 text-gray-700 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:shadow-sm">
+                 class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                        text-gray-700 dark:text-gray-200 
+                        hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-indigo-50/50 dark:hover:from-gray-800 dark:hover:to-gray-800
+                        hover:shadow-sm">
                 <span class="absolute left-0 w-1 h-6 rounded-r-full bg-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-purple-600 dark:text-purple-400 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/50 transition-all">
-                  <i class="fas fa-building text-base"></i>
+                <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-xl bg-gradient-to-r from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-800/30 text-purple-600 dark:text-purple-400 group-hover:from-purple-200 group-hover:to-purple-100 dark:group-hover:from-purple-900/50 dark:group-hover:to-purple-800/50 transition-all shadow-inner">
+                  <i class="fas fa-building text-sm"></i>
                 </span>
                 Create Business
-                <span class="ml-auto inline-flex items-center justify-center h-5 w-5 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50 transition-colors">
+                <span class="ml-auto inline-flex items-center justify-center h-5 w-5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50 transition-colors">
                   <i class="fas fa-plus text-xs"></i>
                 </span>
               </a>
+              
               <a href="{{ url_for('bhapos.list_businesses') }}" 
-                 class="group relative flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:shadow-sm">
+                 class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                        text-gray-700 dark:text-gray-200 
+                        hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-blue-50/50 dark:hover:from-gray-800 dark:hover:to-gray-800
+                        hover:shadow-sm">
                 <span class="absolute left-0 w-1 h-6 rounded-r-full bg-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 transition-all">
-                  <i class="fas fa-list-ul text-base"></i>
+                <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-xl bg-gradient-to-r from-indigo-100 to-indigo-50 dark:from-indigo-900/30 dark:to-indigo-800/30 text-indigo-600 dark:text-indigo-400 group-hover:from-indigo-200 group-hover:to-indigo-100 dark:group-hover:from-indigo-900/50 dark:group-hover:to-indigo-800/50 transition-all shadow-inner">
+                  <i class="fas fa-list-ul text-sm"></i>
                 </span>
                 All Businesses
                 <span class="ml-auto inline-flex items-center justify-center h-5 px-2 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 transition-colors">
                   {{ business_count }}
                 </span>
               </a>
-              {% elif current_user.is_tenant() %}
+              
+            {% elif current_user.is_tenant() %}
               <a href="{{ url_for('bhapos.create_shop', business_id=current_user.business.id) }}" 
-                 class="group relative flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 text-gray-700 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-green-900/30 hover:shadow-sm">
+                 class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                        text-gray-700 dark:text-gray-200 
+                        hover:bg-gradient-to-r hover:from-green-50/50 hover:to-teal-50/50 dark:hover:from-gray-800 dark:hover:to-gray-800
+                        hover:shadow-sm">
                 <span class="absolute left-0 w-1 h-6 rounded-r-full bg-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-green-600 dark:text-green-400 group-hover:bg-green-100 dark:group-hover:bg-green-900/50 transition-all">
-                  <i class="fas fa-store text-base"></i>
+                <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-xl bg-gradient-to-r from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-800/30 text-green-600 dark:text-green-400 group-hover:from-green-200 group-hover:to-green-100 dark:group-hover:from-green-900/50 dark:group-hover:to-green-800/50 transition-all shadow-inner">
+                  <i class="fas fa-store text-sm"></i>
                 </span>
                 Create Shop
-                <span class="ml-auto inline-flex items-center justify-center h-5 w-5 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 group-hover:bg-green-200 dark:group-hover:bg-green-800/50 transition-colors">
+                <span class="ml-auto inline-flex items-center justify-center h-5 w-5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 group-hover:bg-green-200 dark:group-hover:bg-green-800/50 transition-colors">
                   <i class="fas fa-plus text-xs"></i>
                 </span>
               </a>
+              
               <a href="{{ url_for('bhapos.tenant_shops') }}" 
-                 class="group relative flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 text-gray-700 dark:text-gray-200 hover:bg-amber-50 dark:hover:bg-amber-900/30 hover:shadow-sm">
+                 class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                        text-gray-700 dark:text-gray-200 
+                        hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-orange-50/50 dark:hover:from-gray-800 dark:hover:to-gray-800
+                        hover:shadow-sm">
                 <span class="absolute left-0 w-1 h-6 rounded-r-full bg-amber-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-amber-600 dark:text-amber-400 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/50 transition-all">
-                  <i class="fas fa-th-list text-base"></i>
+                <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-xl bg-gradient-to-r from-amber-100 to-amber-50 dark:from-amber-900/30 dark:to-amber-800/30 text-amber-600 dark:text-amber-400 group-hover:from-amber-200 group-hover:to-amber-100 dark:group-hover:from-amber-900/50 dark:group-hover:to-amber-800/50 transition-all shadow-inner">
+                  <i class="fas fa-th-list text-sm"></i>
                 </span>
                 My Shops
                 <span class="ml-auto inline-flex items-center justify-center h-5 px-2 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 transition-colors">
                   {{ shop_count }}
                 </span>
               </a>
-              {% elif current_user.is_cashier() %}
+              
+            {% elif current_user.is_cashier() %}
               <a href="#" 
-                 class="group relative flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:shadow-sm">
+                 class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                        text-gray-700 dark:text-gray-200 
+                        hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-cyan-50/50 dark:hover:from-gray-800 dark:hover:to-gray-800
+                        hover:shadow-sm">
                 <span class="absolute left-0 w-1 h-6 rounded-r-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-blue-600 dark:text-blue-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-all">
-                  <i class="fas fa-cash-register text-base"></i>
+                <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-xl bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/30 text-blue-600 dark:text-blue-400 group-hover:from-blue-200 group-hover:to-blue-100 dark:group-hover:from-blue-900/50 dark:group-hover:to-blue-800/50 transition-all shadow-inner">
+                  <i class="fas fa-cash-register text-sm"></i>
                 </span>
                 POS Terminal
-                <span class="ml-auto inline-flex items-center justify-center h-5 px-2 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors">
+                <span class="ml-auto inline-flex items-center justify-center h-5 px-2 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors">
                   <i class="fas fa-bolt text-xs mr-1"></i> Live
                 </span>
               </a>
-              {% endif %}
-            </div>
+            {% endif %}
           </div>
-
-          <!-- System Section -->
-          <div class="mt-6">
-            <div class="px-3 flex items-center">
-              <h4 class="text-xs font-semibold tracking-wider text-gray-500 dark:text-gray-400 uppercase flex-1">System</h4>
+          
+          <!-- Secondary Navigation Group -->
+          <div class="mt-8 space-y-2">
+            <div class="px-4 flex items-center">
+              <h4 class="text-xs font-bold tracking-wider text-gray-500 dark:text-gray-400 uppercase flex-1">
+                System
+              </h4>
               <span class="h-px flex-1 bg-gray-200 dark:bg-gray-700 ml-3"></span>
             </div>
-            <div class="space-y-1 mt-2">
-              <a href="#" 
-                 class="group relative flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-sm">
-                <span class="absolute left-0 w-1 h-6 rounded-r-full bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 transition-all">
-                  <i class="fas fa-cog text-base"></i>
-                </span>
-                Settings
-              </a>
-              <a href="#" 
-                 class="group relative flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 text-gray-700 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/30 hover:shadow-sm">
-                <span class="absolute left-0 w-1 h-6 rounded-r-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400 group-hover:bg-red-100 dark:group-hover:bg-red-900/50 transition-all">
-                  <i class="fas fa-question-circle text-base"></i>
-                </span>
-                Help Center
-              </a>
-            </div>
+            
+            <a href="#" 
+               class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                      text-gray-700 dark:text-gray-200 
+                      hover:bg-gradient-to-r hover:from-gray-50/50 hover:to-gray-100/50 dark:hover:from-gray-800 dark:hover:to-gray-800
+                      hover:shadow-sm">
+              <span class="absolute left-0 w-1 h-6 rounded-r-full bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+              <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-xl bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700/30 text-gray-600 dark:text-gray-400 group-hover:from-gray-200 group-hover:to-gray-100 dark:group-hover:from-gray-700 dark:group-hover:to-gray-600/50 transition-all shadow-inner">
+                <i class="fas fa-cog text-sm"></i>
+              </span>
+              Settings
+            </a>
+            
+            <a href="#" 
+               class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200
+                      text-gray-700 dark:text-gray-200 
+                      hover:bg-gradient-to-r hover:from-red-50/50 hover:to-pink-50/50 dark:hover:from-gray-800 dark:hover:to-gray-800
+                      hover:shadow-sm">
+              <span class="absolute left-0 w-1 h-6 rounded-r-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+              <span class="flex items-center justify-center w-8 h-8 mr-3 rounded-xl bg-gradient-to-r from-red-100 to-red-50 dark:from-red-900/30 dark:to-red-800/30 text-red-600 dark:text-red-400 group-hover:from-red-200 group-hover:to-red-100 dark:group-hover:from-red-900/50 dark:group-hover:to-red-800/50 transition-all shadow-inner">
+                <i class="fas fa-question-circle text-sm"></i>
+              </span>
+              Help Center
+            </a>
           </div>
         </nav>
       </div>
-
+      
       <!-- User Section -->
-      <div class="px-4 py-4 border-t border-gray-200 dark:border-gray-700 bg-gradient-to-t from-gray-50 dark:from-gray-800 to-transparent">
+      <div class="px-4 py-4 border-t border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-gray-50/50 to-gray-100/50 dark:from-gray-800 dark:to-gray-800/80">
         <div class="flex items-center">
           <div class="flex-shrink-0">
-            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-md">
-              <span class="text-white font-medium text-base">{{ current_user.username[0].upper() }}</span>
+            <div class="h-10 w-10 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center shadow-md">
+              <span class="text-white font-medium">{{ current_user.username[0].upper() }}</span>
             </div>
           </div>
-          <div class="ml-3 truncate">
-            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ current_user.username }}</p>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ current_user.username }}</p>
             <p class="text-xs text-gray-500 dark:text-gray-400">
               {% if current_user.is_superadmin() %}Super Administrator{% endif %}
               {% if current_user.is_tenant() %}Business Owner{% endif %}
@@ -190,72 +198,41 @@
           </div>
           <div class="ml-auto">
             <a href="{{ url_for('auth.logout') }}" 
-               class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" 
-               title="Logout" 
-               aria-label="Logout">
-              <i class="fas fa-sign-out-alt text-base"></i>
+               class="flex items-center justify-center h-8 w-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+               title="Logout">
+              <i class="fas fa-sign-out-alt text-sm"></i>
             </a>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Main Content -->
-  <div class="flex flex-col h-full">
-    <!-- Top Bar (Mobile Toggle) -->
-    <div class="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="h-8 w-8 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-          <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-          </svg>
-        </div>
-        <h1 class="text-lg font-bold text-gray-900 dark:text-white">BHAPOS</h1>
-      </div>
-      <button @click="isSidebarOpen = true" 
-              class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700" 
-              aria-label="Open sidebar">
-        <i class="fas fa-bars text-lg"></i>
-      </button>
-    </div>
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.03);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.1);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.2);
+  }
+  .dark .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.03);
+  }
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+  }
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.2);
+  }
+</style>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto transition-all duration-300" :class="{ 'lg:ml-64': isSidebarOpen || window.innerWidth >= 768 }">
-      {% block content %}
-      {% endblock %}
-    </main>
-  </div>
 
-  <style>
-    .custom-scrollbar {
-      scrollbar-width: thin;
-      scrollbar-color: rgba(0,0,0,0.2) transparent;
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(0,0,0,0.2);
-      border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: rgba(0,0,0,0.3);
-    }
-    .dark .custom-scrollbar {
-      scrollbar-color: rgba(255,255,255,0.2) transparent;
-    }
-    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.2);
-    }
-    .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: rgba(255,255,255,0.3);
-    }
-
-    [x-cloak] { display: none; }
-  </style>
-</body>
-</html>
